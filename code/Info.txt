@@ -1,0 +1,51 @@
+DCOPF-able grids for the following conditions:
+	active power assignments of generators set to negative (consumer`s standpoint)
+	upper limits of active power for the generators set to 0
+	lower limits of active power for the generators set to active power assignment
+	active power assignments of static generators set to negative (consumer`s standpoint)
+	branch limits set to maximum	
+
+1-MVLV-semiurb-4.201-1-sw: Number of Buses = 165
+1-MVLV-semiurb-4.201-1-no_sw: Number of Buses = 163
+1-MVLV-semiurb-4.201-2-sw: Number of Buses = 165
+1-MVLV-semiurb-4.201-2-no_sw: Number of Buses = 163
+1-MVLV-semiurb-5.220-1-sw: Number of Buses = 232
+1-MVLV-semiurb-5.220-1-no_sw: Number of Buses = 230
+1-MVLV-semiurb-5.220-2-sw: Number of Buses = 232
+1-MVLV-semiurb-5.220-2-no_sw: Number of Buses = 230
+1-MVLV-comm-4.416-0-sw: Number of Buses = 150
+1-MVLV-comm-4.416-0-no_sw: Number of Buses = 146
+1-MVLV-comm-4.416-1-sw: Number of Buses = 153
+1-MVLV-comm-4.416-1-no_sw: Number of Buses = 149
+1-MVLV-comm-4.416-2-sw: Number of Buses = 154
+1-MVLV-comm-4.416-2-no_sw: Number of Buses = 150
+1-MVLV-comm-5.401-0-sw: Number of Buses = 217
+1-MVLV-comm-5.401-0-no_sw: Number of Buses = 213
+1-MVLV-comm-5.401-1-sw: Number of Buses = 220
+1-MVLV-comm-5.401-1-no_sw: Number of Buses = 216
+1-MVLV-comm-5.401-2-sw: Number of Buses = 221
+1-MVLV-comm-5.401-2-no_sw: Number of Buses = 217
+1-MV-semiurb--1-sw: Number of Buses = 122
+1-MV-semiurb--1-no_sw: Number of Buses = 120
+1-MV-semiurb--2-sw: Number of Buses = 122
+1-MV-semiurb--2-no_sw: Number of Buses = 120
+1-MV-comm--0-sw: Number of Buses = 107
+1-MV-comm--0-no_sw: Number of Buses = 103
+1-MV-comm--1-sw: Number of Buses = 110
+1-MV-comm--1-no_sw: Number of Buses = 106
+1-MV-comm--2-sw: Number of Buses = 111
+1-MV-comm--2-no_sw: Number of Buses = 107
+1-LV-semiurb4--0-sw: Number of Buses = 44
+1-LV-semiurb4--0-no_sw: Number of Buses = 44
+1-LV-semiurb4--1-sw: Number of Buses = 44
+1-LV-semiurb4--1-no_sw: Number of Buses = 44
+1-LV-semiurb5--0-sw: Number of Buses = 111
+1-LV-semiurb5--0-no_sw: Number of Buses = 111
+1-LV-semiurb5--1-sw: Number of Buses = 111
+1-LV-semiurb5--1-no_sw: Number of Buses = 111
+1-LV-semiurb5--2-sw: Number of Buses = 111
+1-LV-semiurb5--2-no_sw: Number of Buses = 111
+1-LV-urban6--0-sw: Number of Buses = 59
+1-LV-urban6--0-no_sw: Number of Buses = 59
+1-LV-urban6--1-sw: Number of Buses = 59
+1-LV-urban6--1-no_sw: Number of Buses = 59
