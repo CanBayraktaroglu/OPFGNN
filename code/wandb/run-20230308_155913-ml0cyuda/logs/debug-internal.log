@@ -1,0 +1,188 @@
+2023-03-08 15:59:13,996 INFO    StreamThr :8084 [internal.py:wandb_internal():90] W&B internal server running at pid: 8084, started at: 2023-03-08 15:59:13.996219
+2023-03-08 15:59:13,998 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: status
+2023-03-08 15:59:14,006 INFO    WriterThread:8084 [datastore.py:open_for_write():85] open: C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230308_155913-ml0cyuda\run-ml0cyuda.wandb
+2023-03-08 15:59:14,007 DEBUG   SenderThread:8084 [sender.py:send():336] send: header
+2023-03-08 15:59:14,051 DEBUG   SenderThread:8084 [sender.py:send():336] send: run
+2023-03-08 15:59:14,669 INFO    SenderThread:8084 [dir_watcher.py:__init__():216] watching files in: C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230308_155913-ml0cyuda\files
+2023-03-08 15:59:14,669 INFO    SenderThread:8084 [sender.py:_start_run_threads():1070] run started: ml0cyuda with start time 1678287553.996218
+2023-03-08 15:59:14,669 DEBUG   SenderThread:8084 [sender.py:send_request():363] send_request: summary_record
+2023-03-08 15:59:14,670 INFO    SenderThread:8084 [sender.py:_save_file():1321] saving file wandb-summary.json with policy end
+2023-03-08 15:59:14,670 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: check_version
+2023-03-08 15:59:14,671 DEBUG   SenderThread:8084 [sender.py:send_request():363] send_request: check_version
+2023-03-08 15:59:15,019 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: run_start
+2023-03-08 15:59:15,037 DEBUG   HandlerThread:8084 [system_info.py:__init__():31] System info init
+2023-03-08 15:59:15,037 DEBUG   HandlerThread:8084 [system_info.py:__init__():46] System info init done
+2023-03-08 15:59:15,037 INFO    HandlerThread:8084 [system_monitor.py:start():151] Starting system monitor
+2023-03-08 15:59:15,038 INFO    SystemMonitor:8084 [system_monitor.py:_start():116] Starting system asset monitoring threads
+2023-03-08 15:59:15,038 INFO    HandlerThread:8084 [system_monitor.py:probe():172] Collecting system info
+2023-03-08 15:59:15,041 INFO    SystemMonitor:8084 [interfaces.py:start():168] Started cpu
+2023-03-08 15:59:15,041 INFO    SystemMonitor:8084 [interfaces.py:start():168] Started disk
+2023-03-08 15:59:15,041 INFO    SystemMonitor:8084 [interfaces.py:start():168] Started gpu
+2023-03-08 15:59:15,042 INFO    SystemMonitor:8084 [interfaces.py:start():168] Started memory
+2023-03-08 15:59:15,048 INFO    SystemMonitor:8084 [interfaces.py:start():168] Started network
+2023-03-08 15:59:15,063 DEBUG   HandlerThread:8084 [system_info.py:probe():195] Probing system
+2023-03-08 15:59:15,064 DEBUG   HandlerThread:8084 [system_info.py:_probe_git():180] Probing git
+2023-03-08 15:59:15,137 DEBUG   HandlerThread:8084 [system_info.py:_probe_git():188] Probing git done
+2023-03-08 15:59:15,137 DEBUG   HandlerThread:8084 [system_info.py:probe():241] Probing system done
+2023-03-08 15:59:15,137 DEBUG   HandlerThread:8084 [system_monitor.py:probe():181] {'os': 'Windows-10-10.0.22000-SP0', 'python': '3.7.15', 'heartbeatAt': '2023-03-08T14:59:15.063224', 'startedAt': '2023-03-08T14:59:13.987298', 'docker': None, 'cuda': None, 'args': None, 'state': 'running', 'program': 'code/gnn.ipynb', 'root': 'C:/Users/canba/OneDrive/Masaüstü/OPFGNN', 'git': {'remote': 'https://github.com/CanBayraktaroglu/OPFGNN.git', 'commit': 'cba0f139d32bba27f9a445900afa35a9017d59c0'}, 'email': 'canbay96@gmail.com', 'host': 'MSI', 'username': 'canba', 'executable': 'C:\\Users\\canba\\anaconda3\\envs\\code\\python.exe', 'cpu_count': 14, 'cpu_count_logical': 20, 'cpu_freq': {'current': 2700.0, 'min': 0.0, 'max': 2700.0}, 'cpu_freq_per_core': [{'current': 2700.0, 'min': 0.0, 'max': 2700.0}], 'disk': {'total': 929.3798789978027, 'used': 764.8413581848145}, 'gpu': 'NVIDIA GeForce RTX 3080 Laptop GPU', 'gpu_count': 1, 'gpu_devices': [{'name': 'NVIDIA GeForce RTX 3080 Laptop GPU', 'memory_total': 8589934592}], 'memory': {'total': 31.70822525024414}}
+2023-03-08 15:59:15,138 INFO    HandlerThread:8084 [system_monitor.py:probe():182] Finished collecting system info
+2023-03-08 15:59:15,138 INFO    HandlerThread:8084 [system_monitor.py:probe():185] Publishing system info
+2023-03-08 15:59:15,138 DEBUG   HandlerThread:8084 [system_info.py:_save_pip():52] Saving list of pip packages installed into the current environment
+2023-03-08 15:59:15,139 DEBUG   HandlerThread:8084 [system_info.py:_save_pip():67] Saving pip packages done
+2023-03-08 15:59:15,139 DEBUG   HandlerThread:8084 [system_info.py:_save_conda():75] Saving list of conda packages installed into the current environment
+2023-03-08 15:59:15,672 INFO    Thread-17 :8084 [dir_watcher.py:_on_file_created():275] file/dir created: C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230308_155913-ml0cyuda\files\conda-environment.yaml
+2023-03-08 15:59:15,672 INFO    Thread-17 :8084 [dir_watcher.py:_on_file_created():275] file/dir created: C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230308_155913-ml0cyuda\files\requirements.txt
+2023-03-08 15:59:15,672 INFO    Thread-17 :8084 [dir_watcher.py:_on_file_created():275] file/dir created: C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230308_155913-ml0cyuda\files\wandb-summary.json
+2023-03-08 15:59:18,995 DEBUG   HandlerThread:8084 [system_info.py:_save_conda():86] Saving conda packages done
+2023-03-08 15:59:18,996 INFO    HandlerThread:8084 [system_monitor.py:probe():187] Finished publishing system info
+2023-03-08 15:59:18,999 DEBUG   SenderThread:8084 [sender.py:send():336] send: files
+2023-03-08 15:59:18,999 INFO    SenderThread:8084 [sender.py:_save_file():1321] saving file wandb-metadata.json with policy now
+2023-03-08 15:59:19,010 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: stop_status
+2023-03-08 15:59:19,010 DEBUG   SenderThread:8084 [sender.py:send_request():363] send_request: stop_status
+2023-03-08 15:59:19,014 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: pause
+2023-03-08 15:59:19,014 INFO    HandlerThread:8084 [handler.py:handle_request_pause():717] stopping system metrics thread or process
+2023-03-08 15:59:19,014 INFO    HandlerThread:8084 [system_monitor.py:finish():161] Stopping system monitor
+2023-03-08 15:59:19,014 DEBUG   SystemMonitor:8084 [system_monitor.py:_start():130] Starting system metrics aggregation loop
+2023-03-08 15:59:19,020 INFO    HandlerThread:8084 [interfaces.py:finish():175] Joined cpu
+2023-03-08 15:59:19,020 INFO    HandlerThread:8084 [interfaces.py:finish():175] Joined disk
+2023-03-08 15:59:19,020 DEBUG   SystemMonitor:8084 [system_monitor.py:_start():137] Finished system metrics aggregation loop
+2023-03-08 15:59:19,024 DEBUG   SystemMonitor:8084 [system_monitor.py:_start():141] Publishing last batch of metrics
+2023-03-08 15:59:19,043 INFO    HandlerThread:8084 [interfaces.py:finish():175] Joined gpu
+2023-03-08 15:59:19,043 INFO    HandlerThread:8084 [interfaces.py:finish():175] Joined memory
+2023-03-08 15:59:19,043 INFO    HandlerThread:8084 [interfaces.py:finish():175] Joined network
+2023-03-08 15:59:19,500 DEBUG   SenderThread:8084 [sender.py:send():336] send: telemetry
+2023-03-08 15:59:19,500 DEBUG   SenderThread:8084 [sender.py:send():336] send: stats
+2023-03-08 15:59:19,500 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: status_report
+2023-03-08 15:59:19,721 INFO    Thread-17 :8084 [dir_watcher.py:_on_file_modified():292] file/dir modified: C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230308_155913-ml0cyuda\files\conda-environment.yaml
+2023-03-08 15:59:19,722 INFO    Thread-17 :8084 [dir_watcher.py:_on_file_created():275] file/dir created: C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230308_155913-ml0cyuda\files\wandb-metadata.json
+2023-03-08 15:59:19,722 INFO    Thread-17 :8084 [dir_watcher.py:_on_file_created():275] file/dir created: C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230308_155913-ml0cyuda\files\output.log
+2023-03-08 15:59:19,930 INFO    wandb-upload_0:8084 [upload_job.py:push():138] Uploaded file C:\Users\canba\AppData\Local\Temp\tmph7s8a1q7wandb\ppvg23cr-wandb-metadata.json
+2023-03-08 15:59:21,735 INFO    Thread-17 :8084 [dir_watcher.py:_on_file_modified():292] file/dir modified: C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230308_155913-ml0cyuda\files\output.log
+2023-03-08 15:59:24,554 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: status_report
+2023-03-08 15:59:29,595 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: status_report
+2023-03-08 15:59:34,006 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-08 15:59:34,006 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-08 15:59:34,636 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: status_report
+2023-03-08 15:59:39,029 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-08 15:59:39,683 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: status_report
+2023-03-08 15:59:44,077 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-08 15:59:44,707 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: status_report
+2023-03-08 15:59:45,952 INFO    Thread-17 :8084 [dir_watcher.py:_on_file_modified():292] file/dir modified: C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230308_155913-ml0cyuda\files\config.yaml
+2023-03-08 15:59:49,115 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-08 15:59:50,180 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: status_report
+2023-03-08 15:59:54,155 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-08 15:59:55,231 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: status_report
+2023-03-08 15:59:59,211 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-08 16:00:00,275 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: status_report
+2023-03-08 16:00:04,243 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-08 16:00:05,322 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: status_report
+2023-03-08 16:00:09,263 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-08 16:00:10,341 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: status_report
+2023-03-08 16:00:14,310 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-08 16:00:14,690 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: resume
+2023-03-08 16:00:14,690 INFO    HandlerThread:8084 [handler.py:handle_request_resume():708] starting system metrics thread or process
+2023-03-08 16:00:14,690 INFO    HandlerThread:8084 [system_monitor.py:start():151] Starting system monitor
+2023-03-08 16:00:14,690 INFO    SystemMonitor:8084 [system_monitor.py:_start():116] Starting system asset monitoring threads
+2023-03-08 16:00:14,694 INFO    SystemMonitor:8084 [interfaces.py:start():168] Started cpu
+2023-03-08 16:00:14,695 INFO    SystemMonitor:8084 [interfaces.py:start():168] Started disk
+2023-03-08 16:00:14,695 INFO    SystemMonitor:8084 [interfaces.py:start():168] Started gpu
+2023-03-08 16:00:14,695 INFO    SystemMonitor:8084 [interfaces.py:start():168] Started memory
+2023-03-08 16:00:14,702 INFO    SystemMonitor:8084 [interfaces.py:start():168] Started network
+2023-03-08 16:00:14,706 DEBUG   SenderThread:8084 [sender.py:send():336] send: telemetry
+2023-03-08 16:00:14,708 DEBUG   SenderThread:8084 [sender.py:send():336] send: exit
+2023-03-08 16:00:14,708 INFO    SenderThread:8084 [sender.py:send_exit():559] handling exit code: 0
+2023-03-08 16:00:14,708 INFO    SenderThread:8084 [sender.py:send_exit():561] handling runtime: 4
+2023-03-08 16:00:14,710 INFO    SenderThread:8084 [sender.py:_save_file():1321] saving file wandb-summary.json with policy end
+2023-03-08 16:00:14,710 INFO    SenderThread:8084 [sender.py:send_exit():567] send defer
+2023-03-08 16:00:14,710 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: defer
+2023-03-08 16:00:14,710 INFO    HandlerThread:8084 [handler.py:handle_request_defer():170] handle defer: 0
+2023-03-08 16:00:14,711 DEBUG   SenderThread:8084 [sender.py:send_request():363] send_request: defer
+2023-03-08 16:00:14,711 INFO    SenderThread:8084 [sender.py:send_request_defer():583] handle sender defer: 0
+2023-03-08 16:00:14,711 INFO    SenderThread:8084 [sender.py:transition_state():587] send defer: 1
+2023-03-08 16:00:14,711 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: defer
+2023-03-08 16:00:14,711 INFO    HandlerThread:8084 [handler.py:handle_request_defer():170] handle defer: 1
+2023-03-08 16:00:14,711 DEBUG   SenderThread:8084 [sender.py:send_request():363] send_request: defer
+2023-03-08 16:00:14,711 INFO    SenderThread:8084 [sender.py:send_request_defer():583] handle sender defer: 1
+2023-03-08 16:00:14,711 INFO    SenderThread:8084 [sender.py:transition_state():587] send defer: 2
+2023-03-08 16:00:14,711 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: defer
+2023-03-08 16:00:14,711 INFO    HandlerThread:8084 [handler.py:handle_request_defer():170] handle defer: 2
+2023-03-08 16:00:14,712 INFO    HandlerThread:8084 [system_monitor.py:finish():161] Stopping system monitor
+2023-03-08 16:00:14,712 DEBUG   SystemMonitor:8084 [system_monitor.py:_start():130] Starting system metrics aggregation loop
+2023-03-08 16:00:14,712 DEBUG   SystemMonitor:8084 [system_monitor.py:_start():137] Finished system metrics aggregation loop
+2023-03-08 16:00:14,712 DEBUG   SystemMonitor:8084 [system_monitor.py:_start():141] Publishing last batch of metrics
+2023-03-08 16:00:14,712 INFO    HandlerThread:8084 [interfaces.py:finish():175] Joined cpu
+2023-03-08 16:00:14,713 INFO    HandlerThread:8084 [interfaces.py:finish():175] Joined disk
+2023-03-08 16:00:14,745 INFO    HandlerThread:8084 [interfaces.py:finish():175] Joined gpu
+2023-03-08 16:00:14,746 INFO    HandlerThread:8084 [interfaces.py:finish():175] Joined memory
+2023-03-08 16:00:14,746 INFO    HandlerThread:8084 [interfaces.py:finish():175] Joined network
+2023-03-08 16:00:14,746 DEBUG   SenderThread:8084 [sender.py:send_request():363] send_request: defer
+2023-03-08 16:00:14,746 INFO    SenderThread:8084 [sender.py:send_request_defer():583] handle sender defer: 2
+2023-03-08 16:00:14,746 INFO    SenderThread:8084 [sender.py:transition_state():587] send defer: 3
+2023-03-08 16:00:14,746 DEBUG   SenderThread:8084 [sender.py:send():336] send: stats
+2023-03-08 16:00:14,746 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: defer
+2023-03-08 16:00:14,746 INFO    HandlerThread:8084 [handler.py:handle_request_defer():170] handle defer: 3
+2023-03-08 16:00:14,747 DEBUG   SenderThread:8084 [sender.py:send_request():363] send_request: defer
+2023-03-08 16:00:14,747 INFO    SenderThread:8084 [sender.py:send_request_defer():583] handle sender defer: 3
+2023-03-08 16:00:14,747 INFO    SenderThread:8084 [sender.py:transition_state():587] send defer: 4
+2023-03-08 16:00:14,747 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: defer
+2023-03-08 16:00:14,747 INFO    HandlerThread:8084 [handler.py:handle_request_defer():170] handle defer: 4
+2023-03-08 16:00:14,747 DEBUG   SenderThread:8084 [sender.py:send_request():363] send_request: defer
+2023-03-08 16:00:14,747 INFO    SenderThread:8084 [sender.py:send_request_defer():583] handle sender defer: 4
+2023-03-08 16:00:14,747 INFO    SenderThread:8084 [sender.py:transition_state():587] send defer: 5
+2023-03-08 16:00:14,747 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: defer
+2023-03-08 16:00:14,747 INFO    HandlerThread:8084 [handler.py:handle_request_defer():170] handle defer: 5
+2023-03-08 16:00:14,748 DEBUG   SenderThread:8084 [sender.py:send():336] send: summary
+2023-03-08 16:00:14,748 INFO    SenderThread:8084 [sender.py:_save_file():1321] saving file wandb-summary.json with policy end
+2023-03-08 16:00:14,749 DEBUG   SenderThread:8084 [sender.py:send_request():363] send_request: defer
+2023-03-08 16:00:14,749 INFO    SenderThread:8084 [sender.py:send_request_defer():583] handle sender defer: 5
+2023-03-08 16:00:14,749 INFO    SenderThread:8084 [sender.py:transition_state():587] send defer: 6
+2023-03-08 16:00:14,749 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: defer
+2023-03-08 16:00:14,749 INFO    HandlerThread:8084 [handler.py:handle_request_defer():170] handle defer: 6
+2023-03-08 16:00:14,749 DEBUG   SenderThread:8084 [sender.py:send_request():363] send_request: defer
+2023-03-08 16:00:14,749 INFO    SenderThread:8084 [sender.py:send_request_defer():583] handle sender defer: 6
+2023-03-08 16:00:14,752 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: status_report
+2023-03-08 16:00:15,061 ERROR   SenderThread:8084 [internal_api.py:execute():245] 409 response executing GraphQL.
+2023-03-08 16:00:15,061 ERROR   SenderThread:8084 [internal_api.py:execute():246] {"errors":[{"message":"run cbml/OPF-GNN-Supervised-Homo/ml0cyuda was previously created and deleted; try a new run name","path":["upsertBucket"]}],"data":{"upsertBucket":null}}
+2023-03-08 16:00:15,183 INFO    Thread-17 :8084 [dir_watcher.py:_on_file_modified():292] file/dir modified: C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230308_155913-ml0cyuda\files\wandb-summary.json
+2023-03-08 16:00:15,713 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: poll_exit
+2023-03-08 16:00:16,358 ERROR   SenderThread:8084 [internal_api.py:execute():245] 409 response executing GraphQL.
+2023-03-08 16:00:16,358 ERROR   SenderThread:8084 [internal_api.py:execute():246] {"errors":[{"message":"run cbml/OPF-GNN-Supervised-Homo/ml0cyuda was previously created and deleted; try a new run name","path":["upsertBucket"]}],"data":{"upsertBucket":null}}
+2023-03-08 16:00:19,034 ERROR   SenderThread:8084 [internal_api.py:execute():245] 409 response executing GraphQL.
+2023-03-08 16:00:19,034 ERROR   SenderThread:8084 [internal_api.py:execute():246] {"errors":[{"message":"run cbml/OPF-GNN-Supervised-Homo/ml0cyuda was previously created and deleted; try a new run name","path":["upsertBucket"]}],"data":{"upsertBucket":null}}
+2023-03-08 16:00:19,034 INFO    SenderThread:8084 [retry.py:__call__():172] Retry attempt failed:
+Traceback (most recent call last):
+  File "C:\Users\canba\anaconda3\envs\code\lib\site-packages\wandb\sdk\lib\retry.py", line 131, in __call__
+    result = self._call_fn(*args, **kwargs)
+  File "C:\Users\canba\anaconda3\envs\code\lib\site-packages\wandb\sdk\internal\internal_api.py", line 242, in execute
+    return self.client.execute(*args, **kwargs)  # type: ignore
+  File "C:\Users\canba\anaconda3\envs\code\lib\site-packages\wandb\vendor\gql-0.2.0\wandb_gql\client.py", line 52, in execute
+    result = self._get_result(document, *args, **kwargs)
+  File "C:\Users\canba\anaconda3\envs\code\lib\site-packages\wandb\vendor\gql-0.2.0\wandb_gql\client.py", line 60, in _get_result
+    return self.transport.execute(document, *args, **kwargs)
+  File "C:\Users\canba\anaconda3\envs\code\lib\site-packages\wandb\vendor\gql-0.2.0\wandb_gql\transport\requests.py", line 39, in execute
+    request.raise_for_status()
+  File "C:\Users\canba\anaconda3\envs\code\lib\site-packages\requests\models.py", line 1021, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 409 Client Error: Conflict for url: https://api.wandb.ai/graphql
+2023-03-08 16:00:20,756 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-08 16:00:23,849 ERROR   SenderThread:8084 [internal_api.py:execute():245] 409 response executing GraphQL.
+2023-03-08 16:00:23,849 ERROR   SenderThread:8084 [internal_api.py:execute():246] {"errors":[{"message":"run cbml/OPF-GNN-Supervised-Homo/ml0cyuda was previously created and deleted; try a new run name","path":["upsertBucket"]}],"data":{"upsertBucket":null}}
+2023-03-08 16:00:25,761 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-08 16:00:30,805 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-08 16:00:32,638 ERROR   SenderThread:8084 [internal_api.py:execute():245] 409 response executing GraphQL.
+2023-03-08 16:00:32,638 ERROR   SenderThread:8084 [internal_api.py:execute():246] {"errors":[{"message":"run cbml/OPF-GNN-Supervised-Homo/ml0cyuda was previously created and deleted; try a new run name","path":["upsertBucket"]}],"data":{"upsertBucket":null}}
+2023-03-08 16:00:35,846 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-08 16:00:40,878 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-08 16:00:45,951 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-08 16:00:49,705 ERROR   SenderThread:8084 [internal_api.py:execute():245] 409 response executing GraphQL.
+2023-03-08 16:00:49,705 ERROR   SenderThread:8084 [internal_api.py:execute():246] {"errors":[{"message":"run cbml/OPF-GNN-Supervised-Homo/ml0cyuda was previously created and deleted; try a new run name","path":["upsertBucket"]}],"data":{"upsertBucket":null}}
+2023-03-08 16:00:50,983 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-08 16:00:56,031 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-08 16:01:01,079 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-08 16:01:06,139 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-08 16:01:11,178 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-08 16:01:16,248 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-08 16:01:21,294 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-08 16:01:24,905 ERROR   SenderThread:8084 [internal_api.py:execute():245] 409 response executing GraphQL.
+2023-03-08 16:01:24,905 ERROR   SenderThread:8084 [internal_api.py:execute():246] {"errors":[{"message":"run cbml/OPF-GNN-Supervised-Homo/ml0cyuda was previously created and deleted; try a new run name","path":["upsertBucket"]}],"data":{"upsertBucket":null}}
+2023-03-08 16:01:26,341 DEBUG   HandlerThread:8084 [handler.py:handle_request():144] handle_request: keepalive

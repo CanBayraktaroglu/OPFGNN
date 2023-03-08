@@ -2,15 +2,18 @@ from abc import ABC
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch import Tensor
 from torch_geometric.nn.conv import GraphConv, GCNConv, TransformerConv
 from torch_geometric.nn.conv import MessagePassing
 from torch_geometric.nn.models.basic_gnn import BasicGNN
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 from torch.nn import Linear, ModuleList
 from torch_geometric.nn.models.jumping_knowledge import JumpingKnowledge
-from torch_geometric.nn.resolver import (activation_resolver,normalization_resolver)
+from torch_geometric.nn.resolver import (activation_resolver, normalization_resolver)
+from torch_sparse import SparseTensor
 from tqdm import tqdm
 from torch_geometric.loader import NeighborLoader
+import copy
 
 """
 class GCNConv(MessagePassing, ABC):
@@ -65,7 +68,8 @@ class GCNNet(torch.nn.Module):
         return x
 """
 
-class GNN(BasicGNN, MessagePassing):
+
+class GNN(BasicGNN):
     r"""An abstract class for implementing basic GNN models.
 
     Args:
@@ -100,14 +104,18 @@ class GNN(BasicGNN, MessagePassing):
             :class:`torch_geometric.nn.conv.MessagePassing` layers.
         """
 
-    def __init__(self, in_channels: int, hidden_channels: int, num_layers: int, out_channels: Optional[int] = None, dropout: float = 0.0, jk: Optional[str] = None, **kwargs):
-        super(BasicGNN, self).__init__(aggr='add')
+
+    def __init__(self, in_channels: int, hidden_channels: int, num_layers: int, out_channels: Optional[int] = None,
+                 dropout: float = 0.0, norm: Union[str, Callable, None] = None, jk: Optional[str] = None, **kwargs):
+        super(BasicGNN, self).__init__()
         self.in_channels = in_channels
         self.hidden_channels = hidden_channels
         self.num_layers = num_layers
         self.dropout = dropout
-        self.act = "relu"
+        self.act = activation_resolver("relu", **({}))
+        self.act_first = True
         self.jk_mode = jk
+        self.norm = norm if isinstance(norm, str) else None
 
         if out_channels is not None:
             self.out_channels = out_channels
@@ -139,6 +147,19 @@ class GNN(BasicGNN, MessagePassing):
             self.convs.append(
                 self.init_conv(in_channels, hidden_channels, **kwargs))
 
+        self.norms = None
+        if norm is not None:
+            norm_layer = normalization_resolver(
+                norm,
+                hidden_channels,
+                **({}),
+            )
+            self.norms = ModuleList()
+            for _ in range(num_layers - 1):
+                self.norms.append(copy.deepcopy(norm_layer))
+            if jk is not None:
+                self.norms.append(copy.deepcopy(norm_layer))
+
         if jk is not None and jk != 'last':
             self.jk = JumpingKnowledge(jk, hidden_channels, num_layers)
 
@@ -147,8 +168,9 @@ class GNN(BasicGNN, MessagePassing):
                 in_channels = num_layers * hidden_channels
             else:
                 in_channels = hidden_channels
-            self.lin = Linear(in_channels, self.out_channels)
+            self.lin = Linear(in_channels, self.out_channels, bias=False, dtype=torch.float32)
 
+        self.bias = nn.Parameter(torch.tensor(self.out_channels, dtype=torch.float32))
         self.supports_edge_weight = True
         self.supports_edge_attr = False
         self.reset_parameters()
@@ -167,11 +189,15 @@ class GNN(BasicGNN, MessagePassing):
         if hasattr(self, 'lin'):
             self.lin.reset_parameters()
 
+        if hasattr(self, "bias"):
+            self.bias.data.zero_()
+
     def init_conv(self, in_channels: Union[int, Tuple[int, int]],
                   out_channels: int, **kwargs) -> MessagePassing:
         return GCNConv(in_channels, out_channels, **kwargs)
 
-    def forward(self, x, edge_index, edge_weight: Optional[torch.Tensor] = None, edge_attr: Optional[torch.Tensor] = None):
+    def forward(self, x, edge_index, edge_weight: Optional[torch.Tensor] = None,
+                edge_attr: Optional[torch.Tensor] = None):
         r"""
         Args:
             x (torch.Tensor): The input node features.
@@ -234,7 +260,7 @@ class GNN(BasicGNN, MessagePassing):
             pbar.set_description('Inference')
 
         x_all = loader.data.x.cpu()
-        loader.data.n_id = torch.arange(x_all.size(0))
+        loader.data.n_id = torch.arange(x_all.size(0), dtype=torch.float32)
 
         for i in range(self.num_layers):
             xs: List[torch.Tensor] = []

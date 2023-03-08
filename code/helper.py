@@ -7,11 +7,13 @@ import torchvision
 from torch_geometric.data import Data
 import sklearn.metrics as metrics
 from torch_geometric.utils import add_self_loops, to_undirected
+from torch_geometric.loader import DataLoader
 import pandas as pd
 import numpy as np
 import pandapower as pp
-import networkx as nx
-import pandapower.plotting as plot
+#import networkx as nx
+#import pandapower.plotting as plot
+import wandb
 
 import simbench as sb
 import os
@@ -276,8 +278,8 @@ def read_supervised_training_data(grid_name):
         edge_weights.append(Y_i)
 
     # Convert edge connections to undirected
-    edge_index, edge_weights = to_undirected(edge_index=torch.tensor(edge_index),
-                                             edge_attr=torch.tensor(normalize(edge_weights)),
+    edge_index, edge_weights = to_undirected(edge_index=torch.tensor(edge_index, dtype=torch.int),
+                                             edge_attr=torch.tensor(normalize(edge_weights), dtype=torch.float32),
                                              num_nodes=len(net.bus.index))
 
     # Add self loops to edge connections
@@ -306,24 +308,42 @@ def read_supervised_training_data(grid_name):
 
     for data in training:
         x = data[:num_busses].drop(columns=["Unnamed: 0"])
+        x_rows, x_cols = np.shape(x)
+        x = np.array(x).reshape(x_rows, x_cols)
         y = data[num_busses:].drop(columns=["Unnamed: 0"])
-        assert (len(x) == len(y))
+        y_rows, y_cols = np.shape(y)
+        y = np.array(y).reshape(y_rows, y_cols)
+        x = torch.tensor(data=x, dtype=torch.float32)
+        y = torch.tensor(data=y, dtype=torch.float32)
+        assert (np.shape(x)[0] == np.shape(y)[0] and np.shape(x)[1] == np.shape(y)[1])
         train_data.append(Data(x=x, y=y, edge_index=edge_index, edge_attr=edge_weights, num_nodes=num_busses))
 
     print("Processing Validation Data for " + grid_name + " ...")
 
     for data in validation:
         x = data[:num_busses].drop(columns=["Unnamed: 0"])
+        x_rows, x_cols = np.shape(x)
+        x = np.array(x).reshape(x_rows, x_cols)
         y = data[num_busses:].drop(columns=["Unnamed: 0"])
-        assert (len(x) == len(y))
+        y_rows, y_cols = np.shape(y)
+        y = np.array(y).reshape(y_rows, y_cols)
+        x = torch.tensor(data=x, dtype=torch.float32)
+        y = torch.tensor(data=y, dtype=torch.float32)
+        assert (np.shape(x)[0] == np.shape(y)[0] and np.shape(x)[1] == np.shape(y)[1])
         val_data.append(Data(x=x, y=y, edge_index=edge_index, edge_attr=edge_weights, num_nodes=num_busses))
 
     print("Processing Test Data for " + grid_name + " ...")
 
     for data in test:
         x = data[:num_busses].drop(columns=["Unnamed: 0"])
+        x_rows, x_cols = np.shape(x)
+        x = np.array(x).reshape(x_rows, x_cols)
         y = data[num_busses:].drop(columns=["Unnamed: 0"])
-        assert (len(x) == len(y))
+        y_rows, y_cols = np.shape(y)
+        y = np.array(y).reshape(y_rows, y_cols)
+        x = torch.tensor(data=x, dtype=torch.float32)
+        y = torch.tensor(data=y, dtype=torch.float32)
+        assert (np.shape(x)[0] == np.shape(y)[0] and np.shape(x)[1] == np.shape(y)[1])
         test_data.append(Data(x=x, y=y, edge_index=edge_index, edge_attr=edge_weights, num_nodes=num_busses))
 
     print("Processing complete.")
@@ -333,3 +353,49 @@ def read_supervised_training_data(grid_name):
 def normalize(lst):
     _sum_ = sum(lst)
     return [float(i) / _sum_ for i in lst]
+
+
+def train_one_epoch(epoch, optimizer, training_loader, model, loss_fn, edge_index, edge_weights):
+    running_loss = 0.0
+    last_loss = 0.0
+    last_idx = 0
+
+    # Here, we use enumerate(training_loader) instead of
+    # iter(training_loader) so that we can track the batch
+    # index and do some intra-epoch reporting
+    for i, data in enumerate(training_loader):
+        # Every data instance is an input + label pair
+        inputs, targets = data.x, data.y
+
+        # Zero your gradients for every batch!
+        optimizer.zero_grad()
+
+        # Make predictions for this batch
+        outputs = model(inputs, edge_index, edge_weights)
+
+        # Compute the loss and its gradients
+        loss = loss_fn(outputs, targets)
+        loss.backward()
+
+        # Adjust learning weights
+        optimizer.step()
+
+        # Gather data and report
+        last_loss = loss.item()
+        running_loss += last_loss
+        last_idx = i + 1
+
+        """
+        if i % 1000 == 999:
+            last_loss = running_loss / 1000 # loss per batch
+            print('  batch {} loss: {}'.format(i + 1, last_loss))
+            tb_x = epoch_index * len(training_loader) + i + 1
+            tb_writer.add_scalar('Loss/train', last_loss, tb_x)
+            running_loss = 0.
+        """
+
+    wandb.log({
+        'epoch': epoch,
+        'running_train_loss': running_loss/ last_idx
+
+    })
