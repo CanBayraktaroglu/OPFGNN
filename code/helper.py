@@ -14,7 +14,7 @@ import pandapower as pp
 #import networkx as nx
 #import pandapower.plotting as plot
 import wandb
-
+from sklearn.preprocessing import StandardScaler
 import simbench as sb
 import os
 import random
@@ -367,6 +367,10 @@ def train_one_epoch(epoch, optimizer, training_loader, model, loss_fn, edge_inde
         # Every data instance is an input + label pair
         inputs, targets = data.x, data.y
 
+        # Define Scaler and standardize inputs and targets
+        inputs = torch.tensor(StandardScaler().fit_transform(inputs), dtype=torch.float32)
+        targets = torch.tensor(StandardScaler().fit_transform(targets), dtype=torch.float32)
+
         # Zero your gradients for every batch!
         optimizer.zero_grad()
 
@@ -399,3 +403,45 @@ def train_one_epoch(epoch, optimizer, training_loader, model, loss_fn, edge_inde
         'running_train_loss': running_loss/ last_idx
 
     })
+
+
+def validate_one_epoch(epoch, validation_loader, model, loss_fn, edge_index, edge_weights):
+    running_loss = 0.0
+    last_loss = 0.0
+    last_idx = 0
+
+    # Here, we use enumerate(validation_loader) instead of
+    # iter(validation_loader) so that we can track the batch
+    # index and do some intra-epoch reporting
+    for i, data in enumerate(validation_loader):
+        inputs, targets = data.x, data.y
+
+        # Define Scaler and standardize inputs and targets
+        inputs = torch.tensor(StandardScaler().fit_transform(inputs), dtype=torch.float32)
+        targets = torch.tensor(StandardScaler().fit_transform(targets), dtype=torch.float32)
+
+        # Make predictions for this batch
+        outputs = model(inputs, edge_index, edge_weights)
+
+        # Compute the loss and its gradients
+        loss = loss_fn(outputs, targets)
+
+        # Gather data and report
+        last_loss = loss.item()
+        running_loss += last_loss
+        last_idx = i + 1
+
+    wandb.log({
+        'epoch': epoch,
+        'running_validation_loss': running_loss / last_idx
+
+    })
+
+
+def train_validate_one_epoch(epoch, optimizer, training_loader, validation_loader, model, loss_fn, edge_index, edge_weights):
+    print("Training the model for epoch " + str(epoch))
+    # Train for an epoch
+    train_one_epoch(epoch, optimizer, training_loader, model, loss_fn, edge_index, edge_weights)
+    print("Validating the model on unseen Datasets for epoch " + str(epoch))
+    # Validate for an epoch
+    validate_one_epoch(epoch, validation_loader, model, loss_fn, edge_index, edge_weights)
