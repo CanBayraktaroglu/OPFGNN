@@ -31,3 +31,4 @@ config: {'learning_rate': 0.001, 'architecture': 'Homo-GNN', 'dataset': '1-HV-mi
 2023-03-10 17:43:26,239 INFO    MainThread:25048 [wandb_init.py:_resume_backend():408] resuming backend
 2023-03-10 17:50:55,108 INFO    MainThread:25048 [jupyter.py:save_ipynb():379] not saving jupyter notebook
 2023-03-10 17:50:55,108 INFO    MainThread:25048 [wandb_init.py:_pause_backend():403] pausing backend
+2023-03-10 18:58:16,047 WARNING MsgRouterThr:25048 [router.py:message_loop():77] message_loop has been closed

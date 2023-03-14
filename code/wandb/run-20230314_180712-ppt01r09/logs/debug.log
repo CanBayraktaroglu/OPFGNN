@@ -1,0 +1,39 @@
+2023-03-14 18:07:12,561 INFO    MainThread:11664 [wandb_setup.py:_flush():68] Configure stats pid to 11664
+2023-03-14 18:07:12,561 INFO    MainThread:11664 [wandb_setup.py:_flush():68] Loading settings from C:\Users\canba\.config\wandb\settings
+2023-03-14 18:07:12,561 INFO    MainThread:11664 [wandb_setup.py:_flush():68] Loading settings from C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\settings
+2023-03-14 18:07:12,561 INFO    MainThread:11664 [wandb_setup.py:_flush():68] Loading settings from environment variables: {'_require_service': 'True'}
+2023-03-14 18:07:12,562 INFO    MainThread:11664 [wandb_setup.py:_flush():68] Inferring run settings from compute environment: {'program': '<python with no main file>'}
+2023-03-14 18:07:12,562 INFO    MainThread:11664 [wandb_init.py:_log_setup():492] Logging user logs to C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230314_180712-ppt01r09\logs\debug.log
+2023-03-14 18:07:12,562 INFO    MainThread:11664 [wandb_init.py:_log_setup():493] Logging internal logs to C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230314_180712-ppt01r09\logs\debug-internal.log
+2023-03-14 18:07:12,562 INFO    MainThread:11664 [wandb_init.py:init():532] calling init triggers
+2023-03-14 18:07:12,562 INFO    MainThread:11664 [wandb_init.py:init():539] wandb.init called with sweep_config: {}
+config: {'learning_rate': 0.001, 'architecture': 'Homo-GNN', 'num_layers': 4, 'dataset': '1-HV-mixed--0-no_sw', 'epochs': 400, 'activation': 'tanh', 'dropout': 0.0, 'in_channels': 4, 'output_channels': 4, 'hidden_channels': 512, 'channel type': 'GraphConv', 'norm': 'BatchNorm'}
+2023-03-14 18:07:12,562 INFO    MainThread:11664 [wandb_init.py:init():555] re-initializing run, found existing run on stack: wuimumln
+2023-03-14 18:07:12,563 INFO    MainThread:11664 [wandb_run.py:_finish():1854] finishing run cbml/OPF-GNN-Supervised-Homo/wuimumln
+2023-03-14 18:07:12,564 INFO    MainThread:11664 [jupyter.py:save_history():449] not saving jupyter history
+2023-03-14 18:07:12,564 INFO    MainThread:11664 [jupyter.py:save_ipynb():379] not saving jupyter notebook
+2023-03-14 18:07:12,564 INFO    MainThread:11664 [wandb_init.py:_jupyter_teardown():420] cleaning up jupyter logic
+2023-03-14 18:07:12,564 INFO    MainThread:11664 [wandb_run.py:_atexit_cleanup():2083] got exitcode: 0
+2023-03-14 18:07:12,565 INFO    MainThread:11664 [wandb_run.py:_restore():2066] restore
+2023-03-14 18:07:12,565 INFO    MainThread:11664 [wandb_run.py:_restore():2072] restore done
+2023-03-14 18:07:17,831 INFO    MainThread:11664 [wandb_run.py:_footer_history_summary_info():3442] rendering history
+2023-03-14 18:07:17,832 INFO    MainThread:11664 [wandb_run.py:_footer_history_summary_info():3474] rendering summary
+2023-03-14 18:07:17,835 INFO    MainThread:11664 [wandb_run.py:_footer_sync_info():3398] logging synced files
+2023-03-14 18:07:17,838 INFO    MainThread:11664 [wandb_init.py:init():588] starting backend
+2023-03-14 18:07:17,839 INFO    MainThread:11664 [wandb_init.py:init():592] setting up manager
+2023-03-14 18:07:17,840 INFO    MainThread:11664 [backend.py:_multiprocessing_setup():108] multiprocessing start_methods=spawn, using: spawn
+2023-03-14 18:07:17,841 INFO    MainThread:11664 [wandb_init.py:init():599] backend started and connected
+2023-03-14 18:07:17,850 INFO    MainThread:11664 [wandb_run.py:_label_probe_notebook():1203] probe notebook
+2023-03-14 18:07:17,850 INFO    MainThread:11664 [wandb_run.py:_label_probe_notebook():1213] Unable to probe notebook: 'NoneType' object has no attribute 'get'
+2023-03-14 18:07:17,850 INFO    MainThread:11664 [wandb_init.py:init():687] updated telemetry
+2023-03-14 18:07:17,897 INFO    MainThread:11664 [wandb_init.py:init():727] communicating run to backend with 60.0 second timeout
+2023-03-14 18:07:19,667 INFO    MainThread:11664 [wandb_run.py:_on_init():2134] communicating current version
+2023-03-14 18:07:20,031 INFO    MainThread:11664 [wandb_run.py:_on_init():2143] got version response upgrade_message: "wandb version 0.13.11 is available!  To upgrade, please run:\n $ pip install wandb --upgrade"
+
+2023-03-14 18:07:20,031 INFO    MainThread:11664 [wandb_init.py:init():775] starting run threads in backend
+2023-03-14 18:07:23,981 INFO    MainThread:11664 [wandb_run.py:_console_start():2114] atexit reg
+2023-03-14 18:07:23,981 INFO    MainThread:11664 [wandb_run.py:_redirect():1969] redirect: SettingsConsole.WRAP_RAW
+2023-03-14 18:07:23,981 INFO    MainThread:11664 [wandb_run.py:_redirect():2034] Wrapping output streams.
+2023-03-14 18:07:23,981 INFO    MainThread:11664 [wandb_run.py:_redirect():2059] Redirects installed.
+2023-03-14 18:07:23,981 INFO    MainThread:11664 [wandb_init.py:init():817] run started, returning control to user process
+2023-03-14 18:14:15,320 WARNING MsgRouterThr:11664 [router.py:message_loop():77] message_loop has been closed

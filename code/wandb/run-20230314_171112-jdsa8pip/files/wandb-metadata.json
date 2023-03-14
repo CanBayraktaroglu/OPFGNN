@@ -1,0 +1,49 @@
+{
+    "os": "Windows-10-10.0.22000-SP0",
+    "python": "3.7.15",
+    "heartbeatAt": "2023-03-14T16:11:13.072800",
+    "startedAt": "2023-03-14T16:11:12.102763",
+    "docker": null,
+    "cuda": null,
+    "args": null,
+    "state": "running",
+    "program": "code/gnn.ipynb",
+    "root": "C:/Users/canba/OneDrive/Masa\u00fcst\u00fc/OPFGNN",
+    "git": {
+        "remote": "https://github.com/CanBayraktaroglu/OPFGNN.git",
+        "commit": "30c9ed7567b00920da6a96ea2b222c04e08ddfb9"
+    },
+    "email": "canbay96@gmail.com",
+    "host": "MSI",
+    "username": "canba",
+    "executable": "C:\\Users\\canba\\anaconda3\\envs\\code\\python.exe",
+    "cpu_count": 14,
+    "cpu_count_logical": 20,
+    "cpu_freq": {
+        "current": 2700.0,
+        "min": 0.0,
+        "max": 2700.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2700.0,
+            "min": 0.0,
+            "max": 2700.0
+        }
+    ],
+    "disk": {
+        "total": 929.3798789978027,
+        "used": 763.230281829834
+    },
+    "gpu": "NVIDIA GeForce RTX 3080 Laptop GPU",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "NVIDIA GeForce RTX 3080 Laptop GPU",
+            "memory_total": 8589934592
+        }
+    ],
+    "memory": {
+        "total": 31.70822525024414
+    }
+}

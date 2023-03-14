@@ -106,14 +106,15 @@ class GNN(BasicGNN):
 
 
     def __init__(self, in_channels: int, hidden_channels: int, num_layers: int, out_channels: Optional[int] = None,
-                 dropout: float = 0.0, norm: Union[str, Callable, None] = None, jk: Optional[str] = None, **kwargs):
+                 dropout: float = 0.0, norm: Union[str, Callable, None] = None, jk: Optional[str] = None, layer_type="GCN", **kwargs):
         super(BasicGNN, self).__init__()
         self.in_channels = in_channels
+        self.layer_type=layer_type
         self.hidden_channels = hidden_channels
         self.num_layers = num_layers
         self.dropout = dropout
-        self.act = activation_resolver("relu", **({}))
-        self.act_first = True
+        self.act = activation_resolver("tanh", **({}))
+        self.act_first = False
         self.jk_mode = jk
         self.norm = norm if isinstance(norm, str) else None
 
@@ -171,8 +172,13 @@ class GNN(BasicGNN):
             self.lin = Linear(in_channels, self.out_channels, bias=False, dtype=torch.float32)
 
         self.bias = nn.Parameter(torch.tensor(self.out_channels, dtype=torch.float32))
-        self.supports_edge_weight = True
-        self.supports_edge_attr = False
+
+        if layer_type == "GCN" or layer_type == "GraphConv":
+            self.supports_edge_weight = True
+            self.supports_edge_attr = False
+        elif layer_type == "TransConv":
+            self.supports_edge_weight = False
+            self.supports_edge_attr = True
         self.reset_parameters()
 
     def reset_parameters(self):
@@ -194,7 +200,14 @@ class GNN(BasicGNN):
 
     def init_conv(self, in_channels: Union[int, Tuple[int, int]],
                   out_channels: int, **kwargs) -> MessagePassing:
-        return GCNConv(in_channels, out_channels, **kwargs)
+
+        if self.layer_type == "TransConv":
+            result = TransformerConv(in_channels, out_channels, **kwargs)#GCNConv(in_channels, out_channels, **kwargs)
+        elif self.layer_type == "GCN":
+            result = GCNConv(in_channels, out_channels, **kwargs)
+        else:
+            result = GraphConv(in_channels, out_channels, **kwargs)
+        return result
 
     def forward(self, x, edge_index, edge_weight: Optional[torch.Tensor] = None,
                 edge_attr: Optional[torch.Tensor] = None):
@@ -215,11 +228,11 @@ class GNN(BasicGNN):
             # weights and edge attributes to the module.
             if self.supports_edge_weight and self.supports_edge_attr:
                 x = self.convs[i](x, edge_index, edge_weight=edge_weight,
-                                  edge_attr=edge_attr)
+                                  edge_attr=edge_weight)
             elif self.supports_edge_weight:
                 x = self.convs[i](x, edge_index, edge_weight=edge_weight)
             elif self.supports_edge_attr:
-                x = self.convs[i](x, edge_index, edge_attr=edge_attr)
+                x = self.convs[i](x, edge_index, edge_attr=edge_weight)
             else:
                 x = self.convs[i](x, edge_index)
             if i == self.num_layers - 1 and self.jk_mode is None:

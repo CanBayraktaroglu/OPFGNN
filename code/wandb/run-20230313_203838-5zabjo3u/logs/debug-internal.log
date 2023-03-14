@@ -1,0 +1,92 @@
+2023-03-13 20:38:46,289 INFO    StreamThr :20496 [internal.py:wandb_internal():90] W&B internal server running at pid: 20496, started at: 2023-03-13 20:38:46.288667
+2023-03-13 20:38:46,290 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: status
+2023-03-13 20:38:46,291 INFO    WriterThread:20496 [datastore.py:open_for_write():85] open: C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230313_203838-5zabjo3u\run-5zabjo3u.wandb
+2023-03-13 20:38:46,291 DEBUG   SenderThread:20496 [sender.py:send():336] send: header
+2023-03-13 20:38:46,292 DEBUG   SenderThread:20496 [sender.py:send():336] send: run
+2023-03-13 20:38:46,884 INFO    SenderThread:20496 [dir_watcher.py:__init__():216] watching files in: C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230313_203838-5zabjo3u\files
+2023-03-13 20:38:46,884 INFO    SenderThread:20496 [sender.py:_start_run_threads():1070] run started: 5zabjo3u with start time 1678736325.300337
+2023-03-13 20:38:46,884 DEBUG   SenderThread:20496 [sender.py:send_request():363] send_request: summary_record
+2023-03-13 20:38:46,885 INFO    SenderThread:20496 [sender.py:_save_file():1321] saving file wandb-summary.json with policy end
+2023-03-13 20:38:46,886 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: check_version
+2023-03-13 20:38:46,886 DEBUG   SenderThread:20496 [sender.py:send_request():363] send_request: check_version
+2023-03-13 20:38:47,132 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: run_start
+2023-03-13 20:38:47,139 DEBUG   HandlerThread:20496 [system_info.py:__init__():31] System info init
+2023-03-13 20:38:47,139 DEBUG   HandlerThread:20496 [system_info.py:__init__():46] System info init done
+2023-03-13 20:38:47,139 INFO    HandlerThread:20496 [system_monitor.py:start():151] Starting system monitor
+2023-03-13 20:38:47,139 INFO    SystemMonitor:20496 [system_monitor.py:_start():116] Starting system asset monitoring threads
+2023-03-13 20:38:47,139 INFO    HandlerThread:20496 [system_monitor.py:probe():172] Collecting system info
+2023-03-13 20:38:47,143 INFO    SystemMonitor:20496 [interfaces.py:start():168] Started cpu
+2023-03-13 20:38:47,143 INFO    SystemMonitor:20496 [interfaces.py:start():168] Started disk
+2023-03-13 20:38:47,143 INFO    SystemMonitor:20496 [interfaces.py:start():168] Started gpu
+2023-03-13 20:38:47,143 INFO    SystemMonitor:20496 [interfaces.py:start():168] Started memory
+2023-03-13 20:38:47,151 DEBUG   HandlerThread:20496 [system_info.py:probe():195] Probing system
+2023-03-13 20:38:47,151 INFO    SystemMonitor:20496 [interfaces.py:start():168] Started network
+2023-03-13 20:38:47,153 DEBUG   HandlerThread:20496 [system_info.py:_probe_git():180] Probing git
+2023-03-13 20:38:47,234 DEBUG   HandlerThread:20496 [system_info.py:_probe_git():188] Probing git done
+2023-03-13 20:38:47,234 DEBUG   HandlerThread:20496 [system_info.py:probe():241] Probing system done
+2023-03-13 20:38:47,234 DEBUG   HandlerThread:20496 [system_monitor.py:probe():181] {'os': 'Windows-10-10.0.22000-SP0', 'python': '3.7.15', 'heartbeatAt': '2023-03-13T19:38:47.152022', 'startedAt': '2023-03-13T19:38:38.834773', 'docker': None, 'cuda': None, 'args': None, 'state': 'running', 'program': 'code/gnn.ipynb', 'root': 'C:/Users/canba/OneDrive/Masaüstü/OPFGNN', 'git': {'remote': 'https://github.com/CanBayraktaroglu/OPFGNN.git', 'commit': '30c9ed7567b00920da6a96ea2b222c04e08ddfb9'}, 'email': 'canbay96@gmail.com', 'host': 'MSI', 'username': 'canba', 'executable': 'C:\\Users\\canba\\anaconda3\\envs\\code\\python.exe', 'cpu_count': 14, 'cpu_count_logical': 20, 'cpu_freq': {'current': 2700.0, 'min': 0.0, 'max': 2700.0}, 'cpu_freq_per_core': [{'current': 2700.0, 'min': 0.0, 'max': 2700.0}], 'disk': {'total': 929.3798789978027, 'used': 763.1326332092285}, 'gpu': 'NVIDIA GeForce RTX 3080 Laptop GPU', 'gpu_count': 1, 'gpu_devices': [{'name': 'NVIDIA GeForce RTX 3080 Laptop GPU', 'memory_total': 8589934592}], 'memory': {'total': 31.70822525024414}}
+2023-03-13 20:38:47,234 INFO    HandlerThread:20496 [system_monitor.py:probe():182] Finished collecting system info
+2023-03-13 20:38:47,234 INFO    HandlerThread:20496 [system_monitor.py:probe():185] Publishing system info
+2023-03-13 20:38:47,234 DEBUG   HandlerThread:20496 [system_info.py:_save_pip():52] Saving list of pip packages installed into the current environment
+2023-03-13 20:38:47,235 DEBUG   HandlerThread:20496 [system_info.py:_save_pip():67] Saving pip packages done
+2023-03-13 20:38:47,235 DEBUG   HandlerThread:20496 [system_info.py:_save_conda():75] Saving list of conda packages installed into the current environment
+2023-03-13 20:38:47,899 INFO    Thread-31 :20496 [dir_watcher.py:_on_file_created():275] file/dir created: C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230313_203838-5zabjo3u\files\conda-environment.yaml
+2023-03-13 20:38:47,899 INFO    Thread-31 :20496 [dir_watcher.py:_on_file_created():275] file/dir created: C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230313_203838-5zabjo3u\files\wandb-summary.json
+2023-03-13 20:38:47,899 INFO    Thread-31 :20496 [dir_watcher.py:_on_file_created():275] file/dir created: C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230313_203838-5zabjo3u\files\requirements.txt
+2023-03-13 20:38:50,928 INFO    Thread-31 :20496 [dir_watcher.py:_on_file_modified():292] file/dir modified: C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230313_203838-5zabjo3u\files\conda-environment.yaml
+2023-03-13 20:38:50,998 DEBUG   HandlerThread:20496 [system_info.py:_save_conda():86] Saving conda packages done
+2023-03-13 20:38:50,999 INFO    HandlerThread:20496 [system_monitor.py:probe():187] Finished publishing system info
+2023-03-13 20:38:50,999 DEBUG   SenderThread:20496 [sender.py:send():336] send: files
+2023-03-13 20:38:50,999 INFO    SenderThread:20496 [sender.py:_save_file():1321] saving file wandb-metadata.json with policy now
+2023-03-13 20:38:51,009 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: stop_status
+2023-03-13 20:38:51,010 DEBUG   SenderThread:20496 [sender.py:send_request():363] send_request: stop_status
+2023-03-13 20:38:51,241 DEBUG   SenderThread:20496 [sender.py:send():336] send: telemetry
+2023-03-13 20:38:51,703 INFO    wandb-upload_0:20496 [upload_job.py:push():138] Uploaded file C:\Users\canba\AppData\Local\Temp\tmpq36p_ulhwandb\ozxbnj22-wandb-metadata.json
+2023-03-13 20:38:51,943 INFO    Thread-31 :20496 [dir_watcher.py:_on_file_created():275] file/dir created: C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230313_203838-5zabjo3u\files\output.log
+2023-03-13 20:38:51,943 INFO    Thread-31 :20496 [dir_watcher.py:_on_file_created():275] file/dir created: C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230313_203838-5zabjo3u\files\wandb-metadata.json
+2023-03-13 20:38:52,255 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: status_report
+2023-03-13 20:38:53,958 INFO    Thread-31 :20496 [dir_watcher.py:_on_file_modified():292] file/dir modified: C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230313_203838-5zabjo3u\files\output.log
+2023-03-13 20:38:57,297 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: status_report
+2023-03-13 20:39:02,336 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: status_report
+2023-03-13 20:39:06,021 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-13 20:39:06,021 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-13 20:39:07,391 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: status_report
+2023-03-13 20:39:11,079 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-13 20:39:12,447 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: status_report
+2023-03-13 20:39:16,138 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-13 20:39:17,495 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: status_report
+2023-03-13 20:39:18,230 INFO    Thread-31 :20496 [dir_watcher.py:_on_file_modified():292] file/dir modified: C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230313_203838-5zabjo3u\files\config.yaml
+2023-03-13 20:39:21,193 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-13 20:39:22,880 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: status_report
+2023-03-13 20:39:26,246 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-13 20:39:27,948 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: status_report
+2023-03-13 20:39:31,290 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-13 20:39:32,989 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: status_report
+2023-03-13 20:39:36,341 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-13 20:39:38,034 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: status_report
+2023-03-13 20:39:41,388 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-13 20:39:43,102 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: status_report
+2023-03-13 20:39:46,445 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-13 20:39:47,160 DEBUG   SystemMonitor:20496 [system_monitor.py:_start():130] Starting system metrics aggregation loop
+2023-03-13 20:39:47,160 DEBUG   SenderThread:20496 [sender.py:send():336] send: stats
+2023-03-13 20:39:48,176 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: status_report
+2023-03-13 20:39:51,498 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-13 20:39:53,230 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: status_report
+2023-03-13 20:39:56,569 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-13 20:39:58,302 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: status_report
+2023-03-13 20:40:01,612 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-13 20:40:03,375 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: status_report
+2023-03-13 20:40:06,669 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-13 20:40:08,406 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: status_report
+2023-03-13 20:40:11,713 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-13 20:40:13,458 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: status_report
+2023-03-13 20:40:16,743 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-13 20:40:17,164 DEBUG   SenderThread:20496 [sender.py:send():336] send: stats
+2023-03-13 20:40:19,177 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: status_report
+2023-03-13 20:40:21,797 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-13 20:40:24,233 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: status_report
+2023-03-13 20:40:26,844 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-13 20:40:29,293 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: status_report
+2023-03-13 20:40:31,914 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: keepalive
+2023-03-13 20:40:34,351 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: status_report
+2023-03-13 20:40:36,944 DEBUG   HandlerThread:20496 [handler.py:handle_request():144] handle_request: keepalive
