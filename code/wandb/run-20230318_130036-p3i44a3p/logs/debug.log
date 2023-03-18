@@ -1,0 +1,70 @@
+2023-03-18 13:00:36,293 INFO    MainThread:25416 [wandb_setup.py:_flush():68] Configure stats pid to 25416
+2023-03-18 13:00:36,293 INFO    MainThread:25416 [wandb_setup.py:_flush():68] Loading settings from C:\Users\canba\.config\wandb\settings
+2023-03-18 13:00:36,293 INFO    MainThread:25416 [wandb_setup.py:_flush():68] Loading settings from C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\settings
+2023-03-18 13:00:36,293 INFO    MainThread:25416 [wandb_setup.py:_flush():68] Loading settings from environment variables: {'_require_service': 'True'}
+2023-03-18 13:00:36,293 INFO    MainThread:25416 [wandb_setup.py:_flush():68] Inferring run settings from compute environment: {'program': '<python with no main file>'}
+2023-03-18 13:00:36,294 INFO    MainThread:25416 [wandb_init.py:_log_setup():492] Logging user logs to C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230318_130036-p3i44a3p\logs\debug.log
+2023-03-18 13:00:36,294 INFO    MainThread:25416 [wandb_init.py:_log_setup():493] Logging internal logs to C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230318_130036-p3i44a3p\logs\debug-internal.log
+2023-03-18 13:00:36,294 INFO    MainThread:25416 [wandb_init.py:_jupyter_setup():438] configuring jupyter hooks <wandb.sdk.wandb_init._WandbInit object at 0x000002896C7D03C8>
+2023-03-18 13:00:36,294 INFO    MainThread:25416 [wandb_init.py:init():532] calling init triggers
+2023-03-18 13:00:36,294 INFO    MainThread:25416 [wandb_init.py:init():539] wandb.init called with sweep_config: {}
+config: {'learning_rate': 0.0001, 'architecture': 'Homo-GNN', 'num_layers': 3, 'dataset': '1-HV-mixed--0-no_sw', 'epochs': 400, 'activation': 'tanh', 'dropout': 0.1, 'in_channels': 4, 'output_channels': 4, 'hidden_channels': 186, 'channel type': 'TransConv', 'norm': 'BatchNorm'}
+2023-03-18 13:00:36,294 INFO    MainThread:25416 [wandb_init.py:init():588] starting backend
+2023-03-18 13:00:36,294 INFO    MainThread:25416 [wandb_init.py:init():592] setting up manager
+2023-03-18 13:00:36,296 INFO    MainThread:25416 [backend.py:_multiprocessing_setup():108] multiprocessing start_methods=spawn, using: spawn
+2023-03-18 13:00:36,300 INFO    MainThread:25416 [wandb_init.py:init():599] backend started and connected
+2023-03-18 13:00:36,311 INFO    MainThread:25416 [wandb_run.py:_label_probe_notebook():1203] probe notebook
+2023-03-18 13:00:36,311 INFO    MainThread:25416 [wandb_run.py:_label_probe_notebook():1213] Unable to probe notebook: 'NoneType' object has no attribute 'get'
+2023-03-18 13:00:36,312 INFO    MainThread:25416 [wandb_init.py:init():687] updated telemetry
+2023-03-18 13:00:36,356 INFO    MainThread:25416 [wandb_init.py:init():727] communicating run to backend with 60.0 second timeout
+2023-03-18 13:00:36,930 INFO    MainThread:25416 [wandb_run.py:_on_init():2134] communicating current version
+2023-03-18 13:00:37,182 INFO    MainThread:25416 [wandb_run.py:_on_init():2143] got version response upgrade_message: "wandb version 0.14.0 is available!  To upgrade, please run:\n $ pip install wandb --upgrade"
+
+2023-03-18 13:00:37,182 INFO    MainThread:25416 [wandb_init.py:init():775] starting run threads in backend
+2023-03-18 13:00:41,372 INFO    MainThread:25416 [wandb_run.py:_console_start():2114] atexit reg
+2023-03-18 13:00:41,373 INFO    MainThread:25416 [wandb_run.py:_redirect():1969] redirect: SettingsConsole.WRAP_RAW
+2023-03-18 13:00:41,373 INFO    MainThread:25416 [wandb_run.py:_redirect():2034] Wrapping output streams.
+2023-03-18 13:00:41,373 INFO    MainThread:25416 [wandb_run.py:_redirect():2059] Redirects installed.
+2023-03-18 13:00:41,373 INFO    MainThread:25416 [wandb_init.py:init():817] run started, returning control to user process
+2023-03-18 13:00:41,376 INFO    MainThread:25416 [jupyter.py:save_ipynb():379] not saving jupyter notebook
+2023-03-18 13:00:41,376 INFO    MainThread:25416 [wandb_init.py:_pause_backend():403] pausing backend
+2023-03-18 13:01:28,130 INFO    MainThread:25416 [wandb_init.py:_resume_backend():408] resuming backend
+2023-03-18 13:10:17,169 INFO    MainThread:25416 [jupyter.py:save_ipynb():379] not saving jupyter notebook
+2023-03-18 13:10:17,169 INFO    MainThread:25416 [wandb_init.py:_pause_backend():403] pausing backend
+2023-03-18 13:16:19,237 INFO    MainThread:25416 [wandb_init.py:_resume_backend():408] resuming backend
+2023-03-18 13:16:19,271 INFO    MainThread:25416 [jupyter.py:save_ipynb():379] not saving jupyter notebook
+2023-03-18 13:16:19,271 INFO    MainThread:25416 [wandb_init.py:_pause_backend():403] pausing backend
+2023-03-18 13:16:22,142 INFO    MainThread:25416 [wandb_init.py:_resume_backend():408] resuming backend
+2023-03-18 13:16:22,145 INFO    MainThread:25416 [jupyter.py:save_ipynb():379] not saving jupyter notebook
+2023-03-18 13:16:22,145 INFO    MainThread:25416 [wandb_init.py:_pause_backend():403] pausing backend
+2023-03-18 13:16:25,269 INFO    MainThread:25416 [wandb_init.py:_resume_backend():408] resuming backend
+2023-03-18 13:16:25,273 INFO    MainThread:25416 [jupyter.py:save_ipynb():379] not saving jupyter notebook
+2023-03-18 13:16:25,273 INFO    MainThread:25416 [wandb_init.py:_pause_backend():403] pausing backend
+2023-03-18 13:18:15,892 INFO    MainThread:25416 [wandb_init.py:_resume_backend():408] resuming backend
+2023-03-18 13:18:15,906 INFO    MainThread:25416 [jupyter.py:save_ipynb():379] not saving jupyter notebook
+2023-03-18 13:18:15,906 INFO    MainThread:25416 [wandb_init.py:_pause_backend():403] pausing backend
+2023-03-18 13:19:24,364 INFO    MainThread:25416 [wandb_init.py:_resume_backend():408] resuming backend
+2023-03-18 13:19:24,376 INFO    MainThread:25416 [jupyter.py:save_ipynb():379] not saving jupyter notebook
+2023-03-18 13:19:24,376 INFO    MainThread:25416 [wandb_init.py:_pause_backend():403] pausing backend
+2023-03-18 13:19:34,833 INFO    MainThread:25416 [wandb_init.py:_resume_backend():408] resuming backend
+2023-03-18 13:19:34,849 INFO    MainThread:25416 [wandb_setup.py:_flush():68] Configure stats pid to 25416
+2023-03-18 13:19:34,849 INFO    MainThread:25416 [wandb_setup.py:_flush():68] Loading settings from C:\Users\canba\.config\wandb\settings
+2023-03-18 13:19:34,849 INFO    MainThread:25416 [wandb_setup.py:_flush():68] Loading settings from C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\settings
+2023-03-18 13:19:34,850 INFO    MainThread:25416 [wandb_setup.py:_flush():68] Loading settings from environment variables: {'_require_service': 'True'}
+2023-03-18 13:19:34,850 INFO    MainThread:25416 [wandb_setup.py:_flush():68] Inferring run settings from compute environment: {'program': '<python with no main file>'}
+2023-03-18 13:19:34,850 INFO    MainThread:25416 [wandb_init.py:_log_setup():492] Logging user logs to C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230318_131934-ilmn9zlz\logs\debug.log
+2023-03-18 13:19:34,850 INFO    MainThread:25416 [wandb_init.py:_log_setup():493] Logging internal logs to C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\wandb\run-20230318_131934-ilmn9zlz\logs\debug-internal.log
+2023-03-18 13:19:34,850 INFO    MainThread:25416 [wandb_init.py:init():532] calling init triggers
+2023-03-18 13:19:34,851 INFO    MainThread:25416 [wandb_init.py:init():539] wandb.init called with sweep_config: {}
+config: {'learning_rate': 0.0001, 'architecture': 'Homo-GNN', 'num_layers': 4, 'dataset': '1-HV-mixed--0-no_sw', 'epochs': 400, 'activation': 'tanh', 'dropout': 0.0, 'in_channels': 4, 'output_channels': 4, 'hidden_channels': 186, 'channel type': 'TransConv', 'norm': 'BatchNorm'}
+2023-03-18 13:19:34,851 INFO    MainThread:25416 [wandb_init.py:init():555] re-initializing run, found existing run on stack: p3i44a3p
+2023-03-18 13:19:34,852 INFO    MainThread:25416 [wandb_run.py:_finish():1854] finishing run cbml/OPF-GNN-Supervised-Homo/p3i44a3p
+2023-03-18 13:19:34,853 INFO    MainThread:25416 [jupyter.py:save_history():449] not saving jupyter history
+2023-03-18 13:19:34,853 INFO    MainThread:25416 [jupyter.py:save_ipynb():379] not saving jupyter notebook
+2023-03-18 13:19:34,853 INFO    MainThread:25416 [wandb_init.py:_jupyter_teardown():420] cleaning up jupyter logic
+2023-03-18 13:19:34,853 INFO    MainThread:25416 [wandb_run.py:_atexit_cleanup():2083] got exitcode: 0
+2023-03-18 13:19:34,854 INFO    MainThread:25416 [wandb_run.py:_restore():2066] restore
+2023-03-18 13:19:34,854 INFO    MainThread:25416 [wandb_run.py:_restore():2072] restore done
+2023-03-18 13:19:39,272 INFO    MainThread:25416 [wandb_run.py:_footer_history_summary_info():3442] rendering history
+2023-03-18 13:19:39,272 INFO    MainThread:25416 [wandb_run.py:_footer_history_summary_info():3474] rendering summary
+2023-03-18 13:19:39,277 INFO    MainThread:25416 [wandb_run.py:_footer_sync_info():3398] logging synced files

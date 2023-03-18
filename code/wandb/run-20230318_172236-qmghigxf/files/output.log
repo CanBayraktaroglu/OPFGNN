@@ -1,0 +1,857 @@
+<xml><var name="_dummy_ipython_val"  />
+<var name="_dummy_special_var"  />
+<var name="activation" type="str" qualifier="builtins" value="tanh" />
+<var name="dropout" type="float" qualifier="builtins" value="0.0" />
+<var name="edge_attr" type="ndarray" qualifier="numpy" value="%5B%5B-0.26449818 -0.15213944%5D%2C %5B 2.73238907  2.72434464%5D%2C %5B 1.30555846  1.35483854%5D%2C %5B-0.52353861 -0.40077268%5D%2C %5B 1.21484428  1.26776878%5D%2C %5B 1.43668371  1.48069563%5D%2C %5B-0.68137924 -0.55227188%5D%2C %5B 0.69888347  0.77253726%5D%2C %5B-0.36121288 -0.24496855%5D%2C %5B-0.64956801 -0.52173871%5D%2C %5B-0.23380719 -0.12268149%5D%2C %5B 0.5412435   0.62123074%5D%2C %5B-0.64189793 -0.51437677%5D%2C %5B-0.75277316 -0.62079747%5D%2C %5B-0.39046635 -0.27304671%5D%2C %5B-0.23380719 -0.12268149%5D%2C %5B-0.25454403 -0.14258519%5D%2C %5B-0.62364326 -0.4968555 %5D%2C %5B-0.62390681 -0.49710847%5D%2C %5B 0.42431276  0.50899779%5D%2C %5B 6.50797314  6.34824054%5D%2C %5B-0.18124742 -0.07223336%5D%2C %5B 0.1619665   0.25719157%5D%2C %5B-0.56475459 -0.44033273%5D%2C %5B 0.25134439  0.34297864%5D%2C %5B 0.03991163  0.14004042%5D%2C %5B-0.44887372 -0.32910751%5D%2C %5B 1.04600209  1.10571015%5D%2C %5B-0.73065278 -0.59956581%5D%2C %5B-0.70238535 -0.62392188%5D%2C %5B-0.07229979  0.03233719%5D%2C %5B-0.58560321 -0.46034375%5D%2C %5B 1.30093716  1.35040275%5D%2C %5B 1.82977173  1.85799112%5D%2C %5B 0.5412435   0.62123074%5D%2C %5B 1.30093716  1.35040275%5D%2C %5B 0.25842982  0.34977943%5D%2C ..." isContainer="True" shape="(186, 2)" />
+<var name="edge_index" type="Tensor" qualifier="torch" value="tensor%28%5B%5B 3%2C  3%2C  3%2C  4%2C  5%2C  5%2C  5%2C  5%2C  5%2C  5%2C  6%2C  6%2C  6%2C  6%2C  6%2C  7%2C  7%2C  8%2C%0A          9%2C 10%2C 10%2C 10%2C 10%2C 11%2C 12%2C 12%2C 13%2C 14%2C 14%2C 15%2C 16%2C 16%2C 17%2C 17%2C 18%2C 18%2C%0A         19%2C 20%2C 21%2C 22%2C 23%2C 24%2C 24%2C 25%2C 25%2C 26%2C 26%2C 26%2C 27%2C 27%2C 27%2C 28%2C 29%2C 29%2C%0A         29%2C 30%2C 30%2C 31%2C 31%2C 32%2C 32%2C 33%2C 33%2C 34%2C 34%2C 34%2C 35%2C 36%2C 37%2C 37%2C 38%2C 38%2C%0A         38%2C 39%2C 39%2C 39%2C 40%2C 40%2C 41%2C 41%2C 41%2C 42%2C 43%2C 43%2C 43%2C 44%2C 44%2C 44%2C 45%2C 46%2C%0A         46%2C 46%2C 47%2C 48%2C 48%2C 48%2C 49%2C 50%2C 50%2C 50%2C 51%2C 51%2C 52%2C 52%2C 53%2C 53%2C 53%2C 54%2C%0A         55%2C 55%2C 56%2C 57%2C 57%2C 58%2C 58%2C 59%2C 60%2C 61%2C 61%2C 62%2C 63%2C 63%2C  0%2C  1%2C  2%2C  3%2C%0A          4%2C  5%2C  6%2C  7%2C  8%2C  9%2C 10%2C 11%2C 12%2C 13%2C 14%2C 15%2C 16%2C 17%2C 18%2C 19%2C 20%2C 21%2C%0A         22%2C 23%2C 24%2C 25%2C 26%2C 27%2C 28%2C 29%2C 30%2C 31%2C 32%2C 33%2C 34%2C 35%2C 36%2C 37%2C 38%2C 39%2C%0A         40%2C 41%2C 42%2C 43%2C 44%2C 45%2C 46%2C 47%2C 48%2C 49%2C 50%2C 51%2C 52%2C 53%2C 54%2C 55%2C 56%2C 57%2C%0A         58%2C 59%2C 60%2C 61%2C 62%2C 63%5D%2C%0A        %5B24%2C 25%2C 50%2C 39%2C 26%2C 29%2C 33%2C 38%2C 40%2C 51%2C  7%2C 18%2C 37%2C 54%2C 63%2C  6%2C 39%2C 43%2C%0A         41%2C 28%2C 34%2C 44%2C 62%2C 38%2C 20%2C 27%2C 26%2C 25%2C 32%2C 40%2C 45%2C 48%2C 18%2C 38%2C  6..." isContainer="True" shape="(2, 186)" />
+<var name="grid_name" type="str" qualifier="builtins" value="1-HV-mixed--0-no_sw" />
+<var name="hidden_channels" type="int" qualifier="builtins" value="256" />
+<var name="i" type="int" qualifier="builtins" value="199" />
+<var name="in_channels" type="int" qualifier="builtins" value="4" />
+<var name="jk" type="str" qualifier="builtins" value="last" />
+<var name="layer_type" type="str" qualifier="builtins" value="TransConv" />
+<var name="loss" type="MSELoss" qualifier="torch.nn.modules.loss" value="MSELoss%28%29" isContainer="True" />
+<var name="lr" type="float" qualifier="builtins" value="0.0001" />
+<var name="model" type="GNN" qualifier="gnn" value="GNN%284%2C 4%2C num_layers=3%29" isContainer="True" />
+<var name="name" type="str" qualifier="builtins" value="lin.weight" />
+<var name="num_epochs" type="int" qualifier="builtins" value="400" />
+<var name="num_layers" type="int" qualifier="builtins" value="3" />
+<var name="optimizer" type="Adam" qualifier="torch.optim.adam" value="Adam %28%0AParameter Group 0%0A    amsgrad%3A False%0A    betas%3A %280.9%2C 0.999%29%0A    capturable%3A False%0A    differentiable%3A False%0A    eps%3A 1e-08%0A    foreach%3A None%0A    fused%3A False%0A    lr%3A 0.0001%0A    maximize%3A False%0A    weight_decay%3A 0%0A%29" isContainer="True" />
+<var name="out_channels" type="int" qualifier="builtins" value="4" />
+<var name="output" type="ndarray" qualifier="numpy" value="%5B%5B 1.09933925e%2B00  2.10566921e%2B01  1.84152786e%2B02 -3.42756348e%2B01%5D%2C %5B 1.09229040e%2B00  1.01957843e-01  6.89556580e%2B02 -3.31201904e%2B02%5D%2C %5B 1.09953165e%2B00  2.07833881e%2B01 -1.75603371e%2B01 -7.49734573e%2B01%5D%2C %5B 1.06715345e%2B00  2.05628185e%2B01 -4.20932680e-01  3.14781442e-04%5D%2C %5B 1.08365047e%2B00  2.07371788e%2B01  5.50987387e%2B00  8.56409848e-01%5D%2C %5B 1.01922977e%2B00  1.14192410e%2B01  1.81710243e%2B00  8.54473412e-01%5D%2C %5B 1.08624065e%2B00  2.03397350e%2B01 -4.02286768e%2B00  1.29198205e%2B00%5D%2C %5B 1.08566988e%2B00  2.04955196e%2B01 -1.79019604e%2B01  1.56717002e%2B00%5D%2C %5B 1.08292019e%2B00  2.09654827e%2B01 -3.77145314e%2B00  8.34532082e-01%5D%2C %5B 1.01642907e%2B00  1.14980307e%2B01  7.88913298e%2B00  1.25855656e%2B01%5D%2C %5B 1.09227908e%2B00  2.37616081e%2B01 -1.50807800e%2B02  6.37414753e-01%5D%2C %5B 1.03130460e%2B00  1.37130375e%2B01 -1.24285746e%2B01  5.97271395e%2B00%5D%2C %5B 1.03254604e%2B00  1.60284500e%2B01 -1.28478531e%2B02  1.21871376e%2B01%5D%2C %5B 1.02436841e%2B00  1.40019941e%2B01 -3.43152695e%2B01  1.40981996e%2B00%5D%2C %5B 1.03929090e%2B00  1.57871666e%2B01 -1.10511892e-01 -1.82605430e..." isContainer="True" shape="(64, 4)" />
+<var name="param" type="int" qualifier="builtins" value="535553" />
+<var name="scaler" type="StandardScaler" qualifier="sklearn.preprocessing._data" value="StandardScaler%28%29" isContainer="True" />
+<var name="target" type="ndarray" qualifier="numpy" value="%5B%5B 1.09999990e%2B00  2.11135216e%2B01  1.80405777e%2B02 -3.25420990e%2B01%5D%2C %5B 1.09200001e%2B00  5.21540642e-07  6.88853333e%2B02 -3.31062225e%2B02%5D%2C %5B 1.10000002e%2B00  2.06344872e%2B01 -1.99998684e%2B01 -7.48578568e%2B01%5D%2C %5B 1.06783974e%2B00  2.07016125e%2B01  1.00990292e-08  6.89178705e-08%5D%2C %5B 1.08447134e%2B00  2.07619991e%2B01  2.72727966e%2B00  1.19648302e%2B00%5D%2C %5B 1.01879919e%2B00  1.12869072e%2B01  2.78144455e%2B00  1.15234458e%2B00%5D%2C %5B 1.08637846e%2B00  2.04511871e%2B01 -2.67765236e%2B00  1.10139930e%2B00%5D%2C %5B 1.08568394e%2B00  2.06436100e%2B01 -1.75902443e%2B01  1.29479873e%2B00%5D%2C %5B 1.08381391e%2B00  2.09198036e%2B01 -6.36548805e%2B00  1.15715730e%2B00%5D%2C %5B 1.01607168e%2B00  1.13048849e%2B01  8.25025082e%2B00  1.28628941e%2B01%5D%2C %5B 1.09258771e%2B00  2.38252697e%2B01 -1.49059998e%2B02  6.89178705e-08%5D%2C %5B 1.03055835e%2B00  1.35745459e%2B01 -1.28210411e%2B01  6.23710394e%2B00%5D%2C %5B 1.03298366e%2B00  1.61127853e%2B01 -1.25449020e%2B02  1.17619133e%2B01%5D%2C %5B 1.02391946e%2B00  1.38823309e%2B01 -3.34123497e%2B01  1.10244691e%2B00%5D%2C %5B 1.03892648e%2B00  1.58049202e%2B01  1.00990292e-08  6.89178705e..." isContainer="True" shape="(64, 4)" />
+<var name="test_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="5" />
+<var name="test_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000024180232E48&gt;" isContainer="True" shape="5" />
+<var name="train_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Dat..." isContainer="True" shape="85" />
+<var name="training_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000024180242588&gt;" isContainer="True" shape="85" />
+<var name="val_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="10" />
+<var name="validation_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000024180242348&gt;" isContainer="True" shape="10" />
+</xml>
+Training the model for epoch 0
+<xml><var name="_dummy_ipython_val"  />
+<var name="_dummy_special_var"  />
+<var name="activation" type="str" qualifier="builtins" value="tanh" />
+<var name="dropout" type="float" qualifier="builtins" value="0.0" />
+<var name="edge_attr" type="ndarray" qualifier="numpy" value="%5B%5B-0.26449818 -0.15213944%5D%2C %5B 2.73238907  2.72434464%5D%2C %5B 1.30555846  1.35483854%5D%2C %5B-0.52353861 -0.40077268%5D%2C %5B 1.21484428  1.26776878%5D%2C %5B 1.43668371  1.48069563%5D%2C %5B-0.68137924 -0.55227188%5D%2C %5B 0.69888347  0.77253726%5D%2C %5B-0.36121288 -0.24496855%5D%2C %5B-0.64956801 -0.52173871%5D%2C %5B-0.23380719 -0.12268149%5D%2C %5B 0.5412435   0.62123074%5D%2C %5B-0.64189793 -0.51437677%5D%2C %5B-0.75277316 -0.62079747%5D%2C %5B-0.39046635 -0.27304671%5D%2C %5B-0.23380719 -0.12268149%5D%2C %5B-0.25454403 -0.14258519%5D%2C %5B-0.62364326 -0.4968555 %5D%2C %5B-0.62390681 -0.49710847%5D%2C %5B 0.42431276  0.50899779%5D%2C %5B 6.50797314  6.34824054%5D%2C %5B-0.18124742 -0.07223336%5D%2C %5B 0.1619665   0.25719157%5D%2C %5B-0.56475459 -0.44033273%5D%2C %5B 0.25134439  0.34297864%5D%2C %5B 0.03991163  0.14004042%5D%2C %5B-0.44887372 -0.32910751%5D%2C %5B 1.04600209  1.10571015%5D%2C %5B-0.73065278 -0.59956581%5D%2C %5B-0.70238535 -0.62392188%5D%2C %5B-0.07229979  0.03233719%5D%2C %5B-0.58560321 -0.46034375%5D%2C %5B 1.30093716  1.35040275%5D%2C %5B 1.82977173  1.85799112%5D%2C %5B 0.5412435   0.62123074%5D%2C %5B 1.30093716  1.35040275%5D%2C %5B 0.25842982  0.34977943%5D%2C ..." isContainer="True" shape="(186, 2)" />
+<var name="edge_index" type="Tensor" qualifier="torch" value="tensor%28%5B%5B 3%2C  3%2C  3%2C  4%2C  5%2C  5%2C  5%2C  5%2C  5%2C  5%2C  6%2C  6%2C  6%2C  6%2C  6%2C  7%2C  7%2C  8%2C%0A          9%2C 10%2C 10%2C 10%2C 10%2C 11%2C 12%2C 12%2C 13%2C 14%2C 14%2C 15%2C 16%2C 16%2C 17%2C 17%2C 18%2C 18%2C%0A         19%2C 20%2C 21%2C 22%2C 23%2C 24%2C 24%2C 25%2C 25%2C 26%2C 26%2C 26%2C 27%2C 27%2C 27%2C 28%2C 29%2C 29%2C%0A         29%2C 30%2C 30%2C 31%2C 31%2C 32%2C 32%2C 33%2C 33%2C 34%2C 34%2C 34%2C 35%2C 36%2C 37%2C 37%2C 38%2C 38%2C%0A         38%2C 39%2C 39%2C 39%2C 40%2C 40%2C 41%2C 41%2C 41%2C 42%2C 43%2C 43%2C 43%2C 44%2C 44%2C 44%2C 45%2C 46%2C%0A         46%2C 46%2C 47%2C 48%2C 48%2C 48%2C 49%2C 50%2C 50%2C 50%2C 51%2C 51%2C 52%2C 52%2C 53%2C 53%2C 53%2C 54%2C%0A         55%2C 55%2C 56%2C 57%2C 57%2C 58%2C 58%2C 59%2C 60%2C 61%2C 61%2C 62%2C 63%2C 63%2C  0%2C  1%2C  2%2C  3%2C%0A          4%2C  5%2C  6%2C  7%2C  8%2C  9%2C 10%2C 11%2C 12%2C 13%2C 14%2C 15%2C 16%2C 17%2C 18%2C 19%2C 20%2C 21%2C%0A         22%2C 23%2C 24%2C 25%2C 26%2C 27%2C 28%2C 29%2C 30%2C 31%2C 32%2C 33%2C 34%2C 35%2C 36%2C 37%2C 38%2C 39%2C%0A         40%2C 41%2C 42%2C 43%2C 44%2C 45%2C 46%2C 47%2C 48%2C 49%2C 50%2C 51%2C 52%2C 53%2C 54%2C 55%2C 56%2C 57%2C%0A         58%2C 59%2C 60%2C 61%2C 62%2C 63%5D%2C%0A        %5B24%2C 25%2C 50%2C 39%2C 26%2C 29%2C 33%2C 38%2C 40%2C 51%2C  7%2C 18%2C 37%2C 54%2C 63%2C  6%2C 39%2C 43%2C%0A         41%2C 28%2C 34%2C 44%2C 62%2C 38%2C 20%2C 27%2C 26%2C 25%2C 32%2C 40%2C 45%2C 48%2C 18%2C 38%2C  6..." isContainer="True" shape="(2, 186)" />
+<var name="grid_name" type="str" qualifier="builtins" value="1-HV-mixed--0-no_sw" />
+<var name="hidden_channels" type="int" qualifier="builtins" value="256" />
+<var name="i" type="int" qualifier="builtins" value="0" />
+<var name="in_channels" type="int" qualifier="builtins" value="4" />
+<var name="jk" type="str" qualifier="builtins" value="last" />
+<var name="layer_type" type="str" qualifier="builtins" value="TransConv" />
+<var name="loss" type="MSELoss" qualifier="torch.nn.modules.loss" value="MSELoss%28%29" isContainer="True" />
+<var name="lr" type="float" qualifier="builtins" value="0.0001" />
+<var name="model" type="GNN" qualifier="gnn" value="GNN%284%2C 4%2C num_layers=3%29" isContainer="True" />
+<var name="name" type="str" qualifier="builtins" value="lin.weight" />
+<var name="num_epochs" type="int" qualifier="builtins" value="400" />
+<var name="num_layers" type="int" qualifier="builtins" value="3" />
+<var name="optimizer" type="Adam" qualifier="torch.optim.adam" value="Adam %28%0AParameter Group 0%0A    amsgrad%3A False%0A    betas%3A %280.9%2C 0.999%29%0A    capturable%3A False%0A    differentiable%3A False%0A    eps%3A 1e-08%0A    foreach%3A None%0A    fused%3A False%0A    lr%3A 0.0001%0A    maximize%3A False%0A    weight_decay%3A 0%0A%29" isContainer="True" />
+<var name="out_channels" type="int" qualifier="builtins" value="4" />
+<var name="output" type="ndarray" qualifier="numpy" value="%5B%5B 1.09933925e%2B00  2.10566921e%2B01  1.84152786e%2B02 -3.42756348e%2B01%5D%2C %5B 1.09229040e%2B00  1.01957843e-01  6.89556580e%2B02 -3.31201904e%2B02%5D%2C %5B 1.09953165e%2B00  2.07833881e%2B01 -1.75603371e%2B01 -7.49734573e%2B01%5D%2C %5B 1.06715345e%2B00  2.05628185e%2B01 -4.20932680e-01  3.14781442e-04%5D%2C %5B 1.08365047e%2B00  2.07371788e%2B01  5.50987387e%2B00  8.56409848e-01%5D%2C %5B 1.01922977e%2B00  1.14192410e%2B01  1.81710243e%2B00  8.54473412e-01%5D%2C %5B 1.08624065e%2B00  2.03397350e%2B01 -4.02286768e%2B00  1.29198205e%2B00%5D%2C %5B 1.08566988e%2B00  2.04955196e%2B01 -1.79019604e%2B01  1.56717002e%2B00%5D%2C %5B 1.08292019e%2B00  2.09654827e%2B01 -3.77145314e%2B00  8.34532082e-01%5D%2C %5B 1.01642907e%2B00  1.14980307e%2B01  7.88913298e%2B00  1.25855656e%2B01%5D%2C %5B 1.09227908e%2B00  2.37616081e%2B01 -1.50807800e%2B02  6.37414753e-01%5D%2C %5B 1.03130460e%2B00  1.37130375e%2B01 -1.24285746e%2B01  5.97271395e%2B00%5D%2C %5B 1.03254604e%2B00  1.60284500e%2B01 -1.28478531e%2B02  1.21871376e%2B01%5D%2C %5B 1.02436841e%2B00  1.40019941e%2B01 -3.43152695e%2B01  1.40981996e%2B00%5D%2C %5B 1.03929090e%2B00  1.57871666e%2B01 -1.10511892e-01 -1.82605430e..." isContainer="True" shape="(64, 4)" />
+<var name="param" type="int" qualifier="builtins" value="535553" />
+<var name="scaler" type="StandardScaler" qualifier="sklearn.preprocessing._data" value="StandardScaler%28%29" isContainer="True" />
+<var name="target" type="ndarray" qualifier="numpy" value="%5B%5B 1.09999990e%2B00  2.11135216e%2B01  1.80405777e%2B02 -3.25420990e%2B01%5D%2C %5B 1.09200001e%2B00  5.21540642e-07  6.88853333e%2B02 -3.31062225e%2B02%5D%2C %5B 1.10000002e%2B00  2.06344872e%2B01 -1.99998684e%2B01 -7.48578568e%2B01%5D%2C %5B 1.06783974e%2B00  2.07016125e%2B01  1.00990292e-08  6.89178705e-08%5D%2C %5B 1.08447134e%2B00  2.07619991e%2B01  2.72727966e%2B00  1.19648302e%2B00%5D%2C %5B 1.01879919e%2B00  1.12869072e%2B01  2.78144455e%2B00  1.15234458e%2B00%5D%2C %5B 1.08637846e%2B00  2.04511871e%2B01 -2.67765236e%2B00  1.10139930e%2B00%5D%2C %5B 1.08568394e%2B00  2.06436100e%2B01 -1.75902443e%2B01  1.29479873e%2B00%5D%2C %5B 1.08381391e%2B00  2.09198036e%2B01 -6.36548805e%2B00  1.15715730e%2B00%5D%2C %5B 1.01607168e%2B00  1.13048849e%2B01  8.25025082e%2B00  1.28628941e%2B01%5D%2C %5B 1.09258771e%2B00  2.38252697e%2B01 -1.49059998e%2B02  6.89178705e-08%5D%2C %5B 1.03055835e%2B00  1.35745459e%2B01 -1.28210411e%2B01  6.23710394e%2B00%5D%2C %5B 1.03298366e%2B00  1.61127853e%2B01 -1.25449020e%2B02  1.17619133e%2B01%5D%2C %5B 1.02391946e%2B00  1.38823309e%2B01 -3.34123497e%2B01  1.10244691e%2B00%5D%2C %5B 1.03892648e%2B00  1.58049202e%2B01  1.00990292e-08  6.89178705e..." isContainer="True" shape="(64, 4)" />
+<var name="test_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="5" />
+<var name="test_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000024180232E48&gt;" isContainer="True" shape="5" />
+<var name="train_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Dat..." isContainer="True" shape="85" />
+<var name="training_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000024180242588&gt;" isContainer="True" shape="85" />
+<var name="val_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="10" />
+<var name="validation_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000024180242348&gt;" isContainer="True" shape="10" />
+</xml>
+Calculating edge index and edge weights for the grid 1-HV-mixed--0-no_sw ...
+Reading all of the .csv files from the directory of 1-HV-mixed--0-no_sw ...
+Processing Training Data for 1-HV-mixed--0-no_sw ...
+Processing Validation Data for 1-HV-mixed--0-no_sw ...
+Processing Test Data for 1-HV-mixed--0-no_sw ...
+Processing complete.
+<xml><var name="_dummy_ipython_val"  />
+<var name="_dummy_special_var"  />
+<var name="activation" type="str" qualifier="builtins" value="tanh" />
+<var name="dropout" type="float" qualifier="builtins" value="0.0" />
+<var name="edge_attr" type="Tensor" qualifier="torch" value="tensor%28%5B%5B-0.2645%2C -0.1521%5D%2C%0A        %5B 2.7324%2C  2.7243%5D%2C%0A        %5B 1.3056%2C  1.3548%5D%2C%0A        %5B-0.5235%2C -0.4008%5D%2C%0A        %5B 1.2148%2C  1.2678%5D%2C%0A        %5B 1.4367%2C  1.4807%5D%2C%0A        %5B-0.6814%2C -0.5523%5D%2C%0A        %5B 0.6989%2C  0.7725%5D%2C%0A        %5B-0.3612%2C -0.2450%5D%2C%0A        %5B-0.6496%2C -0.5217%5D%2C%0A        %5B-0.2338%2C -0.1227%5D%2C%0A        %5B 0.5412%2C  0.6212%5D%2C%0A        %5B-0.6419%2C -0.5144%5D%2C%0A        %5B-0.7528%2C -0.6208%5D%2C%0A        %5B-0.3905%2C -0.2730%5D%2C%0A        %5B-0.2338%2C -0.1227%5D%2C%0A        %5B-0.2545%2C -0.1426%5D%2C%0A        %5B-0.6236%2C -0.4969%5D%2C%0A        %5B-0.6239%2C -0.4971%5D%2C%0A        %5B 0.4243%2C  0.5090%5D%2C%0A        %5B 6.5080%2C  6.3482%5D%2C%0A        %5B-0.1812%2C -0.0722%5D%2C%0A        %5B 0.1620%2C  0.2572%5D%2C%0A        %5B-0.5648%2C -0.4403%5D%2C%0A        %5B 0.2513%2C  0.3430%5D%2C%0A        %5B 0.0399%2C  0.1400%5D%2C%0A        %5B-0.4489%2C -0.3291%5D%2C%0A        %5B 1.0460%2C  1.1057%5D%2C%0A        %5B-0.7307%2C -0.5996%5D%2C%0A        %5B-0.7024%2C -0.6239%5D%2C%0A        %5B-0.0723%2C  0.0323%5D%2C%0A        %5B-0.5856%2C -0.4603%5D%2C%0A        %5B 1.3009%2C  1.3504%5D%2C%0A        %5B 1.8298%2C  1.8580%5D%2C%0A        %5B 0.5412%2C  0.6212%5D%2C%0A        %5B 1.3009%2C  1..." isContainer="True" shape="(186, 2)" />
+<var name="edge_index" type="Tensor" qualifier="torch" value="tensor%28%5B%5B 3%2C  3%2C  3%2C  4%2C  5%2C  5%2C  5%2C  5%2C  5%2C  5%2C  6%2C  6%2C  6%2C  6%2C  6%2C  7%2C  7%2C  8%2C%0A          9%2C 10%2C 10%2C 10%2C 10%2C 11%2C 12%2C 12%2C 13%2C 14%2C 14%2C 15%2C 16%2C 16%2C 17%2C 17%2C 18%2C 18%2C%0A         19%2C 20%2C 21%2C 22%2C 23%2C 24%2C 24%2C 25%2C 25%2C 26%2C 26%2C 26%2C 27%2C 27%2C 27%2C 28%2C 29%2C 29%2C%0A         29%2C 30%2C 30%2C 31%2C 31%2C 32%2C 32%2C 33%2C 33%2C 34%2C 34%2C 34%2C 35%2C 36%2C 37%2C 37%2C 38%2C 38%2C%0A         38%2C 39%2C 39%2C 39%2C 40%2C 40%2C 41%2C 41%2C 41%2C 42%2C 43%2C 43%2C 43%2C 44%2C 44%2C 44%2C 45%2C 46%2C%0A         46%2C 46%2C 47%2C 48%2C 48%2C 48%2C 49%2C 50%2C 50%2C 50%2C 51%2C 51%2C 52%2C 52%2C 53%2C 53%2C 53%2C 54%2C%0A         55%2C 55%2C 56%2C 57%2C 57%2C 58%2C 58%2C 59%2C 60%2C 61%2C 61%2C 62%2C 63%2C 63%2C  0%2C  1%2C  2%2C  3%2C%0A          4%2C  5%2C  6%2C  7%2C  8%2C  9%2C 10%2C 11%2C 12%2C 13%2C 14%2C 15%2C 16%2C 17%2C 18%2C 19%2C 20%2C 21%2C%0A         22%2C 23%2C 24%2C 25%2C 26%2C 27%2C 28%2C 29%2C 30%2C 31%2C 32%2C 33%2C 34%2C 35%2C 36%2C 37%2C 38%2C 39%2C%0A         40%2C 41%2C 42%2C 43%2C 44%2C 45%2C 46%2C 47%2C 48%2C 49%2C 50%2C 51%2C 52%2C 53%2C 54%2C 55%2C 56%2C 57%2C%0A         58%2C 59%2C 60%2C 61%2C 62%2C 63%5D%2C%0A        %5B24%2C 25%2C 50%2C 39%2C 26%2C 29%2C 33%2C 38%2C 40%2C 51%2C  7%2C 18%2C 37%2C 54%2C 63%2C  6%2C 39%2C 43%2C%0A         41%2C 28%2C 34%2C 44%2C 62%2C 38%2C 20%2C 27%2C 26%2C 25%2C 32%2C 40%2C 45%2C 48%2C 18%2C 38%2C  6..." isContainer="True" shape="(2, 186)" />
+<var name="grid_name" type="str" qualifier="builtins" value="1-HV-mixed--0-no_sw" />
+<var name="hidden_channels" type="int" qualifier="builtins" value="256" />
+<var name="i" type="int" qualifier="builtins" value="0" />
+<var name="in_channels" type="int" qualifier="builtins" value="4" />
+<var name="jk" type="str" qualifier="builtins" value="last" />
+<var name="layer_type" type="str" qualifier="builtins" value="TransConv" />
+<var name="loss" type="MSELoss" qualifier="torch.nn.modules.loss" value="MSELoss%28%29" isContainer="True" />
+<var name="lr" type="float" qualifier="builtins" value="0.0001" />
+<var name="model" type="GNN" qualifier="gnn" value="GNN%284%2C 4%2C num_layers=3%29" isContainer="True" />
+<var name="name" type="str" qualifier="builtins" value="lin.weight" />
+<var name="num_epochs" type="int" qualifier="builtins" value="400" />
+<var name="num_layers" type="int" qualifier="builtins" value="3" />
+<var name="optimizer" type="Adam" qualifier="torch.optim.adam" value="Adam %28%0AParameter Group 0%0A    amsgrad%3A False%0A    betas%3A %280.9%2C 0.999%29%0A    capturable%3A False%0A    differentiable%3A False%0A    eps%3A 1e-08%0A    foreach%3A None%0A    fused%3A False%0A    lr%3A 0.0001%0A    maximize%3A False%0A    weight_decay%3A 0%0A%29" isContainer="True" />
+<var name="out_channels" type="int" qualifier="builtins" value="4" />
+<var name="output" type="ndarray" qualifier="numpy" value="%5B%5B 1.09933925e%2B00  2.10566921e%2B01  1.84152786e%2B02 -3.42756348e%2B01%5D%2C %5B 1.09229040e%2B00  1.01957843e-01  6.89556580e%2B02 -3.31201904e%2B02%5D%2C %5B 1.09953165e%2B00  2.07833881e%2B01 -1.75603371e%2B01 -7.49734573e%2B01%5D%2C %5B 1.06715345e%2B00  2.05628185e%2B01 -4.20932680e-01  3.14781442e-04%5D%2C %5B 1.08365047e%2B00  2.07371788e%2B01  5.50987387e%2B00  8.56409848e-01%5D%2C %5B 1.01922977e%2B00  1.14192410e%2B01  1.81710243e%2B00  8.54473412e-01%5D%2C %5B 1.08624065e%2B00  2.03397350e%2B01 -4.02286768e%2B00  1.29198205e%2B00%5D%2C %5B 1.08566988e%2B00  2.04955196e%2B01 -1.79019604e%2B01  1.56717002e%2B00%5D%2C %5B 1.08292019e%2B00  2.09654827e%2B01 -3.77145314e%2B00  8.34532082e-01%5D%2C %5B 1.01642907e%2B00  1.14980307e%2B01  7.88913298e%2B00  1.25855656e%2B01%5D%2C %5B 1.09227908e%2B00  2.37616081e%2B01 -1.50807800e%2B02  6.37414753e-01%5D%2C %5B 1.03130460e%2B00  1.37130375e%2B01 -1.24285746e%2B01  5.97271395e%2B00%5D%2C %5B 1.03254604e%2B00  1.60284500e%2B01 -1.28478531e%2B02  1.21871376e%2B01%5D%2C %5B 1.02436841e%2B00  1.40019941e%2B01 -3.43152695e%2B01  1.40981996e%2B00%5D%2C %5B 1.03929090e%2B00  1.57871666e%2B01 -1.10511892e-01 -1.82605430e..." isContainer="True" shape="(64, 4)" />
+<var name="param" type="int" qualifier="builtins" value="535553" />
+<var name="scaler" type="StandardScaler" qualifier="sklearn.preprocessing._data" value="StandardScaler%28%29" isContainer="True" />
+<var name="target" type="ndarray" qualifier="numpy" value="%5B%5B 1.09999990e%2B00  2.11135216e%2B01  1.80405777e%2B02 -3.25420990e%2B01%5D%2C %5B 1.09200001e%2B00  5.21540642e-07  6.88853333e%2B02 -3.31062225e%2B02%5D%2C %5B 1.10000002e%2B00  2.06344872e%2B01 -1.99998684e%2B01 -7.48578568e%2B01%5D%2C %5B 1.06783974e%2B00  2.07016125e%2B01  1.00990292e-08  6.89178705e-08%5D%2C %5B 1.08447134e%2B00  2.07619991e%2B01  2.72727966e%2B00  1.19648302e%2B00%5D%2C %5B 1.01879919e%2B00  1.12869072e%2B01  2.78144455e%2B00  1.15234458e%2B00%5D%2C %5B 1.08637846e%2B00  2.04511871e%2B01 -2.67765236e%2B00  1.10139930e%2B00%5D%2C %5B 1.08568394e%2B00  2.06436100e%2B01 -1.75902443e%2B01  1.29479873e%2B00%5D%2C %5B 1.08381391e%2B00  2.09198036e%2B01 -6.36548805e%2B00  1.15715730e%2B00%5D%2C %5B 1.01607168e%2B00  1.13048849e%2B01  8.25025082e%2B00  1.28628941e%2B01%5D%2C %5B 1.09258771e%2B00  2.38252697e%2B01 -1.49059998e%2B02  6.89178705e-08%5D%2C %5B 1.03055835e%2B00  1.35745459e%2B01 -1.28210411e%2B01  6.23710394e%2B00%5D%2C %5B 1.03298366e%2B00  1.61127853e%2B01 -1.25449020e%2B02  1.17619133e%2B01%5D%2C %5B 1.02391946e%2B00  1.38823309e%2B01 -3.34123497e%2B01  1.10244691e%2B00%5D%2C %5B 1.03892648e%2B00  1.58049202e%2B01  1.00990292e-08  6.89178705e..." isContainer="True" shape="(64, 4)" />
+<var name="test_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="5" />
+<var name="test_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000024180232E48&gt;" isContainer="True" shape="5" />
+<var name="train_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Dat..." isContainer="True" shape="85" />
+<var name="training_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000024180242588&gt;" isContainer="True" shape="85" />
+<var name="val_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="10" />
+<var name="validation_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000024180242348&gt;" isContainer="True" shape="10" />
+</xml>
+<xml><var name="_dummy_ipython_val"  />
+<var name="_dummy_special_var"  />
+<var name="activation" type="str" qualifier="builtins" value="tanh" />
+<var name="dropout" type="float" qualifier="builtins" value="0.0" />
+<var name="edge_attr" type="Tensor" qualifier="torch" value="tensor%28%5B%5B-0.2645%2C -0.1521%5D%2C%0A        %5B 2.7324%2C  2.7243%5D%2C%0A        %5B 1.3056%2C  1.3548%5D%2C%0A        %5B-0.5235%2C -0.4008%5D%2C%0A        %5B 1.2148%2C  1.2678%5D%2C%0A        %5B 1.4367%2C  1.4807%5D%2C%0A        %5B-0.6814%2C -0.5523%5D%2C%0A        %5B 0.6989%2C  0.7725%5D%2C%0A        %5B-0.3612%2C -0.2450%5D%2C%0A        %5B-0.6496%2C -0.5217%5D%2C%0A        %5B-0.2338%2C -0.1227%5D%2C%0A        %5B 0.5412%2C  0.6212%5D%2C%0A        %5B-0.6419%2C -0.5144%5D%2C%0A        %5B-0.7528%2C -0.6208%5D%2C%0A        %5B-0.3905%2C -0.2730%5D%2C%0A        %5B-0.2338%2C -0.1227%5D%2C%0A        %5B-0.2545%2C -0.1426%5D%2C%0A        %5B-0.6236%2C -0.4969%5D%2C%0A        %5B-0.6239%2C -0.4971%5D%2C%0A        %5B 0.4243%2C  0.5090%5D%2C%0A        %5B 6.5080%2C  6.3482%5D%2C%0A        %5B-0.1812%2C -0.0722%5D%2C%0A        %5B 0.1620%2C  0.2572%5D%2C%0A        %5B-0.5648%2C -0.4403%5D%2C%0A        %5B 0.2513%2C  0.3430%5D%2C%0A        %5B 0.0399%2C  0.1400%5D%2C%0A        %5B-0.4489%2C -0.3291%5D%2C%0A        %5B 1.0460%2C  1.1057%5D%2C%0A        %5B-0.7307%2C -0.5996%5D%2C%0A        %5B-0.7024%2C -0.6239%5D%2C%0A        %5B-0.0723%2C  0.0323%5D%2C%0A        %5B-0.5856%2C -0.4603%5D%2C%0A        %5B 1.3009%2C  1.3504%5D%2C%0A        %5B 1.8298%2C  1.8580%5D%2C%0A        %5B 0.5412%2C  0.6212%5D%2C%0A        %5B 1.3009%2C  1..." isContainer="True" shape="(186, 2)" />
+<var name="edge_index" type="Tensor" qualifier="torch" value="tensor%28%5B%5B 3%2C  3%2C  3%2C  4%2C  5%2C  5%2C  5%2C  5%2C  5%2C  5%2C  6%2C  6%2C  6%2C  6%2C  6%2C  7%2C  7%2C  8%2C%0A          9%2C 10%2C 10%2C 10%2C 10%2C 11%2C 12%2C 12%2C 13%2C 14%2C 14%2C 15%2C 16%2C 16%2C 17%2C 17%2C 18%2C 18%2C%0A         19%2C 20%2C 21%2C 22%2C 23%2C 24%2C 24%2C 25%2C 25%2C 26%2C 26%2C 26%2C 27%2C 27%2C 27%2C 28%2C 29%2C 29%2C%0A         29%2C 30%2C 30%2C 31%2C 31%2C 32%2C 32%2C 33%2C 33%2C 34%2C 34%2C 34%2C 35%2C 36%2C 37%2C 37%2C 38%2C 38%2C%0A         38%2C 39%2C 39%2C 39%2C 40%2C 40%2C 41%2C 41%2C 41%2C 42%2C 43%2C 43%2C 43%2C 44%2C 44%2C 44%2C 45%2C 46%2C%0A         46%2C 46%2C 47%2C 48%2C 48%2C 48%2C 49%2C 50%2C 50%2C 50%2C 51%2C 51%2C 52%2C 52%2C 53%2C 53%2C 53%2C 54%2C%0A         55%2C 55%2C 56%2C 57%2C 57%2C 58%2C 58%2C 59%2C 60%2C 61%2C 61%2C 62%2C 63%2C 63%2C  0%2C  1%2C  2%2C  3%2C%0A          4%2C  5%2C  6%2C  7%2C  8%2C  9%2C 10%2C 11%2C 12%2C 13%2C 14%2C 15%2C 16%2C 17%2C 18%2C 19%2C 20%2C 21%2C%0A         22%2C 23%2C 24%2C 25%2C 26%2C 27%2C 28%2C 29%2C 30%2C 31%2C 32%2C 33%2C 34%2C 35%2C 36%2C 37%2C 38%2C 39%2C%0A         40%2C 41%2C 42%2C 43%2C 44%2C 45%2C 46%2C 47%2C 48%2C 49%2C 50%2C 51%2C 52%2C 53%2C 54%2C 55%2C 56%2C 57%2C%0A         58%2C 59%2C 60%2C 61%2C 62%2C 63%5D%2C%0A        %5B24%2C 25%2C 50%2C 39%2C 26%2C 29%2C 33%2C 38%2C 40%2C 51%2C  7%2C 18%2C 37%2C 54%2C 63%2C  6%2C 39%2C 43%2C%0A         41%2C 28%2C 34%2C 44%2C 62%2C 38%2C 20%2C 27%2C 26%2C 25%2C 32%2C 40%2C 45%2C 48%2C 18%2C 38%2C  6..." isContainer="True" shape="(2, 186)" />
+<var name="grid_name" type="str" qualifier="builtins" value="1-HV-mixed--0-no_sw" />
+<var name="hidden_channels" type="int" qualifier="builtins" value="256" />
+<var name="i" type="int" qualifier="builtins" value="0" />
+<var name="in_channels" type="int" qualifier="builtins" value="4" />
+<var name="jk" type="str" qualifier="builtins" value="last" />
+<var name="layer_type" type="str" qualifier="builtins" value="TransConv" />
+<var name="loss" type="MSELoss" qualifier="torch.nn.modules.loss" value="MSELoss%28%29" isContainer="True" />
+<var name="lr" type="float" qualifier="builtins" value="0.0001" />
+<var name="model" type="GNN" qualifier="gnn" value="GNN%284%2C 4%2C num_layers=3%29" isContainer="True" />
+<var name="name" type="str" qualifier="builtins" value="lin.weight" />
+<var name="num_epochs" type="int" qualifier="builtins" value="400" />
+<var name="num_layers" type="int" qualifier="builtins" value="3" />
+<var name="optimizer" type="Adam" qualifier="torch.optim.adam" value="Adam %28%0AParameter Group 0%0A    amsgrad%3A False%0A    betas%3A %280.9%2C 0.999%29%0A    capturable%3A False%0A    differentiable%3A False%0A    eps%3A 1e-08%0A    foreach%3A None%0A    fused%3A False%0A    lr%3A 0.0001%0A    maximize%3A False%0A    weight_decay%3A 0%0A%29" isContainer="True" />
+<var name="out_channels" type="int" qualifier="builtins" value="4" />
+<var name="output" type="ndarray" qualifier="numpy" value="%5B%5B 1.09933925e%2B00  2.10566921e%2B01  1.84152786e%2B02 -3.42756348e%2B01%5D%2C %5B 1.09229040e%2B00  1.01957843e-01  6.89556580e%2B02 -3.31201904e%2B02%5D%2C %5B 1.09953165e%2B00  2.07833881e%2B01 -1.75603371e%2B01 -7.49734573e%2B01%5D%2C %5B 1.06715345e%2B00  2.05628185e%2B01 -4.20932680e-01  3.14781442e-04%5D%2C %5B 1.08365047e%2B00  2.07371788e%2B01  5.50987387e%2B00  8.56409848e-01%5D%2C %5B 1.01922977e%2B00  1.14192410e%2B01  1.81710243e%2B00  8.54473412e-01%5D%2C %5B 1.08624065e%2B00  2.03397350e%2B01 -4.02286768e%2B00  1.29198205e%2B00%5D%2C %5B 1.08566988e%2B00  2.04955196e%2B01 -1.79019604e%2B01  1.56717002e%2B00%5D%2C %5B 1.08292019e%2B00  2.09654827e%2B01 -3.77145314e%2B00  8.34532082e-01%5D%2C %5B 1.01642907e%2B00  1.14980307e%2B01  7.88913298e%2B00  1.25855656e%2B01%5D%2C %5B 1.09227908e%2B00  2.37616081e%2B01 -1.50807800e%2B02  6.37414753e-01%5D%2C %5B 1.03130460e%2B00  1.37130375e%2B01 -1.24285746e%2B01  5.97271395e%2B00%5D%2C %5B 1.03254604e%2B00  1.60284500e%2B01 -1.28478531e%2B02  1.21871376e%2B01%5D%2C %5B 1.02436841e%2B00  1.40019941e%2B01 -3.43152695e%2B01  1.40981996e%2B00%5D%2C %5B 1.03929090e%2B00  1.57871666e%2B01 -1.10511892e-01 -1.82605430e..." isContainer="True" shape="(64, 4)" />
+<var name="param" type="int" qualifier="builtins" value="535553" />
+<var name="scaler" type="StandardScaler" qualifier="sklearn.preprocessing._data" value="StandardScaler%28%29" isContainer="True" />
+<var name="target" type="ndarray" qualifier="numpy" value="%5B%5B 1.09999990e%2B00  2.11135216e%2B01  1.80405777e%2B02 -3.25420990e%2B01%5D%2C %5B 1.09200001e%2B00  5.21540642e-07  6.88853333e%2B02 -3.31062225e%2B02%5D%2C %5B 1.10000002e%2B00  2.06344872e%2B01 -1.99998684e%2B01 -7.48578568e%2B01%5D%2C %5B 1.06783974e%2B00  2.07016125e%2B01  1.00990292e-08  6.89178705e-08%5D%2C %5B 1.08447134e%2B00  2.07619991e%2B01  2.72727966e%2B00  1.19648302e%2B00%5D%2C %5B 1.01879919e%2B00  1.12869072e%2B01  2.78144455e%2B00  1.15234458e%2B00%5D%2C %5B 1.08637846e%2B00  2.04511871e%2B01 -2.67765236e%2B00  1.10139930e%2B00%5D%2C %5B 1.08568394e%2B00  2.06436100e%2B01 -1.75902443e%2B01  1.29479873e%2B00%5D%2C %5B 1.08381391e%2B00  2.09198036e%2B01 -6.36548805e%2B00  1.15715730e%2B00%5D%2C %5B 1.01607168e%2B00  1.13048849e%2B01  8.25025082e%2B00  1.28628941e%2B01%5D%2C %5B 1.09258771e%2B00  2.38252697e%2B01 -1.49059998e%2B02  6.89178705e-08%5D%2C %5B 1.03055835e%2B00  1.35745459e%2B01 -1.28210411e%2B01  6.23710394e%2B00%5D%2C %5B 1.03298366e%2B00  1.61127853e%2B01 -1.25449020e%2B02  1.17619133e%2B01%5D%2C %5B 1.02391946e%2B00  1.38823309e%2B01 -3.34123497e%2B01  1.10244691e%2B00%5D%2C %5B 1.03892648e%2B00  1.58049202e%2B01  1.00990292e-08  6.89178705e..." isContainer="True" shape="(64, 4)" />
+<var name="test_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="5" />
+<var name="test_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x00000241EF130B48&gt;" isContainer="True" shape="5" />
+<var name="train_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Dat..." isContainer="True" shape="85" />
+<var name="training_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x00000241EF130788&gt;" isContainer="True" shape="85" />
+<var name="val_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="10" />
+<var name="validation_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x00000241EF130C08&gt;" isContainer="True" shape="10" />
+</xml>
+<xml><var name="_dummy_ipython_val"  />
+<var name="_dummy_special_var"  />
+<var name="activation" type="str" qualifier="builtins" value="tanh" />
+<var name="dropout" type="float" qualifier="builtins" value="0.0" />
+<var name="edge_attr" type="Tensor" qualifier="torch" value="tensor%28%5B%5B-0.2645%2C -0.1521%5D%2C%0A        %5B 2.7324%2C  2.7243%5D%2C%0A        %5B 1.3056%2C  1.3548%5D%2C%0A        %5B-0.5235%2C -0.4008%5D%2C%0A        %5B 1.2148%2C  1.2678%5D%2C%0A        %5B 1.4367%2C  1.4807%5D%2C%0A        %5B-0.6814%2C -0.5523%5D%2C%0A        %5B 0.6989%2C  0.7725%5D%2C%0A        %5B-0.3612%2C -0.2450%5D%2C%0A        %5B-0.6496%2C -0.5217%5D%2C%0A        %5B-0.2338%2C -0.1227%5D%2C%0A        %5B 0.5412%2C  0.6212%5D%2C%0A        %5B-0.6419%2C -0.5144%5D%2C%0A        %5B-0.7528%2C -0.6208%5D%2C%0A        %5B-0.3905%2C -0.2730%5D%2C%0A        %5B-0.2338%2C -0.1227%5D%2C%0A        %5B-0.2545%2C -0.1426%5D%2C%0A        %5B-0.6236%2C -0.4969%5D%2C%0A        %5B-0.6239%2C -0.4971%5D%2C%0A        %5B 0.4243%2C  0.5090%5D%2C%0A        %5B 6.5080%2C  6.3482%5D%2C%0A        %5B-0.1812%2C -0.0722%5D%2C%0A        %5B 0.1620%2C  0.2572%5D%2C%0A        %5B-0.5648%2C -0.4403%5D%2C%0A        %5B 0.2513%2C  0.3430%5D%2C%0A        %5B 0.0399%2C  0.1400%5D%2C%0A        %5B-0.4489%2C -0.3291%5D%2C%0A        %5B 1.0460%2C  1.1057%5D%2C%0A        %5B-0.7307%2C -0.5996%5D%2C%0A        %5B-0.7024%2C -0.6239%5D%2C%0A        %5B-0.0723%2C  0.0323%5D%2C%0A        %5B-0.5856%2C -0.4603%5D%2C%0A        %5B 1.3009%2C  1.3504%5D%2C%0A        %5B 1.8298%2C  1.8580%5D%2C%0A        %5B 0.5412%2C  0.6212%5D%2C%0A        %5B 1.3009%2C  1..." isContainer="True" shape="(186, 2)" />
+<var name="edge_index" type="Tensor" qualifier="torch" value="tensor%28%5B%5B 3%2C  3%2C  3%2C  4%2C  5%2C  5%2C  5%2C  5%2C  5%2C  5%2C  6%2C  6%2C  6%2C  6%2C  6%2C  7%2C  7%2C  8%2C%0A          9%2C 10%2C 10%2C 10%2C 10%2C 11%2C 12%2C 12%2C 13%2C 14%2C 14%2C 15%2C 16%2C 16%2C 17%2C 17%2C 18%2C 18%2C%0A         19%2C 20%2C 21%2C 22%2C 23%2C 24%2C 24%2C 25%2C 25%2C 26%2C 26%2C 26%2C 27%2C 27%2C 27%2C 28%2C 29%2C 29%2C%0A         29%2C 30%2C 30%2C 31%2C 31%2C 32%2C 32%2C 33%2C 33%2C 34%2C 34%2C 34%2C 35%2C 36%2C 37%2C 37%2C 38%2C 38%2C%0A         38%2C 39%2C 39%2C 39%2C 40%2C 40%2C 41%2C 41%2C 41%2C 42%2C 43%2C 43%2C 43%2C 44%2C 44%2C 44%2C 45%2C 46%2C%0A         46%2C 46%2C 47%2C 48%2C 48%2C 48%2C 49%2C 50%2C 50%2C 50%2C 51%2C 51%2C 52%2C 52%2C 53%2C 53%2C 53%2C 54%2C%0A         55%2C 55%2C 56%2C 57%2C 57%2C 58%2C 58%2C 59%2C 60%2C 61%2C 61%2C 62%2C 63%2C 63%2C  0%2C  1%2C  2%2C  3%2C%0A          4%2C  5%2C  6%2C  7%2C  8%2C  9%2C 10%2C 11%2C 12%2C 13%2C 14%2C 15%2C 16%2C 17%2C 18%2C 19%2C 20%2C 21%2C%0A         22%2C 23%2C 24%2C 25%2C 26%2C 27%2C 28%2C 29%2C 30%2C 31%2C 32%2C 33%2C 34%2C 35%2C 36%2C 37%2C 38%2C 39%2C%0A         40%2C 41%2C 42%2C 43%2C 44%2C 45%2C 46%2C 47%2C 48%2C 49%2C 50%2C 51%2C 52%2C 53%2C 54%2C 55%2C 56%2C 57%2C%0A         58%2C 59%2C 60%2C 61%2C 62%2C 63%5D%2C%0A        %5B24%2C 25%2C 50%2C 39%2C 26%2C 29%2C 33%2C 38%2C 40%2C 51%2C  7%2C 18%2C 37%2C 54%2C 63%2C  6%2C 39%2C 43%2C%0A         41%2C 28%2C 34%2C 44%2C 62%2C 38%2C 20%2C 27%2C 26%2C 25%2C 32%2C 40%2C 45%2C 48%2C 18%2C 38%2C  6..." isContainer="True" shape="(2, 186)" />
+<var name="grid_name" type="str" qualifier="builtins" value="1-HV-mixed--0-no_sw" />
+<var name="hidden_channels" type="int" qualifier="builtins" value="256" />
+<var name="i" type="int" qualifier="builtins" value="0" />
+<var name="in_channels" type="int" qualifier="builtins" value="4" />
+<var name="jk" type="str" qualifier="builtins" value="last" />
+<var name="layer_type" type="str" qualifier="builtins" value="TransConv" />
+<var name="loss" type="MSELoss" qualifier="torch.nn.modules.loss" value="MSELoss%28%29" isContainer="True" />
+<var name="lr" type="float" qualifier="builtins" value="0.0001" />
+<var name="model" type="GNN" qualifier="gnn" value="GNN%284%2C 4%2C num_layers=3%29" isContainer="True" />
+<var name="name" type="str" qualifier="builtins" value="lin.weight" />
+<var name="num_epochs" type="int" qualifier="builtins" value="400" />
+<var name="num_layers" type="int" qualifier="builtins" value="3" />
+<var name="optimizer" type="Adam" qualifier="torch.optim.adam" value="Adam %28%0AParameter Group 0%0A    amsgrad%3A False%0A    betas%3A %280.9%2C 0.999%29%0A    capturable%3A False%0A    differentiable%3A False%0A    eps%3A 1e-08%0A    foreach%3A None%0A    fused%3A False%0A    lr%3A 0.0001%0A    maximize%3A False%0A    weight_decay%3A 0%0A%29" isContainer="True" />
+<var name="out_channels" type="int" qualifier="builtins" value="4" />
+<var name="output" type="ndarray" qualifier="numpy" value="%5B%5B 1.09933925e%2B00  2.10566921e%2B01  1.84152786e%2B02 -3.42756348e%2B01%5D%2C %5B 1.09229040e%2B00  1.01957843e-01  6.89556580e%2B02 -3.31201904e%2B02%5D%2C %5B 1.09953165e%2B00  2.07833881e%2B01 -1.75603371e%2B01 -7.49734573e%2B01%5D%2C %5B 1.06715345e%2B00  2.05628185e%2B01 -4.20932680e-01  3.14781442e-04%5D%2C %5B 1.08365047e%2B00  2.07371788e%2B01  5.50987387e%2B00  8.56409848e-01%5D%2C %5B 1.01922977e%2B00  1.14192410e%2B01  1.81710243e%2B00  8.54473412e-01%5D%2C %5B 1.08624065e%2B00  2.03397350e%2B01 -4.02286768e%2B00  1.29198205e%2B00%5D%2C %5B 1.08566988e%2B00  2.04955196e%2B01 -1.79019604e%2B01  1.56717002e%2B00%5D%2C %5B 1.08292019e%2B00  2.09654827e%2B01 -3.77145314e%2B00  8.34532082e-01%5D%2C %5B 1.01642907e%2B00  1.14980307e%2B01  7.88913298e%2B00  1.25855656e%2B01%5D%2C %5B 1.09227908e%2B00  2.37616081e%2B01 -1.50807800e%2B02  6.37414753e-01%5D%2C %5B 1.03130460e%2B00  1.37130375e%2B01 -1.24285746e%2B01  5.97271395e%2B00%5D%2C %5B 1.03254604e%2B00  1.60284500e%2B01 -1.28478531e%2B02  1.21871376e%2B01%5D%2C %5B 1.02436841e%2B00  1.40019941e%2B01 -3.43152695e%2B01  1.40981996e%2B00%5D%2C %5B 1.03929090e%2B00  1.57871666e%2B01 -1.10511892e-01 -1.82605430e..." isContainer="True" shape="(64, 4)" />
+<var name="param" type="int" qualifier="builtins" value="535553" />
+<var name="scaler" type="StandardScaler" qualifier="sklearn.preprocessing._data" value="StandardScaler%28%29" isContainer="True" />
+<var name="target" type="ndarray" qualifier="numpy" value="%5B%5B 1.09999990e%2B00  2.11135216e%2B01  1.80405777e%2B02 -3.25420990e%2B01%5D%2C %5B 1.09200001e%2B00  5.21540642e-07  6.88853333e%2B02 -3.31062225e%2B02%5D%2C %5B 1.10000002e%2B00  2.06344872e%2B01 -1.99998684e%2B01 -7.48578568e%2B01%5D%2C %5B 1.06783974e%2B00  2.07016125e%2B01  1.00990292e-08  6.89178705e-08%5D%2C %5B 1.08447134e%2B00  2.07619991e%2B01  2.72727966e%2B00  1.19648302e%2B00%5D%2C %5B 1.01879919e%2B00  1.12869072e%2B01  2.78144455e%2B00  1.15234458e%2B00%5D%2C %5B 1.08637846e%2B00  2.04511871e%2B01 -2.67765236e%2B00  1.10139930e%2B00%5D%2C %5B 1.08568394e%2B00  2.06436100e%2B01 -1.75902443e%2B01  1.29479873e%2B00%5D%2C %5B 1.08381391e%2B00  2.09198036e%2B01 -6.36548805e%2B00  1.15715730e%2B00%5D%2C %5B 1.01607168e%2B00  1.13048849e%2B01  8.25025082e%2B00  1.28628941e%2B01%5D%2C %5B 1.09258771e%2B00  2.38252697e%2B01 -1.49059998e%2B02  6.89178705e-08%5D%2C %5B 1.03055835e%2B00  1.35745459e%2B01 -1.28210411e%2B01  6.23710394e%2B00%5D%2C %5B 1.03298366e%2B00  1.61127853e%2B01 -1.25449020e%2B02  1.17619133e%2B01%5D%2C %5B 1.02391946e%2B00  1.38823309e%2B01 -3.34123497e%2B01  1.10244691e%2B00%5D%2C %5B 1.03892648e%2B00  1.58049202e%2B01  1.00990292e-08  6.89178705e..." isContainer="True" shape="(64, 4)" />
+<var name="test_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="5" />
+<var name="test_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x00000241EF130B48&gt;" isContainer="True" shape="5" />
+<var name="train_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Dat..." isContainer="True" shape="85" />
+<var name="training_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x00000241EF130788&gt;" isContainer="True" shape="85" />
+<var name="val_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="10" />
+<var name="validation_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x00000241EF130C08&gt;" isContainer="True" shape="10" />
+</xml>
+bias
+torch.Size([])
+convs.0.lin_key.weight
+torch.Size([256, 4])
+convs.0.lin_key.bias
+torch.Size([256])
+convs.0.lin_query.weight
+torch.Size([256, 4])
+convs.0.lin_query.bias
+torch.Size([256])
+convs.0.lin_value.weight
+torch.Size([256, 4])
+convs.0.lin_value.bias
+torch.Size([256])
+convs.0.lin_edge.weight
+torch.Size([256, 2])
+convs.0.lin_skip.weight
+torch.Size([256, 4])
+convs.0.lin_skip.bias
+torch.Size([256])
+convs.1.lin_key.weight
+torch.Size([256, 256])
+convs.1.lin_key.bias
+torch.Size([256])
+convs.1.lin_query.weight
+torch.Size([256, 256])
+convs.1.lin_query.bias
+torch.Size([256])
+convs.1.lin_value.weight
+torch.Size([256, 256])
+convs.1.lin_value.bias
+torch.Size([256])
+convs.1.lin_edge.weight
+torch.Size([256, 2])
+convs.1.lin_skip.weight
+torch.Size([256, 256])
+convs.1.lin_skip.bias
+torch.Size([256])
+convs.2.lin_key.weight
+torch.Size([256, 256])
+convs.2.lin_key.bias
+torch.Size([256])
+convs.2.lin_query.weight
+torch.Size([256, 256])
+convs.2.lin_query.bias
+torch.Size([256])
+convs.2.lin_value.weight
+torch.Size([256, 256])
+convs.2.lin_value.bias
+torch.Size([256])
+convs.2.lin_edge.weight
+torch.Size([256, 2])
+convs.2.lin_skip.weight
+torch.Size([256, 256])
+convs.2.lin_skip.bias
+torch.Size([256])
+norms.0.module.weight
+torch.Size([256])
+norms.0.module.bias
+torch.Size([256])
+norms.1.module.weight
+torch.Size([256])
+norms.1.module.bias
+torch.Size([256])
+norms.2.module.weight
+torch.Size([256])
+norms.2.module.bias
+torch.Size([256])
+lin.weight
+torch.Size([4, 256])
+<xml><var name="_dummy_ipython_val"  />
+<var name="_dummy_special_var"  />
+<var name="activation" type="str" qualifier="builtins" value="tanh" />
+<var name="dropout" type="float" qualifier="builtins" value="0.0" />
+<var name="edge_attr" type="Tensor" qualifier="torch" value="tensor%28%5B%5B-0.2645%2C -0.1521%5D%2C%0A        %5B 2.7324%2C  2.7243%5D%2C%0A        %5B 1.3056%2C  1.3548%5D%2C%0A        %5B-0.5235%2C -0.4008%5D%2C%0A        %5B 1.2148%2C  1.2678%5D%2C%0A        %5B 1.4367%2C  1.4807%5D%2C%0A        %5B-0.6814%2C -0.5523%5D%2C%0A        %5B 0.6989%2C  0.7725%5D%2C%0A        %5B-0.3612%2C -0.2450%5D%2C%0A        %5B-0.6496%2C -0.5217%5D%2C%0A        %5B-0.2338%2C -0.1227%5D%2C%0A        %5B 0.5412%2C  0.6212%5D%2C%0A        %5B-0.6419%2C -0.5144%5D%2C%0A        %5B-0.7528%2C -0.6208%5D%2C%0A        %5B-0.3905%2C -0.2730%5D%2C%0A        %5B-0.2338%2C -0.1227%5D%2C%0A        %5B-0.2545%2C -0.1426%5D%2C%0A        %5B-0.6236%2C -0.4969%5D%2C%0A        %5B-0.6239%2C -0.4971%5D%2C%0A        %5B 0.4243%2C  0.5090%5D%2C%0A        %5B 6.5080%2C  6.3482%5D%2C%0A        %5B-0.1812%2C -0.0722%5D%2C%0A        %5B 0.1620%2C  0.2572%5D%2C%0A        %5B-0.5648%2C -0.4403%5D%2C%0A        %5B 0.2513%2C  0.3430%5D%2C%0A        %5B 0.0399%2C  0.1400%5D%2C%0A        %5B-0.4489%2C -0.3291%5D%2C%0A        %5B 1.0460%2C  1.1057%5D%2C%0A        %5B-0.7307%2C -0.5996%5D%2C%0A        %5B-0.7024%2C -0.6239%5D%2C%0A        %5B-0.0723%2C  0.0323%5D%2C%0A        %5B-0.5856%2C -0.4603%5D%2C%0A        %5B 1.3009%2C  1.3504%5D%2C%0A        %5B 1.8298%2C  1.8580%5D%2C%0A        %5B 0.5412%2C  0.6212%5D%2C%0A        %5B 1.3009%2C  1..." isContainer="True" shape="(186, 2)" />
+<var name="edge_index" type="Tensor" qualifier="torch" value="tensor%28%5B%5B 3%2C  3%2C  3%2C  4%2C  5%2C  5%2C  5%2C  5%2C  5%2C  5%2C  6%2C  6%2C  6%2C  6%2C  6%2C  7%2C  7%2C  8%2C%0A          9%2C 10%2C 10%2C 10%2C 10%2C 11%2C 12%2C 12%2C 13%2C 14%2C 14%2C 15%2C 16%2C 16%2C 17%2C 17%2C 18%2C 18%2C%0A         19%2C 20%2C 21%2C 22%2C 23%2C 24%2C 24%2C 25%2C 25%2C 26%2C 26%2C 26%2C 27%2C 27%2C 27%2C 28%2C 29%2C 29%2C%0A         29%2C 30%2C 30%2C 31%2C 31%2C 32%2C 32%2C 33%2C 33%2C 34%2C 34%2C 34%2C 35%2C 36%2C 37%2C 37%2C 38%2C 38%2C%0A         38%2C 39%2C 39%2C 39%2C 40%2C 40%2C 41%2C 41%2C 41%2C 42%2C 43%2C 43%2C 43%2C 44%2C 44%2C 44%2C 45%2C 46%2C%0A         46%2C 46%2C 47%2C 48%2C 48%2C 48%2C 49%2C 50%2C 50%2C 50%2C 51%2C 51%2C 52%2C 52%2C 53%2C 53%2C 53%2C 54%2C%0A         55%2C 55%2C 56%2C 57%2C 57%2C 58%2C 58%2C 59%2C 60%2C 61%2C 61%2C 62%2C 63%2C 63%2C  0%2C  1%2C  2%2C  3%2C%0A          4%2C  5%2C  6%2C  7%2C  8%2C  9%2C 10%2C 11%2C 12%2C 13%2C 14%2C 15%2C 16%2C 17%2C 18%2C 19%2C 20%2C 21%2C%0A         22%2C 23%2C 24%2C 25%2C 26%2C 27%2C 28%2C 29%2C 30%2C 31%2C 32%2C 33%2C 34%2C 35%2C 36%2C 37%2C 38%2C 39%2C%0A         40%2C 41%2C 42%2C 43%2C 44%2C 45%2C 46%2C 47%2C 48%2C 49%2C 50%2C 51%2C 52%2C 53%2C 54%2C 55%2C 56%2C 57%2C%0A         58%2C 59%2C 60%2C 61%2C 62%2C 63%5D%2C%0A        %5B24%2C 25%2C 50%2C 39%2C 26%2C 29%2C 33%2C 38%2C 40%2C 51%2C  7%2C 18%2C 37%2C 54%2C 63%2C  6%2C 39%2C 43%2C%0A         41%2C 28%2C 34%2C 44%2C 62%2C 38%2C 20%2C 27%2C 26%2C 25%2C 32%2C 40%2C 45%2C 48%2C 18%2C 38%2C  6..." isContainer="True" shape="(2, 186)" />
+<var name="grid_name" type="str" qualifier="builtins" value="1-HV-mixed--0-no_sw" />
+<var name="hidden_channels" type="int" qualifier="builtins" value="256" />
+<var name="i" type="int" qualifier="builtins" value="0" />
+<var name="in_channels" type="int" qualifier="builtins" value="4" />
+<var name="jk" type="str" qualifier="builtins" value="last" />
+<var name="layer_type" type="str" qualifier="builtins" value="TransConv" />
+<var name="loss" type="MSELoss" qualifier="torch.nn.modules.loss" value="MSELoss%28%29" isContainer="True" />
+<var name="lr" type="float" qualifier="builtins" value="0.0001" />
+<var name="model" type="GNN" qualifier="gnn" value="GNN%284%2C 4%2C num_layers=3%29" isContainer="True" />
+<var name="name" type="str" qualifier="builtins" value="lin.weight" />
+<var name="num_epochs" type="int" qualifier="builtins" value="400" />
+<var name="num_layers" type="int" qualifier="builtins" value="3" />
+<var name="optimizer" type="Adam" qualifier="torch.optim.adam" value="Adam %28%0AParameter Group 0%0A    amsgrad%3A False%0A    betas%3A %280.9%2C 0.999%29%0A    capturable%3A False%0A    differentiable%3A False%0A    eps%3A 1e-08%0A    foreach%3A None%0A    fused%3A False%0A    lr%3A 0.0001%0A    maximize%3A False%0A    weight_decay%3A 0%0A%29" isContainer="True" />
+<var name="out_channels" type="int" qualifier="builtins" value="4" />
+<var name="output" type="ndarray" qualifier="numpy" value="%5B%5B 1.09933925e%2B00  2.10566921e%2B01  1.84152786e%2B02 -3.42756348e%2B01%5D%2C %5B 1.09229040e%2B00  1.01957843e-01  6.89556580e%2B02 -3.31201904e%2B02%5D%2C %5B 1.09953165e%2B00  2.07833881e%2B01 -1.75603371e%2B01 -7.49734573e%2B01%5D%2C %5B 1.06715345e%2B00  2.05628185e%2B01 -4.20932680e-01  3.14781442e-04%5D%2C %5B 1.08365047e%2B00  2.07371788e%2B01  5.50987387e%2B00  8.56409848e-01%5D%2C %5B 1.01922977e%2B00  1.14192410e%2B01  1.81710243e%2B00  8.54473412e-01%5D%2C %5B 1.08624065e%2B00  2.03397350e%2B01 -4.02286768e%2B00  1.29198205e%2B00%5D%2C %5B 1.08566988e%2B00  2.04955196e%2B01 -1.79019604e%2B01  1.56717002e%2B00%5D%2C %5B 1.08292019e%2B00  2.09654827e%2B01 -3.77145314e%2B00  8.34532082e-01%5D%2C %5B 1.01642907e%2B00  1.14980307e%2B01  7.88913298e%2B00  1.25855656e%2B01%5D%2C %5B 1.09227908e%2B00  2.37616081e%2B01 -1.50807800e%2B02  6.37414753e-01%5D%2C %5B 1.03130460e%2B00  1.37130375e%2B01 -1.24285746e%2B01  5.97271395e%2B00%5D%2C %5B 1.03254604e%2B00  1.60284500e%2B01 -1.28478531e%2B02  1.21871376e%2B01%5D%2C %5B 1.02436841e%2B00  1.40019941e%2B01 -3.43152695e%2B01  1.40981996e%2B00%5D%2C %5B 1.03929090e%2B00  1.57871666e%2B01 -1.10511892e-01 -1.82605430e..." isContainer="True" shape="(64, 4)" />
+<var name="param" type="int" qualifier="builtins" value="535553" />
+<var name="scaler" type="StandardScaler" qualifier="sklearn.preprocessing._data" value="StandardScaler%28%29" isContainer="True" />
+<var name="target" type="ndarray" qualifier="numpy" value="%5B%5B 1.09999990e%2B00  2.11135216e%2B01  1.80405777e%2B02 -3.25420990e%2B01%5D%2C %5B 1.09200001e%2B00  5.21540642e-07  6.88853333e%2B02 -3.31062225e%2B02%5D%2C %5B 1.10000002e%2B00  2.06344872e%2B01 -1.99998684e%2B01 -7.48578568e%2B01%5D%2C %5B 1.06783974e%2B00  2.07016125e%2B01  1.00990292e-08  6.89178705e-08%5D%2C %5B 1.08447134e%2B00  2.07619991e%2B01  2.72727966e%2B00  1.19648302e%2B00%5D%2C %5B 1.01879919e%2B00  1.12869072e%2B01  2.78144455e%2B00  1.15234458e%2B00%5D%2C %5B 1.08637846e%2B00  2.04511871e%2B01 -2.67765236e%2B00  1.10139930e%2B00%5D%2C %5B 1.08568394e%2B00  2.06436100e%2B01 -1.75902443e%2B01  1.29479873e%2B00%5D%2C %5B 1.08381391e%2B00  2.09198036e%2B01 -6.36548805e%2B00  1.15715730e%2B00%5D%2C %5B 1.01607168e%2B00  1.13048849e%2B01  8.25025082e%2B00  1.28628941e%2B01%5D%2C %5B 1.09258771e%2B00  2.38252697e%2B01 -1.49059998e%2B02  6.89178705e-08%5D%2C %5B 1.03055835e%2B00  1.35745459e%2B01 -1.28210411e%2B01  6.23710394e%2B00%5D%2C %5B 1.03298366e%2B00  1.61127853e%2B01 -1.25449020e%2B02  1.17619133e%2B01%5D%2C %5B 1.02391946e%2B00  1.38823309e%2B01 -3.34123497e%2B01  1.10244691e%2B00%5D%2C %5B 1.03892648e%2B00  1.58049202e%2B01  1.00990292e-08  6.89178705e..." isContainer="True" shape="(64, 4)" />
+<var name="test_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="5" />
+<var name="test_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x00000241EF130B48&gt;" isContainer="True" shape="5" />
+<var name="train_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Dat..." isContainer="True" shape="85" />
+<var name="training_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x00000241EF130788&gt;" isContainer="True" shape="85" />
+<var name="val_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="10" />
+<var name="validation_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x00000241EF130C08&gt;" isContainer="True" shape="10" />
+</xml>
+Training the model for epoch 0
+Validating the model on unseen Datasets for epoch 0
+Training the model for epoch 1
+Validating the model on unseen Datasets for epoch 1
+Training the model for epoch 2
+Validating the model on unseen Datasets for epoch 2
+Training the model for epoch 3
+Validating the model on unseen Datasets for epoch 3
+Training the model for epoch 4
+Validating the model on unseen Datasets for epoch 4
+Training the model for epoch 5
+Validating the model on unseen Datasets for epoch 5
+Training the model for epoch 6
+Validating the model on unseen Datasets for epoch 6
+Training the model for epoch 7
+Validating the model on unseen Datasets for epoch 7
+Training the model for epoch 8
+Validating the model on unseen Datasets for epoch 8
+Training the model for epoch 9
+Validating the model on unseen Datasets for epoch 9
+Training the model for epoch 10
+Validating the model on unseen Datasets for epoch 10
+Training the model for epoch 11
+Validating the model on unseen Datasets for epoch 11
+Training the model for epoch 12
+Validating the model on unseen Datasets for epoch 12
+Training the model for epoch 13
+Validating the model on unseen Datasets for epoch 13
+Training the model for epoch 14
+Validating the model on unseen Datasets for epoch 14
+Training the model for epoch 15
+Validating the model on unseen Datasets for epoch 15
+Training the model for epoch 16
+Validating the model on unseen Datasets for epoch 16
+Training the model for epoch 17
+Validating the model on unseen Datasets for epoch 17
+Training the model for epoch 18
+Validating the model on unseen Datasets for epoch 18
+Training the model for epoch 19
+Validating the model on unseen Datasets for epoch 19
+Training the model for epoch 20
+Validating the model on unseen Datasets for epoch 20
+Training the model for epoch 21
+Validating the model on unseen Datasets for epoch 21
+Training the model for epoch 22
+Validating the model on unseen Datasets for epoch 22
+Training the model for epoch 23
+Validating the model on unseen Datasets for epoch 23
+Training the model for epoch 24
+Validating the model on unseen Datasets for epoch 24
+Training the model for epoch 25
+Validating the model on unseen Datasets for epoch 25
+Training the model for epoch 26
+Validating the model on unseen Datasets for epoch 26
+Training the model for epoch 27
+Validating the model on unseen Datasets for epoch 27
+Training the model for epoch 28
+Validating the model on unseen Datasets for epoch 28
+Training the model for epoch 29
+Validating the model on unseen Datasets for epoch 29
+Training the model for epoch 30
+Validating the model on unseen Datasets for epoch 30
+Training the model for epoch 31
+Validating the model on unseen Datasets for epoch 31
+Training the model for epoch 32
+Validating the model on unseen Datasets for epoch 32
+Training the model for epoch 33
+Validating the model on unseen Datasets for epoch 33
+Training the model for epoch 34
+Validating the model on unseen Datasets for epoch 34
+Training the model for epoch 35
+Validating the model on unseen Datasets for epoch 35
+Training the model for epoch 36
+Validating the model on unseen Datasets for epoch 36
+Training the model for epoch 37
+Validating the model on unseen Datasets for epoch 37
+Training the model for epoch 38
+Validating the model on unseen Datasets for epoch 38
+Training the model for epoch 39
+Validating the model on unseen Datasets for epoch 39
+Training the model for epoch 40
+Validating the model on unseen Datasets for epoch 40
+Training the model for epoch 41
+Validating the model on unseen Datasets for epoch 41
+Training the model for epoch 42
+Validating the model on unseen Datasets for epoch 42
+Training the model for epoch 43
+Validating the model on unseen Datasets for epoch 43
+Training the model for epoch 44
+Validating the model on unseen Datasets for epoch 44
+Training the model for epoch 45
+Validating the model on unseen Datasets for epoch 45
+Training the model for epoch 46
+Validating the model on unseen Datasets for epoch 46
+Training the model for epoch 47
+Validating the model on unseen Datasets for epoch 47
+Training the model for epoch 48
+Validating the model on unseen Datasets for epoch 48
+Training the model for epoch 49
+Validating the model on unseen Datasets for epoch 49
+Training the model for epoch 50
+Validating the model on unseen Datasets for epoch 50
+Training the model for epoch 51
+Validating the model on unseen Datasets for epoch 51
+Training the model for epoch 52
+Validating the model on unseen Datasets for epoch 52
+Training the model for epoch 53
+Validating the model on unseen Datasets for epoch 53
+Training the model for epoch 54
+Validating the model on unseen Datasets for epoch 54
+Training the model for epoch 55
+Validating the model on unseen Datasets for epoch 55
+Training the model for epoch 56
+Validating the model on unseen Datasets for epoch 56
+Training the model for epoch 57
+Validating the model on unseen Datasets for epoch 57
+Training the model for epoch 58
+Validating the model on unseen Datasets for epoch 58
+Training the model for epoch 59
+Validating the model on unseen Datasets for epoch 59
+Training the model for epoch 60
+Validating the model on unseen Datasets for epoch 60
+Training the model for epoch 61
+Validating the model on unseen Datasets for epoch 61
+Training the model for epoch 62
+Validating the model on unseen Datasets for epoch 62
+Training the model for epoch 63
+Validating the model on unseen Datasets for epoch 63
+Training the model for epoch 64
+Validating the model on unseen Datasets for epoch 64
+Training the model for epoch 65
+Validating the model on unseen Datasets for epoch 65
+Training the model for epoch 66
+Validating the model on unseen Datasets for epoch 66
+Training the model for epoch 67
+Validating the model on unseen Datasets for epoch 67
+Training the model for epoch 68
+Validating the model on unseen Datasets for epoch 68
+Training the model for epoch 69
+Validating the model on unseen Datasets for epoch 69
+Training the model for epoch 70
+Validating the model on unseen Datasets for epoch 70
+Training the model for epoch 71
+Validating the model on unseen Datasets for epoch 71
+Training the model for epoch 72
+Validating the model on unseen Datasets for epoch 72
+Training the model for epoch 73
+Validating the model on unseen Datasets for epoch 73
+Training the model for epoch 74
+Validating the model on unseen Datasets for epoch 74
+Training the model for epoch 75
+Validating the model on unseen Datasets for epoch 75
+Training the model for epoch 76
+Validating the model on unseen Datasets for epoch 76
+Training the model for epoch 77
+Validating the model on unseen Datasets for epoch 77
+Training the model for epoch 78
+Validating the model on unseen Datasets for epoch 78
+Training the model for epoch 79
+Validating the model on unseen Datasets for epoch 79
+Training the model for epoch 80
+Validating the model on unseen Datasets for epoch 80
+Training the model for epoch 81
+Validating the model on unseen Datasets for epoch 81
+Training the model for epoch 82
+Validating the model on unseen Datasets for epoch 82
+Training the model for epoch 83
+Validating the model on unseen Datasets for epoch 83
+Training the model for epoch 84
+Validating the model on unseen Datasets for epoch 84
+Training the model for epoch 85
+Validating the model on unseen Datasets for epoch 85
+Training the model for epoch 86
+Validating the model on unseen Datasets for epoch 86
+Training the model for epoch 87
+Validating the model on unseen Datasets for epoch 87
+Training the model for epoch 88
+Validating the model on unseen Datasets for epoch 88
+Training the model for epoch 89
+Validating the model on unseen Datasets for epoch 89
+Training the model for epoch 90
+Validating the model on unseen Datasets for epoch 90
+Training the model for epoch 91
+Validating the model on unseen Datasets for epoch 91
+Training the model for epoch 92
+Validating the model on unseen Datasets for epoch 92
+Training the model for epoch 93
+Validating the model on unseen Datasets for epoch 93
+Training the model for epoch 94
+Validating the model on unseen Datasets for epoch 94
+Training the model for epoch 95
+Validating the model on unseen Datasets for epoch 95
+Training the model for epoch 96
+Validating the model on unseen Datasets for epoch 96
+Training the model for epoch 97
+Validating the model on unseen Datasets for epoch 97
+Training the model for epoch 98
+Validating the model on unseen Datasets for epoch 98
+Training the model for epoch 99
+Validating the model on unseen Datasets for epoch 99
+Training the model for epoch 100
+Validating the model on unseen Datasets for epoch 100
+Training the model for epoch 101
+Validating the model on unseen Datasets for epoch 101
+Training the model for epoch 102
+Validating the model on unseen Datasets for epoch 102
+Training the model for epoch 103
+Validating the model on unseen Datasets for epoch 103
+Training the model for epoch 104
+Validating the model on unseen Datasets for epoch 104
+Training the model for epoch 105
+Validating the model on unseen Datasets for epoch 105
+Training the model for epoch 106
+Validating the model on unseen Datasets for epoch 106
+Training the model for epoch 107
+Validating the model on unseen Datasets for epoch 107
+Training the model for epoch 108
+Validating the model on unseen Datasets for epoch 108
+Training the model for epoch 109
+Validating the model on unseen Datasets for epoch 109
+Training the model for epoch 110
+Validating the model on unseen Datasets for epoch 110
+Training the model for epoch 111
+Validating the model on unseen Datasets for epoch 111
+Training the model for epoch 112
+Validating the model on unseen Datasets for epoch 112
+Training the model for epoch 113
+Validating the model on unseen Datasets for epoch 113
+Training the model for epoch 114
+Validating the model on unseen Datasets for epoch 114
+Training the model for epoch 115
+Validating the model on unseen Datasets for epoch 115
+Training the model for epoch 116
+Validating the model on unseen Datasets for epoch 116
+Training the model for epoch 117
+Validating the model on unseen Datasets for epoch 117
+Training the model for epoch 118
+Validating the model on unseen Datasets for epoch 118
+Training the model for epoch 119
+Validating the model on unseen Datasets for epoch 119
+Training the model for epoch 120
+Validating the model on unseen Datasets for epoch 120
+Training the model for epoch 121
+Validating the model on unseen Datasets for epoch 121
+Training the model for epoch 122
+Validating the model on unseen Datasets for epoch 122
+Training the model for epoch 123
+Validating the model on unseen Datasets for epoch 123
+Training the model for epoch 124
+Validating the model on unseen Datasets for epoch 124
+Training the model for epoch 125
+Validating the model on unseen Datasets for epoch 125
+Training the model for epoch 126
+Validating the model on unseen Datasets for epoch 126
+Training the model for epoch 127
+Validating the model on unseen Datasets for epoch 127
+Training the model for epoch 128
+Validating the model on unseen Datasets for epoch 128
+Training the model for epoch 129
+Validating the model on unseen Datasets for epoch 129
+Training the model for epoch 130
+Validating the model on unseen Datasets for epoch 130
+Training the model for epoch 131
+Validating the model on unseen Datasets for epoch 131
+Training the model for epoch 132
+Validating the model on unseen Datasets for epoch 132
+Training the model for epoch 133
+Validating the model on unseen Datasets for epoch 133
+Training the model for epoch 134
+Validating the model on unseen Datasets for epoch 134
+Training the model for epoch 135
+Validating the model on unseen Datasets for epoch 135
+Training the model for epoch 136
+Validating the model on unseen Datasets for epoch 136
+Training the model for epoch 137
+Validating the model on unseen Datasets for epoch 137
+Training the model for epoch 138
+Validating the model on unseen Datasets for epoch 138
+Training the model for epoch 139
+Validating the model on unseen Datasets for epoch 139
+Training the model for epoch 140
+Validating the model on unseen Datasets for epoch 140
+Training the model for epoch 141
+Validating the model on unseen Datasets for epoch 141
+Training the model for epoch 142
+Validating the model on unseen Datasets for epoch 142
+Training the model for epoch 143
+Validating the model on unseen Datasets for epoch 143
+Training the model for epoch 144
+Validating the model on unseen Datasets for epoch 144
+Training the model for epoch 145
+Validating the model on unseen Datasets for epoch 145
+Training the model for epoch 146
+Validating the model on unseen Datasets for epoch 146
+Training the model for epoch 147
+Validating the model on unseen Datasets for epoch 147
+Training the model for epoch 148
+Validating the model on unseen Datasets for epoch 148
+Training the model for epoch 149
+Validating the model on unseen Datasets for epoch 149
+Training the model for epoch 150
+Validating the model on unseen Datasets for epoch 150
+Training the model for epoch 151
+Validating the model on unseen Datasets for epoch 151
+Training the model for epoch 152
+Validating the model on unseen Datasets for epoch 152
+Training the model for epoch 153
+Validating the model on unseen Datasets for epoch 153
+Training the model for epoch 154
+Validating the model on unseen Datasets for epoch 154
+Training the model for epoch 155
+Validating the model on unseen Datasets for epoch 155
+Training the model for epoch 156
+Validating the model on unseen Datasets for epoch 156
+Training the model for epoch 157
+Validating the model on unseen Datasets for epoch 157
+Training the model for epoch 158
+Validating the model on unseen Datasets for epoch 158
+Training the model for epoch 159
+Validating the model on unseen Datasets for epoch 159
+Training the model for epoch 160
+Validating the model on unseen Datasets for epoch 160
+Training the model for epoch 161
+Validating the model on unseen Datasets for epoch 161
+Training the model for epoch 162
+Validating the model on unseen Datasets for epoch 162
+Training the model for epoch 163
+Validating the model on unseen Datasets for epoch 163
+Training the model for epoch 164
+Validating the model on unseen Datasets for epoch 164
+Training the model for epoch 165
+Validating the model on unseen Datasets for epoch 165
+Training the model for epoch 166
+Validating the model on unseen Datasets for epoch 166
+Training the model for epoch 167
+Validating the model on unseen Datasets for epoch 167
+Training the model for epoch 168
+Validating the model on unseen Datasets for epoch 168
+Training the model for epoch 169
+Validating the model on unseen Datasets for epoch 169
+Training the model for epoch 170
+Validating the model on unseen Datasets for epoch 170
+Training the model for epoch 171
+Validating the model on unseen Datasets for epoch 171
+Training the model for epoch 172
+Validating the model on unseen Datasets for epoch 172
+Training the model for epoch 173
+Validating the model on unseen Datasets for epoch 173
+Training the model for epoch 174
+Validating the model on unseen Datasets for epoch 174
+Training the model for epoch 175
+Validating the model on unseen Datasets for epoch 175
+Training the model for epoch 176
+Validating the model on unseen Datasets for epoch 176
+Training the model for epoch 177
+Validating the model on unseen Datasets for epoch 177
+Training the model for epoch 178
+Validating the model on unseen Datasets for epoch 178
+Training the model for epoch 179
+Validating the model on unseen Datasets for epoch 179
+Training the model for epoch 180
+Validating the model on unseen Datasets for epoch 180
+Training the model for epoch 181
+Validating the model on unseen Datasets for epoch 181
+Training the model for epoch 182
+Validating the model on unseen Datasets for epoch 182
+Training the model for epoch 183
+Validating the model on unseen Datasets for epoch 183
+Training the model for epoch 184
+Validating the model on unseen Datasets for epoch 184
+Training the model for epoch 185
+Validating the model on unseen Datasets for epoch 185
+Training the model for epoch 186
+Validating the model on unseen Datasets for epoch 186
+Training the model for epoch 187
+Validating the model on unseen Datasets for epoch 187
+Training the model for epoch 188
+Validating the model on unseen Datasets for epoch 188
+Training the model for epoch 189
+Validating the model on unseen Datasets for epoch 189
+Training the model for epoch 190
+Validating the model on unseen Datasets for epoch 190
+Training the model for epoch 191
+Validating the model on unseen Datasets for epoch 191
+Training the model for epoch 192
+Validating the model on unseen Datasets for epoch 192
+Training the model for epoch 193
+Validating the model on unseen Datasets for epoch 193
+Training the model for epoch 194
+Validating the model on unseen Datasets for epoch 194
+Training the model for epoch 195
+Validating the model on unseen Datasets for epoch 195
+Training the model for epoch 196
+Validating the model on unseen Datasets for epoch 196
+Training the model for epoch 197
+Validating the model on unseen Datasets for epoch 197
+Training the model for epoch 198
+Validating the model on unseen Datasets for epoch 198
+Training the model for epoch 199
+Validating the model on unseen Datasets for epoch 199
+Training the model for epoch 200
+Validating the model on unseen Datasets for epoch 200
+Training the model for epoch 201
+Validating the model on unseen Datasets for epoch 201
+Training the model for epoch 202
+Validating the model on unseen Datasets for epoch 202
+Training the model for epoch 203
+Validating the model on unseen Datasets for epoch 203
+Training the model for epoch 204
+Validating the model on unseen Datasets for epoch 204
+Training the model for epoch 205
+Validating the model on unseen Datasets for epoch 205
+Training the model for epoch 206
+Validating the model on unseen Datasets for epoch 206
+Training the model for epoch 207
+Validating the model on unseen Datasets for epoch 207
+Training the model for epoch 208
+Validating the model on unseen Datasets for epoch 208
+Training the model for epoch 209
+Validating the model on unseen Datasets for epoch 209
+Training the model for epoch 210
+Validating the model on unseen Datasets for epoch 210
+Training the model for epoch 211
+Validating the model on unseen Datasets for epoch 211
+Training the model for epoch 212
+Validating the model on unseen Datasets for epoch 212
+Training the model for epoch 213
+Validating the model on unseen Datasets for epoch 213
+Training the model for epoch 214
+Validating the model on unseen Datasets for epoch 214
+Training the model for epoch 215
+<xml><var name="_dummy_ipython_val"  />
+<var name="_dummy_special_var"  />
+<var name="activation" type="str" qualifier="builtins" value="tanh" />
+<var name="dropout" type="float" qualifier="builtins" value="0.0" />
+<var name="edge_attr" type="Tensor" qualifier="torch" value="tensor%28%5B%5B-0.2645%2C -0.1521%5D%2C%0A        %5B 2.7324%2C  2.7243%5D%2C%0A        %5B 1.3056%2C  1.3548%5D%2C%0A        %5B-0.5235%2C -0.4008%5D%2C%0A        %5B 1.2148%2C  1.2678%5D%2C%0A        %5B 1.4367%2C  1.4807%5D%2C%0A        %5B-0.6814%2C -0.5523%5D%2C%0A        %5B 0.6989%2C  0.7725%5D%2C%0A        %5B-0.3612%2C -0.2450%5D%2C%0A        %5B-0.6496%2C -0.5217%5D%2C%0A        %5B-0.2338%2C -0.1227%5D%2C%0A        %5B 0.5412%2C  0.6212%5D%2C%0A        %5B-0.6419%2C -0.5144%5D%2C%0A        %5B-0.7528%2C -0.6208%5D%2C%0A        %5B-0.3905%2C -0.2730%5D%2C%0A        %5B-0.2338%2C -0.1227%5D%2C%0A        %5B-0.2545%2C -0.1426%5D%2C%0A        %5B-0.6236%2C -0.4969%5D%2C%0A        %5B-0.6239%2C -0.4971%5D%2C%0A        %5B 0.4243%2C  0.5090%5D%2C%0A        %5B 6.5080%2C  6.3482%5D%2C%0A        %5B-0.1812%2C -0.0722%5D%2C%0A        %5B 0.1620%2C  0.2572%5D%2C%0A        %5B-0.5648%2C -0.4403%5D%2C%0A        %5B 0.2513%2C  0.3430%5D%2C%0A        %5B 0.0399%2C  0.1400%5D%2C%0A        %5B-0.4489%2C -0.3291%5D%2C%0A        %5B 1.0460%2C  1.1057%5D%2C%0A        %5B-0.7307%2C -0.5996%5D%2C%0A        %5B-0.7024%2C -0.6239%5D%2C%0A        %5B-0.0723%2C  0.0323%5D%2C%0A        %5B-0.5856%2C -0.4603%5D%2C%0A        %5B 1.3009%2C  1.3504%5D%2C%0A        %5B 1.8298%2C  1.8580%5D%2C%0A        %5B 0.5412%2C  0.6212%5D%2C%0A        %5B 1.3009%2C  1..." isContainer="True" shape="(186, 2)" />
+<var name="edge_index" type="Tensor" qualifier="torch" value="tensor%28%5B%5B 3%2C  3%2C  3%2C  4%2C  5%2C  5%2C  5%2C  5%2C  5%2C  5%2C  6%2C  6%2C  6%2C  6%2C  6%2C  7%2C  7%2C  8%2C%0A          9%2C 10%2C 10%2C 10%2C 10%2C 11%2C 12%2C 12%2C 13%2C 14%2C 14%2C 15%2C 16%2C 16%2C 17%2C 17%2C 18%2C 18%2C%0A         19%2C 20%2C 21%2C 22%2C 23%2C 24%2C 24%2C 25%2C 25%2C 26%2C 26%2C 26%2C 27%2C 27%2C 27%2C 28%2C 29%2C 29%2C%0A         29%2C 30%2C 30%2C 31%2C 31%2C 32%2C 32%2C 33%2C 33%2C 34%2C 34%2C 34%2C 35%2C 36%2C 37%2C 37%2C 38%2C 38%2C%0A         38%2C 39%2C 39%2C 39%2C 40%2C 40%2C 41%2C 41%2C 41%2C 42%2C 43%2C 43%2C 43%2C 44%2C 44%2C 44%2C 45%2C 46%2C%0A         46%2C 46%2C 47%2C 48%2C 48%2C 48%2C 49%2C 50%2C 50%2C 50%2C 51%2C 51%2C 52%2C 52%2C 53%2C 53%2C 53%2C 54%2C%0A         55%2C 55%2C 56%2C 57%2C 57%2C 58%2C 58%2C 59%2C 60%2C 61%2C 61%2C 62%2C 63%2C 63%2C  0%2C  1%2C  2%2C  3%2C%0A          4%2C  5%2C  6%2C  7%2C  8%2C  9%2C 10%2C 11%2C 12%2C 13%2C 14%2C 15%2C 16%2C 17%2C 18%2C 19%2C 20%2C 21%2C%0A         22%2C 23%2C 24%2C 25%2C 26%2C 27%2C 28%2C 29%2C 30%2C 31%2C 32%2C 33%2C 34%2C 35%2C 36%2C 37%2C 38%2C 39%2C%0A         40%2C 41%2C 42%2C 43%2C 44%2C 45%2C 46%2C 47%2C 48%2C 49%2C 50%2C 51%2C 52%2C 53%2C 54%2C 55%2C 56%2C 57%2C%0A         58%2C 59%2C 60%2C 61%2C 62%2C 63%5D%2C%0A        %5B24%2C 25%2C 50%2C 39%2C 26%2C 29%2C 33%2C 38%2C 40%2C 51%2C  7%2C 18%2C 37%2C 54%2C 63%2C  6%2C 39%2C 43%2C%0A         41%2C 28%2C 34%2C 44%2C 62%2C 38%2C 20%2C 27%2C 26%2C 25%2C 32%2C 40%2C 45%2C 48%2C 18%2C 38%2C  6..." isContainer="True" shape="(2, 186)" />
+<var name="grid_name" type="str" qualifier="builtins" value="1-HV-mixed--0-no_sw" />
+<var name="hidden_channels" type="int" qualifier="builtins" value="256" />
+<var name="i" type="int" qualifier="builtins" value="215" />
+<var name="in_channels" type="int" qualifier="builtins" value="4" />
+<var name="jk" type="str" qualifier="builtins" value="last" />
+<var name="layer_type" type="str" qualifier="builtins" value="TransConv" />
+<var name="loss" type="MSELoss" qualifier="torch.nn.modules.loss" value="MSELoss%28%29" isContainer="True" />
+<var name="lr" type="float" qualifier="builtins" value="0.0001" />
+<var name="model" type="GNN" qualifier="gnn" value="GNN%284%2C 4%2C num_layers=3%29" isContainer="True" />
+<var name="name" type="str" qualifier="builtins" value="lin.weight" />
+<var name="num_epochs" type="int" qualifier="builtins" value="400" />
+<var name="num_layers" type="int" qualifier="builtins" value="3" />
+<var name="optimizer" type="Adam" qualifier="torch.optim.adam" value="Adam %28%0AParameter Group 0%0A    amsgrad%3A False%0A    betas%3A %280.9%2C 0.999%29%0A    capturable%3A False%0A    differentiable%3A False%0A    eps%3A 1e-08%0A    foreach%3A None%0A    fused%3A False%0A    lr%3A 0.0001%0A    maximize%3A False%0A    weight_decay%3A 0%0A%29" isContainer="True" />
+<var name="out_channels" type="int" qualifier="builtins" value="4" />
+<var name="output" type="ndarray" qualifier="numpy" value="%5B%5B 1.09933925e%2B00  2.10566921e%2B01  1.84152786e%2B02 -3.42756348e%2B01%5D%2C %5B 1.09229040e%2B00  1.01957843e-01  6.89556580e%2B02 -3.31201904e%2B02%5D%2C %5B 1.09953165e%2B00  2.07833881e%2B01 -1.75603371e%2B01 -7.49734573e%2B01%5D%2C %5B 1.06715345e%2B00  2.05628185e%2B01 -4.20932680e-01  3.14781442e-04%5D%2C %5B 1.08365047e%2B00  2.07371788e%2B01  5.50987387e%2B00  8.56409848e-01%5D%2C %5B 1.01922977e%2B00  1.14192410e%2B01  1.81710243e%2B00  8.54473412e-01%5D%2C %5B 1.08624065e%2B00  2.03397350e%2B01 -4.02286768e%2B00  1.29198205e%2B00%5D%2C %5B 1.08566988e%2B00  2.04955196e%2B01 -1.79019604e%2B01  1.56717002e%2B00%5D%2C %5B 1.08292019e%2B00  2.09654827e%2B01 -3.77145314e%2B00  8.34532082e-01%5D%2C %5B 1.01642907e%2B00  1.14980307e%2B01  7.88913298e%2B00  1.25855656e%2B01%5D%2C %5B 1.09227908e%2B00  2.37616081e%2B01 -1.50807800e%2B02  6.37414753e-01%5D%2C %5B 1.03130460e%2B00  1.37130375e%2B01 -1.24285746e%2B01  5.97271395e%2B00%5D%2C %5B 1.03254604e%2B00  1.60284500e%2B01 -1.28478531e%2B02  1.21871376e%2B01%5D%2C %5B 1.02436841e%2B00  1.40019941e%2B01 -3.43152695e%2B01  1.40981996e%2B00%5D%2C %5B 1.03929090e%2B00  1.57871666e%2B01 -1.10511892e-01 -1.82605430e..." isContainer="True" shape="(64, 4)" />
+<var name="param" type="int" qualifier="builtins" value="535553" />
+<var name="scaler" type="StandardScaler" qualifier="sklearn.preprocessing._data" value="StandardScaler%28%29" isContainer="True" />
+<var name="target" type="ndarray" qualifier="numpy" value="%5B%5B 1.09999990e%2B00  2.11135216e%2B01  1.80405777e%2B02 -3.25420990e%2B01%5D%2C %5B 1.09200001e%2B00  5.21540642e-07  6.88853333e%2B02 -3.31062225e%2B02%5D%2C %5B 1.10000002e%2B00  2.06344872e%2B01 -1.99998684e%2B01 -7.48578568e%2B01%5D%2C %5B 1.06783974e%2B00  2.07016125e%2B01  1.00990292e-08  6.89178705e-08%5D%2C %5B 1.08447134e%2B00  2.07619991e%2B01  2.72727966e%2B00  1.19648302e%2B00%5D%2C %5B 1.01879919e%2B00  1.12869072e%2B01  2.78144455e%2B00  1.15234458e%2B00%5D%2C %5B 1.08637846e%2B00  2.04511871e%2B01 -2.67765236e%2B00  1.10139930e%2B00%5D%2C %5B 1.08568394e%2B00  2.06436100e%2B01 -1.75902443e%2B01  1.29479873e%2B00%5D%2C %5B 1.08381391e%2B00  2.09198036e%2B01 -6.36548805e%2B00  1.15715730e%2B00%5D%2C %5B 1.01607168e%2B00  1.13048849e%2B01  8.25025082e%2B00  1.28628941e%2B01%5D%2C %5B 1.09258771e%2B00  2.38252697e%2B01 -1.49059998e%2B02  6.89178705e-08%5D%2C %5B 1.03055835e%2B00  1.35745459e%2B01 -1.28210411e%2B01  6.23710394e%2B00%5D%2C %5B 1.03298366e%2B00  1.61127853e%2B01 -1.25449020e%2B02  1.17619133e%2B01%5D%2C %5B 1.02391946e%2B00  1.38823309e%2B01 -3.34123497e%2B01  1.10244691e%2B00%5D%2C %5B 1.03892648e%2B00  1.58049202e%2B01  1.00990292e-08  6.89178705e..." isContainer="True" shape="(64, 4)" />
+<var name="test_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="5" />
+<var name="test_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x00000241EF130B48&gt;" isContainer="True" shape="5" />
+<var name="train_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Dat..." isContainer="True" shape="85" />
+<var name="training_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x00000241EF130788&gt;" isContainer="True" shape="85" />
+<var name="val_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="10" />
+<var name="validation_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x00000241EF130C08&gt;" isContainer="True" shape="10" />
+</xml>
+<xml><var name="_dummy_ipython_val"  />
+<var name="_dummy_special_var"  />
+<var name="activation" type="str" qualifier="builtins" value="tanh" />
+<var name="dropout" type="float" qualifier="builtins" value="0.0" />
+<var name="edge_attr" type="Tensor" qualifier="torch" value="tensor%28%5B%5B-0.2645%2C -0.1521%5D%2C%0A        %5B 2.7324%2C  2.7243%5D%2C%0A        %5B 1.3056%2C  1.3548%5D%2C%0A        %5B-0.5235%2C -0.4008%5D%2C%0A        %5B 1.2148%2C  1.2678%5D%2C%0A        %5B 1.4367%2C  1.4807%5D%2C%0A        %5B-0.6814%2C -0.5523%5D%2C%0A        %5B 0.6989%2C  0.7725%5D%2C%0A        %5B-0.3612%2C -0.2450%5D%2C%0A        %5B-0.6496%2C -0.5217%5D%2C%0A        %5B-0.2338%2C -0.1227%5D%2C%0A        %5B 0.5412%2C  0.6212%5D%2C%0A        %5B-0.6419%2C -0.5144%5D%2C%0A        %5B-0.7528%2C -0.6208%5D%2C%0A        %5B-0.3905%2C -0.2730%5D%2C%0A        %5B-0.2338%2C -0.1227%5D%2C%0A        %5B-0.2545%2C -0.1426%5D%2C%0A        %5B-0.6236%2C -0.4969%5D%2C%0A        %5B-0.6239%2C -0.4971%5D%2C%0A        %5B 0.4243%2C  0.5090%5D%2C%0A        %5B 6.5080%2C  6.3482%5D%2C%0A        %5B-0.1812%2C -0.0722%5D%2C%0A        %5B 0.1620%2C  0.2572%5D%2C%0A        %5B-0.5648%2C -0.4403%5D%2C%0A        %5B 0.2513%2C  0.3430%5D%2C%0A        %5B 0.0399%2C  0.1400%5D%2C%0A        %5B-0.4489%2C -0.3291%5D%2C%0A        %5B 1.0460%2C  1.1057%5D%2C%0A        %5B-0.7307%2C -0.5996%5D%2C%0A        %5B-0.7024%2C -0.6239%5D%2C%0A        %5B-0.0723%2C  0.0323%5D%2C%0A        %5B-0.5856%2C -0.4603%5D%2C%0A        %5B 1.3009%2C  1.3504%5D%2C%0A        %5B 1.8298%2C  1.8580%5D%2C%0A        %5B 0.5412%2C  0.6212%5D%2C%0A        %5B 1.3009%2C  1..." isContainer="True" shape="(186, 2)" />
+<var name="edge_index" type="Tensor" qualifier="torch" value="tensor%28%5B%5B 3%2C  3%2C  3%2C  4%2C  5%2C  5%2C  5%2C  5%2C  5%2C  5%2C  6%2C  6%2C  6%2C  6%2C  6%2C  7%2C  7%2C  8%2C%0A          9%2C 10%2C 10%2C 10%2C 10%2C 11%2C 12%2C 12%2C 13%2C 14%2C 14%2C 15%2C 16%2C 16%2C 17%2C 17%2C 18%2C 18%2C%0A         19%2C 20%2C 21%2C 22%2C 23%2C 24%2C 24%2C 25%2C 25%2C 26%2C 26%2C 26%2C 27%2C 27%2C 27%2C 28%2C 29%2C 29%2C%0A         29%2C 30%2C 30%2C 31%2C 31%2C 32%2C 32%2C 33%2C 33%2C 34%2C 34%2C 34%2C 35%2C 36%2C 37%2C 37%2C 38%2C 38%2C%0A         38%2C 39%2C 39%2C 39%2C 40%2C 40%2C 41%2C 41%2C 41%2C 42%2C 43%2C 43%2C 43%2C 44%2C 44%2C 44%2C 45%2C 46%2C%0A         46%2C 46%2C 47%2C 48%2C 48%2C 48%2C 49%2C 50%2C 50%2C 50%2C 51%2C 51%2C 52%2C 52%2C 53%2C 53%2C 53%2C 54%2C%0A         55%2C 55%2C 56%2C 57%2C 57%2C 58%2C 58%2C 59%2C 60%2C 61%2C 61%2C 62%2C 63%2C 63%2C  0%2C  1%2C  2%2C  3%2C%0A          4%2C  5%2C  6%2C  7%2C  8%2C  9%2C 10%2C 11%2C 12%2C 13%2C 14%2C 15%2C 16%2C 17%2C 18%2C 19%2C 20%2C 21%2C%0A         22%2C 23%2C 24%2C 25%2C 26%2C 27%2C 28%2C 29%2C 30%2C 31%2C 32%2C 33%2C 34%2C 35%2C 36%2C 37%2C 38%2C 39%2C%0A         40%2C 41%2C 42%2C 43%2C 44%2C 45%2C 46%2C 47%2C 48%2C 49%2C 50%2C 51%2C 52%2C 53%2C 54%2C 55%2C 56%2C 57%2C%0A         58%2C 59%2C 60%2C 61%2C 62%2C 63%5D%2C%0A        %5B24%2C 25%2C 50%2C 39%2C 26%2C 29%2C 33%2C 38%2C 40%2C 51%2C  7%2C 18%2C 37%2C 54%2C 63%2C  6%2C 39%2C 43%2C%0A         41%2C 28%2C 34%2C 44%2C 62%2C 38%2C 20%2C 27%2C 26%2C 25%2C 32%2C 40%2C 45%2C 48%2C 18%2C 38%2C  6..." isContainer="True" shape="(2, 186)" />
+<var name="grid_name" type="str" qualifier="builtins" value="1-HV-mixed--0-no_sw" />
+<var name="hidden_channels" type="int" qualifier="builtins" value="256" />
+<var name="i" type="int" qualifier="builtins" value="215" />
+<var name="in_channels" type="int" qualifier="builtins" value="4" />
+<var name="jk" type="str" qualifier="builtins" value="last" />
+<var name="layer_type" type="str" qualifier="builtins" value="TransConv" />
+<var name="loss" type="MSELoss" qualifier="torch.nn.modules.loss" value="MSELoss%28%29" isContainer="True" />
+<var name="lr" type="float" qualifier="builtins" value="0.0001" />
+<var name="model" type="GNN" qualifier="gnn" value="GNN%284%2C 4%2C num_layers=3%29" isContainer="True" />
+<var name="name" type="str" qualifier="builtins" value="lin.weight" />
+<var name="num_epochs" type="int" qualifier="builtins" value="400" />
+<var name="num_layers" type="int" qualifier="builtins" value="3" />
+<var name="optimizer" type="Adam" qualifier="torch.optim.adam" value="Adam %28%0AParameter Group 0%0A    amsgrad%3A False%0A    betas%3A %280.9%2C 0.999%29%0A    capturable%3A False%0A    differentiable%3A False%0A    eps%3A 1e-08%0A    foreach%3A None%0A    fused%3A False%0A    lr%3A 0.0001%0A    maximize%3A False%0A    weight_decay%3A 0%0A%29" isContainer="True" />
+<var name="out_channels" type="int" qualifier="builtins" value="4" />
+<var name="output" type="ndarray" qualifier="numpy" value="%5B%5B 1.10018039e%2B00  2.00081902e%2B01  1.90144501e%2B02 -3.47331238e%2B01%5D%2C %5B 1.09171045e%2B00  3.62697601e-01  6.90273315e%2B02 -3.28773071e%2B02%5D%2C %5B 1.10006142e%2B00  2.06661015e%2B01 -1.74221401e%2B01 -7.37456589e%2B01%5D%2C %5B 1.06776857e%2B00  2.01874352e%2B01  3.13166469e-01 -1.25304889e-02%5D%2C %5B 1.08484161e%2B00  2.06333580e%2B01  2.46548867e%2B00  1.32880414e%2B00%5D%2C %5B 1.01910555e%2B00  1.13757286e%2B01  4.19128799e%2B00  5.12003481e-01%5D%2C %5B 1.08655798e%2B00  2.02380238e%2B01 -4.89850330e%2B00  1.96455061e%2B00%5D%2C %5B 1.08608079e%2B00  2.04061928e%2B01 -1.84217205e%2B01  1.56685841e%2B00%5D%2C %5B 1.08432877e%2B00  2.07893810e%2B01 -6.51349306e%2B00  1.21077073e%2B00%5D%2C %5B 1.01677465e%2B00  1.14061537e%2B01  7.52660370e%2B00  1.25748234e%2B01%5D%2C %5B 1.09297287e%2B00  2.32006168e%2B01 -1.50210052e%2B02 -4.68339175e-02%5D%2C %5B 1.03079474e%2B00  1.36447248e%2B01 -1.54352818e%2B01  6.03561926e%2B00%5D%2C %5B 1.03322792e%2B00  1.62254086e%2B01 -1.30607147e%2B02  1.25871449e%2B01%5D%2C %5B 1.02366948e%2B00  1.39956293e%2B01 -3.42271729e%2B01  1.09529364e%2B00%5D%2C %5B 1.03860343e%2B00  1.55502520e%2B01  6.39584754e-03  5.58760911e..." isContainer="True" shape="(64, 4)" />
+<var name="param" type="int" qualifier="builtins" value="535553" />
+<var name="scaler" type="StandardScaler" qualifier="sklearn.preprocessing._data" value="StandardScaler%28%29" isContainer="True" />
+<var name="target" type="ndarray" qualifier="numpy" value="%5B%5B 1.09999990e%2B00  1.98250618e%2B01  1.93500015e%2B02 -3.47923851e%2B01%5D%2C %5B 1.09200001e%2B00  1.49011612e-08  6.89796814e%2B02 -3.29088562e%2B02%5D%2C %5B 1.09999990e%2B00  2.06637020e%2B01 -1.99994659e%2B01 -7.35051956e%2B01%5D%2C %5B 1.06826580e%2B00  1.99139977e%2B01  3.07336450e-08 -1.62050128e-07%5D%2C %5B 1.08477366e%2B00  2.07872906e%2B01  2.73927307e%2B00  1.16178906e%2B00%5D%2C %5B 1.01941121e%2B00  1.12952242e%2B01  2.78719735e%2B00  1.07379258e%2B00%5D%2C %5B 1.08662426e%2B00  2.04803085e%2B01 -2.80638146e%2B00  1.21962941e%2B00%5D%2C %5B 1.08596468e%2B00  2.06712570e%2B01 -1.79192657e%2B01  1.14665997e%2B00%5D%2C %5B 1.08413637e%2B00  2.09433861e%2B01 -6.36877632e%2B00  1.10978186e%2B00%5D%2C %5B 1.01677620e%2B00  1.13356676e%2B01  6.06646967e%2B00  1.31222763e%2B01%5D%2C %5B 1.09217286e%2B00  2.27347279e%2B01 -1.49060013e%2B02 -1.62050128e-07%5D%2C %5B 1.03130186e%2B00  1.36270876e%2B01 -1.57227983e%2B01  6.20118856e%2B00%5D%2C %5B 1.03314912e%2B00  1.63178749e%2B01 -1.30040268e%2B02  1.27931881e%2B01%5D%2C %5B 1.02402163e%2B00  1.39895983e%2B01 -3.32611618e%2B01  1.20180809e%2B00%5D%2C %5B 1.03995168e%2B00  1.54195929e%2B01  3.07336450e-08 -1.62050128e..." isContainer="True" shape="(64, 4)" />
+<var name="test_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="5" />
+<var name="test_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x00000241EF130B48&gt;" isContainer="True" shape="5" />
+<var name="train_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Dat..." isContainer="True" shape="85" />
+<var name="training_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x00000241EF130788&gt;" isContainer="True" shape="85" />
+<var name="val_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="10" />
+<var name="validation_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x00000241EF130C08&gt;" isContainer="True" shape="10" />
+</xml>
+bias
+torch.Size([])
+convs.0.lin_key.weight
+torch.Size([256, 4])
+convs.0.lin_key.bias
+torch.Size([256])
+convs.0.lin_query.weight
+torch.Size([256, 4])
+convs.0.lin_query.bias
+torch.Size([256])
+convs.0.lin_value.weight
+torch.Size([256, 4])
+convs.0.lin_value.bias
+torch.Size([256])
+convs.0.lin_edge.weight
+torch.Size([256, 2])
+convs.0.lin_skip.weight
+torch.Size([256, 4])
+convs.0.lin_skip.bias
+torch.Size([256])
+convs.1.lin_key.weight
+torch.Size([256, 256])
+convs.1.lin_key.bias
+torch.Size([256])
+convs.1.lin_query.weight
+torch.Size([256, 256])
+convs.1.lin_query.bias
+torch.Size([256])
+convs.1.lin_value.weight
+torch.Size([256, 256])
+convs.1.lin_value.bias
+torch.Size([256])
+convs.1.lin_edge.weight
+torch.Size([256, 2])
+convs.1.lin_skip.weight
+torch.Size([256, 256])
+convs.1.lin_skip.bias
+torch.Size([256])
+convs.2.lin_key.weight
+torch.Size([256, 256])
+convs.2.lin_key.bias
+torch.Size([256])
+convs.2.lin_query.weight
+torch.Size([256, 256])
+convs.2.lin_query.bias
+torch.Size([256])
+convs.2.lin_value.weight
+torch.Size([256, 256])
+convs.2.lin_value.bias
+torch.Size([256])
+convs.2.lin_edge.weight
+torch.Size([256, 2])
+convs.2.lin_skip.weight
+torch.Size([256, 256])
+convs.2.lin_skip.bias
+torch.Size([256])
+norms.0.module.weight
+torch.Size([256])
+norms.0.module.bias
+torch.Size([256])
+norms.1.module.weight
+torch.Size([256])
+norms.1.module.bias
+torch.Size([256])
+norms.2.module.weight
+torch.Size([256])
+norms.2.module.bias
+torch.Size([256])
+lin.weight
+torch.Size([4, 256])
+<xml><var name="_dummy_ipython_val"  />
+<var name="_dummy_special_var"  />
+<var name="activation" type="str" qualifier="builtins" value="tanh" />
+<var name="dropout" type="float" qualifier="builtins" value="0.0" />
+<var name="edge_attr" type="Tensor" qualifier="torch" value="tensor%28%5B%5B-0.2645%2C -0.1521%5D%2C%0A        %5B 2.7324%2C  2.7243%5D%2C%0A        %5B 1.3056%2C  1.3548%5D%2C%0A        %5B-0.5235%2C -0.4008%5D%2C%0A        %5B 1.2148%2C  1.2678%5D%2C%0A        %5B 1.4367%2C  1.4807%5D%2C%0A        %5B-0.6814%2C -0.5523%5D%2C%0A        %5B 0.6989%2C  0.7725%5D%2C%0A        %5B-0.3612%2C -0.2450%5D%2C%0A        %5B-0.6496%2C -0.5217%5D%2C%0A        %5B-0.2338%2C -0.1227%5D%2C%0A        %5B 0.5412%2C  0.6212%5D%2C%0A        %5B-0.6419%2C -0.5144%5D%2C%0A        %5B-0.7528%2C -0.6208%5D%2C%0A        %5B-0.3905%2C -0.2730%5D%2C%0A        %5B-0.2338%2C -0.1227%5D%2C%0A        %5B-0.2545%2C -0.1426%5D%2C%0A        %5B-0.6236%2C -0.4969%5D%2C%0A        %5B-0.6239%2C -0.4971%5D%2C%0A        %5B 0.4243%2C  0.5090%5D%2C%0A        %5B 6.5080%2C  6.3482%5D%2C%0A        %5B-0.1812%2C -0.0722%5D%2C%0A        %5B 0.1620%2C  0.2572%5D%2C%0A        %5B-0.5648%2C -0.4403%5D%2C%0A        %5B 0.2513%2C  0.3430%5D%2C%0A        %5B 0.0399%2C  0.1400%5D%2C%0A        %5B-0.4489%2C -0.3291%5D%2C%0A        %5B 1.0460%2C  1.1057%5D%2C%0A        %5B-0.7307%2C -0.5996%5D%2C%0A        %5B-0.7024%2C -0.6239%5D%2C%0A        %5B-0.0723%2C  0.0323%5D%2C%0A        %5B-0.5856%2C -0.4603%5D%2C%0A        %5B 1.3009%2C  1.3504%5D%2C%0A        %5B 1.8298%2C  1.8580%5D%2C%0A        %5B 0.5412%2C  0.6212%5D%2C%0A        %5B 1.3009%2C  1..." isContainer="True" shape="(186, 2)" />
+<var name="edge_index" type="Tensor" qualifier="torch" value="tensor%28%5B%5B 3%2C  3%2C  3%2C  4%2C  5%2C  5%2C  5%2C  5%2C  5%2C  5%2C  6%2C  6%2C  6%2C  6%2C  6%2C  7%2C  7%2C  8%2C%0A          9%2C 10%2C 10%2C 10%2C 10%2C 11%2C 12%2C 12%2C 13%2C 14%2C 14%2C 15%2C 16%2C 16%2C 17%2C 17%2C 18%2C 18%2C%0A         19%2C 20%2C 21%2C 22%2C 23%2C 24%2C 24%2C 25%2C 25%2C 26%2C 26%2C 26%2C 27%2C 27%2C 27%2C 28%2C 29%2C 29%2C%0A         29%2C 30%2C 30%2C 31%2C 31%2C 32%2C 32%2C 33%2C 33%2C 34%2C 34%2C 34%2C 35%2C 36%2C 37%2C 37%2C 38%2C 38%2C%0A         38%2C 39%2C 39%2C 39%2C 40%2C 40%2C 41%2C 41%2C 41%2C 42%2C 43%2C 43%2C 43%2C 44%2C 44%2C 44%2C 45%2C 46%2C%0A         46%2C 46%2C 47%2C 48%2C 48%2C 48%2C 49%2C 50%2C 50%2C 50%2C 51%2C 51%2C 52%2C 52%2C 53%2C 53%2C 53%2C 54%2C%0A         55%2C 55%2C 56%2C 57%2C 57%2C 58%2C 58%2C 59%2C 60%2C 61%2C 61%2C 62%2C 63%2C 63%2C  0%2C  1%2C  2%2C  3%2C%0A          4%2C  5%2C  6%2C  7%2C  8%2C  9%2C 10%2C 11%2C 12%2C 13%2C 14%2C 15%2C 16%2C 17%2C 18%2C 19%2C 20%2C 21%2C%0A         22%2C 23%2C 24%2C 25%2C 26%2C 27%2C 28%2C 29%2C 30%2C 31%2C 32%2C 33%2C 34%2C 35%2C 36%2C 37%2C 38%2C 39%2C%0A         40%2C 41%2C 42%2C 43%2C 44%2C 45%2C 46%2C 47%2C 48%2C 49%2C 50%2C 51%2C 52%2C 53%2C 54%2C 55%2C 56%2C 57%2C%0A         58%2C 59%2C 60%2C 61%2C 62%2C 63%5D%2C%0A        %5B24%2C 25%2C 50%2C 39%2C 26%2C 29%2C 33%2C 38%2C 40%2C 51%2C  7%2C 18%2C 37%2C 54%2C 63%2C  6%2C 39%2C 43%2C%0A         41%2C 28%2C 34%2C 44%2C 62%2C 38%2C 20%2C 27%2C 26%2C 25%2C 32%2C 40%2C 45%2C 48%2C 18%2C 38%2C  6..." isContainer="True" shape="(2, 186)" />
+<var name="grid_name" type="str" qualifier="builtins" value="1-HV-mixed--0-no_sw" />
+<var name="hidden_channels" type="int" qualifier="builtins" value="256" />
+<var name="i" type="int" qualifier="builtins" value="215" />
+<var name="in_channels" type="int" qualifier="builtins" value="4" />
+<var name="jk" type="str" qualifier="builtins" value="last" />
+<var name="layer_type" type="str" qualifier="builtins" value="TransConv" />
+<var name="loss" type="MSELoss" qualifier="torch.nn.modules.loss" value="MSELoss%28%29" isContainer="True" />
+<var name="lr" type="float" qualifier="builtins" value="5e-05" />
+<var name="model" type="GNN" qualifier="gnn" value="GNN%284%2C 4%2C num_layers=3%29" isContainer="True" />
+<var name="name" type="str" qualifier="builtins" value="lin.weight" />
+<var name="num_epochs" type="int" qualifier="builtins" value="400" />
+<var name="num_layers" type="int" qualifier="builtins" value="3" />
+<var name="optimizer" type="Adam" qualifier="torch.optim.adam" value="Adam %28%0AParameter Group 0%0A    amsgrad%3A False%0A    betas%3A %280.9%2C 0.999%29%0A    capturable%3A False%0A    differentiable%3A False%0A    eps%3A 1e-08%0A    foreach%3A None%0A    fused%3A False%0A    lr%3A 5e-05%0A    maximize%3A False%0A    weight_decay%3A 0%0A%29" isContainer="True" />
+<var name="out_channels" type="int" qualifier="builtins" value="4" />
+<var name="output" type="ndarray" qualifier="numpy" value="%5B%5B 1.10018039e%2B00  2.00081902e%2B01  1.90144501e%2B02 -3.47331238e%2B01%5D%2C %5B 1.09171045e%2B00  3.62697601e-01  6.90273315e%2B02 -3.28773071e%2B02%5D%2C %5B 1.10006142e%2B00  2.06661015e%2B01 -1.74221401e%2B01 -7.37456589e%2B01%5D%2C %5B 1.06776857e%2B00  2.01874352e%2B01  3.13166469e-01 -1.25304889e-02%5D%2C %5B 1.08484161e%2B00  2.06333580e%2B01  2.46548867e%2B00  1.32880414e%2B00%5D%2C %5B 1.01910555e%2B00  1.13757286e%2B01  4.19128799e%2B00  5.12003481e-01%5D%2C %5B 1.08655798e%2B00  2.02380238e%2B01 -4.89850330e%2B00  1.96455061e%2B00%5D%2C %5B 1.08608079e%2B00  2.04061928e%2B01 -1.84217205e%2B01  1.56685841e%2B00%5D%2C %5B 1.08432877e%2B00  2.07893810e%2B01 -6.51349306e%2B00  1.21077073e%2B00%5D%2C %5B 1.01677465e%2B00  1.14061537e%2B01  7.52660370e%2B00  1.25748234e%2B01%5D%2C %5B 1.09297287e%2B00  2.32006168e%2B01 -1.50210052e%2B02 -4.68339175e-02%5D%2C %5B 1.03079474e%2B00  1.36447248e%2B01 -1.54352818e%2B01  6.03561926e%2B00%5D%2C %5B 1.03322792e%2B00  1.62254086e%2B01 -1.30607147e%2B02  1.25871449e%2B01%5D%2C %5B 1.02366948e%2B00  1.39956293e%2B01 -3.42271729e%2B01  1.09529364e%2B00%5D%2C %5B 1.03860343e%2B00  1.55502520e%2B01  6.39584754e-03  5.58760911e..." isContainer="True" shape="(64, 4)" />
+<var name="param" type="int" qualifier="builtins" value="535553" />
+<var name="scaler" type="StandardScaler" qualifier="sklearn.preprocessing._data" value="StandardScaler%28%29" isContainer="True" />
+<var name="target" type="ndarray" qualifier="numpy" value="%5B%5B 1.09999990e%2B00  1.98250618e%2B01  1.93500015e%2B02 -3.47923851e%2B01%5D%2C %5B 1.09200001e%2B00  1.49011612e-08  6.89796814e%2B02 -3.29088562e%2B02%5D%2C %5B 1.09999990e%2B00  2.06637020e%2B01 -1.99994659e%2B01 -7.35051956e%2B01%5D%2C %5B 1.06826580e%2B00  1.99139977e%2B01  3.07336450e-08 -1.62050128e-07%5D%2C %5B 1.08477366e%2B00  2.07872906e%2B01  2.73927307e%2B00  1.16178906e%2B00%5D%2C %5B 1.01941121e%2B00  1.12952242e%2B01  2.78719735e%2B00  1.07379258e%2B00%5D%2C %5B 1.08662426e%2B00  2.04803085e%2B01 -2.80638146e%2B00  1.21962941e%2B00%5D%2C %5B 1.08596468e%2B00  2.06712570e%2B01 -1.79192657e%2B01  1.14665997e%2B00%5D%2C %5B 1.08413637e%2B00  2.09433861e%2B01 -6.36877632e%2B00  1.10978186e%2B00%5D%2C %5B 1.01677620e%2B00  1.13356676e%2B01  6.06646967e%2B00  1.31222763e%2B01%5D%2C %5B 1.09217286e%2B00  2.27347279e%2B01 -1.49060013e%2B02 -1.62050128e-07%5D%2C %5B 1.03130186e%2B00  1.36270876e%2B01 -1.57227983e%2B01  6.20118856e%2B00%5D%2C %5B 1.03314912e%2B00  1.63178749e%2B01 -1.30040268e%2B02  1.27931881e%2B01%5D%2C %5B 1.02402163e%2B00  1.39895983e%2B01 -3.32611618e%2B01  1.20180809e%2B00%5D%2C %5B 1.03995168e%2B00  1.54195929e%2B01  3.07336450e-08 -1.62050128e..." isContainer="True" shape="(64, 4)" />
+<var name="test_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="5" />
+<var name="test_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x00000241EF130B48&gt;" isContainer="True" shape="5" />
+<var name="train_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Dat..." isContainer="True" shape="85" />
+<var name="training_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x00000241EF130788&gt;" isContainer="True" shape="85" />
+<var name="val_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%2C 2%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="10" />
+<var name="validation_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x00000241EF130C08&gt;" isContainer="True" shape="10" />
+</xml>

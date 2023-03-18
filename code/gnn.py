@@ -10,64 +10,14 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 from torch.nn import Linear, ModuleList
 from torch_geometric.nn.models.jumping_knowledge import JumpingKnowledge
 from torch_geometric.nn.resolver import (activation_resolver, normalization_resolver)
-from torch_sparse import SparseTensor
 from tqdm import tqdm
 from torch_geometric.loader import NeighborLoader
 import copy
-
-"""
-class GCNConv(MessagePassing, ABC):
-    def __init__(self, in_channels, out_channels):
-        super(GCNConv, self).__init__(aggr='add')
-        self.lin = nn.Linear(in_channels, out_channels)
-        self.bias = nn.Parameter(torch.Tensor(out_channels))
-        self.reset_parameters()
-
-    def forward(self, x, edge_weight, edge_index):
-
-        # Step 1: Multiply edge weights by source node features
-        edge_weight = F.relu(self.lin(edge_weight))
-
-        # Step 2: Compute normalization.
-        edge_weight = edge_weight.view(-1)
-
-        # Step 3: Start propagating messages.
-        out = self.propagate(edge_index, x=x, norm=edge_weight)
-
-        # Step 4: Apply a final bias vector.
-        out += self.bias
-
-        return out
-
-    def reset_parameters(self):
-        self.lin.reset_parameters()
-        self.bias.data.zero_()
-
-    def message(self, x_j, norm):
-        # Step 4: Normalize messages by edge weights
-        return norm.view(-1, 1) * x_j
-
-
-class GCNNet(torch.nn.Module):
-    def __init__(self, in_channels, out_channels, edge_index, edge_weight):
-        super(GCNNet, self).__init__()
-        self.conv1 = GraphConv(in_channels, out_channels)
-        self.conv2 = GraphConv(out_channels, in_channels)
-        self.edge_index = edge_index
-        self.edge_weight = edge_weight
-
-    def forward(self, x):
-        # Step 1: Pass the input through the first GCN layer.
-        x = self.conv1(x, self.edge_index, self.edge_weight)
-        x = F.relu(x)
-        # x = F.dropout(x, training=self.training)
-
-        # Step 2: Pass the output through the second GCN layer.
-        x = self.conv2(x, self.edge_index, self.edge_weight)
-
-        return x
-"""
-
+from typing import Optional, Tuple, Union
+from torch_geometric.nn.dense.linear import Linear
+from torch_geometric.typing import Adj, OptTensor, PairTensor, SparseTensor
+from torch_geometric.utils import softmax
+import math
 
 class GNN(BasicGNN):
     r"""An abstract class for implementing basic GNN models.
@@ -106,14 +56,14 @@ class GNN(BasicGNN):
 
 
     def __init__(self, in_channels: int, hidden_channels: int, num_layers: int, out_channels: Optional[int] = None,
-                 dropout: float = 0.0, norm: Union[str, Callable, None] = None, jk: Optional[str] = None, layer_type="GCN", **kwargs):
+                 dropout: float = 0.0, norm: Union[str, Callable, None] = None, jk: Optional[str] = None, layer_type="GCN", activation="relu", **kwargs):
         super(BasicGNN, self).__init__()
         self.in_channels = in_channels
         self.layer_type=layer_type
         self.hidden_channels = hidden_channels
         self.num_layers = num_layers
         self.dropout = dropout
-        self.act = activation_resolver("tanh", **({}))
+        self.act = activation_resolver(activation, **({}))
         self.act_first = False
         self.jk_mode = jk
         self.norm = norm if isinstance(norm, str) else None
@@ -169,7 +119,7 @@ class GNN(BasicGNN):
                 in_channels = num_layers * hidden_channels
             else:
                 in_channels = hidden_channels
-            self.lin = Linear(in_channels, self.out_channels, bias=False, dtype=torch.float32)
+            self.lin = Linear(in_channels, self.out_channels, bias=False)
 
         self.bias = nn.Parameter(torch.tensor(self.out_channels, dtype=torch.float32))
 
@@ -202,7 +152,7 @@ class GNN(BasicGNN):
                   out_channels: int, **kwargs) -> MessagePassing:
 
         if self.layer_type == "TransConv":
-            result = TransformerConv(in_channels, out_channels, **kwargs)#GCNConv(in_channels, out_channels, **kwargs)
+            result = TransformerConv(in_channels, out_channels, edge_dim=2, dropout=self.dropout, **kwargs)
         elif self.layer_type == "GCN":
             result = GCNConv(in_channels, out_channels, **kwargs)
         else:
@@ -310,3 +260,4 @@ class GNN(BasicGNN):
     def __repr__(self) -> str:
         return (f'{self.__class__.__name__}({self.in_channels}, '
                 f'{self.out_channels}, num_layers={self.num_layers})')
+

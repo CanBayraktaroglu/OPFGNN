@@ -1,0 +1,1193 @@
+<xml><var name="_dummy_ipython_val"  />
+<var name="_dummy_special_var"  />
+<var name="activation" type="str" qualifier="builtins" value="tanh" />
+<var name="dropout" type="float" qualifier="builtins" value="0.0" />
+<var name="edge_index" type="Tensor" qualifier="torch" value="tensor%28%5B%5B 3%2C  3%2C  3%2C  4%2C  5%2C  5%2C  5%2C  5%2C  5%2C  5%2C  6%2C  6%2C  6%2C  6%2C  6%2C  7%2C  7%2C  8%2C%0A          9%2C 10%2C 10%2C 10%2C 10%2C 11%2C 12%2C 12%2C 13%2C 14%2C 14%2C 15%2C 16%2C 16%2C 17%2C 17%2C 18%2C 18%2C%0A         19%2C 20%2C 21%2C 22%2C 23%2C 24%2C 24%2C 25%2C 25%2C 26%2C 26%2C 26%2C 27%2C 27%2C 27%2C 28%2C 29%2C 29%2C%0A         29%2C 30%2C 30%2C 31%2C 31%2C 32%2C 32%2C 33%2C 33%2C 34%2C 34%2C 34%2C 35%2C 36%2C 37%2C 37%2C 38%2C 38%2C%0A         38%2C 39%2C 39%2C 39%2C 40%2C 40%2C 41%2C 41%2C 41%2C 42%2C 43%2C 43%2C 43%2C 44%2C 44%2C 44%2C 45%2C 46%2C%0A         46%2C 46%2C 47%2C 48%2C 48%2C 48%2C 49%2C 50%2C 50%2C 50%2C 51%2C 51%2C 52%2C 52%2C 53%2C 53%2C 53%2C 54%2C%0A         55%2C 55%2C 56%2C 57%2C 57%2C 58%2C 58%2C 59%2C 60%2C 61%2C 61%2C 62%2C 63%2C 63%2C  0%2C  1%2C  2%2C  3%2C%0A          4%2C  5%2C  6%2C  7%2C  8%2C  9%2C 10%2C 11%2C 12%2C 13%2C 14%2C 15%2C 16%2C 17%2C 18%2C 19%2C 20%2C 21%2C%0A         22%2C 23%2C 24%2C 25%2C 26%2C 27%2C 28%2C 29%2C 30%2C 31%2C 32%2C 33%2C 34%2C 35%2C 36%2C 37%2C 38%2C 39%2C%0A         40%2C 41%2C 42%2C 43%2C 44%2C 45%2C 46%2C 47%2C 48%2C 49%2C 50%2C 51%2C 52%2C 53%2C 54%2C 55%2C 56%2C 57%2C%0A         58%2C 59%2C 60%2C 61%2C 62%2C 63%5D%2C%0A        %5B24%2C 25%2C 50%2C 39%2C 26%2C 29%2C 33%2C 38%2C 40%2C 51%2C  7%2C 18%2C 37%2C 54%2C 63%2C  6%2C 39%2C 43%2C%0A         41%2C 28%2C 34%2C 44%2C 62%2C 38%2C 20%2C 27%2C 26%2C 25%2C 32%2C 40%2C 45%2C 48%2C 18%2C 38%2C  6..." isContainer="True" shape="(2, 186)" />
+<var name="edge_weights" type="Tensor" qualifier="torch" value="tensor%28%5B0.0039%2C 0.0023%2C 0.0039%2C 0.0078%2C 0.0041%2C 0.0037%2C 0.0772%2C 0.0055%2C 0.0048%2C%0A        0.0149%2C 0.0148%2C 0.0062%2C 0.0141%2C 0.0587%2C 0.0052%2C 0.0148%2C 0.0154%2C 0.0125%2C%0A        0.0125%2C 0.0017%2C 0.0045%2C 0.0135%2C 0.0022%2C 0.0092%2C 0.0020%2C 0.0099%2C 0.0061%2C%0A        0.0045%2C 0.1439%2C 0.0489%2C 0.0029%2C 0.0102%2C 0.0039%2C 0.0031%2C 0.0062%2C 0.0039%2C%0A        0.0079%2C 0.0020%2C 0.0032%2C 0.0087%2C 0.0035%2C 0.0039%2C 0.0035%2C 0.0023%2C 0.0045%2C%0A        0.0041%2C 0.0061%2C 0.0048%2C 0.0099%2C 0.0048%2C 0.0072%2C 0.0017%2C 0.0037%2C 0.0355%2C%0A        0.0071%2C 0.0052%2C 0.0114%2C 0.0414%2C 0.0085%2C 0.1439%2C 0.0018%2C 0.0772%2C 0.0018%2C%0A        0.0045%2C 0.0032%2C 0.0453%2C 0.0038%2C 0.0072%2C 0.0141%2C 0.0029%2C 0.0055%2C 0.0092%2C%0A        0.0031%2C 0.0078%2C 0.0154%2C 0.0152%2C 0.0048%2C 0.0489%2C 0.0125%2C 0.0257%2C 0.0341%2C%0A        0.0029%2C 0.0125%2C 0.0152%2C 0.0473%2C 0.0135%2C 0.0079%2C 0.0035%2C 0.0029%2C 0.0069%2C%0A        0.0013%2C 0.0389%2C 0.0355%2C 0.0102%2C 0.0069%2C 0.0063%2C 0.0035%2C 0.0039%2C 0.0087%2C%0A        0.0453%2C 0.0149%2C 0.0257%2C 0.0414%2C 0.0055%2C 0.0052%2C 0.0055%2C 0.0570%2C 0.0587%2C%0A        0.0013%2C 0.0258%2C 0.0341%2C 0.0473%2C ..." isContainer="True" shape="(186,)" />
+<var name="grid_name" type="str" qualifier="builtins" value="1-HV-mixed--0-no_sw" />
+<var name="hidden_channels" type="int" qualifier="builtins" value="186" />
+<var name="in_channels" type="int" qualifier="builtins" value="4" />
+<var name="jk" type="str" qualifier="builtins" value="last" />
+<var name="layer_type" type="str" qualifier="builtins" value="TransConv" />
+<var name="lr" type="float" qualifier="builtins" value="0.0001" />
+<var name="model" type="GNN" qualifier="gnn" value="GNN%284%2C 4%2C num_layers=4%29" isContainer="True" />
+<var name="name" type="str" qualifier="builtins" value="lin.weight" />
+<var name="num_layers" type="int" qualifier="builtins" value="4" />
+<var name="optimizer" type="Adam" qualifier="torch.optim.adam" value="Adam %28%0AParameter Group 0%0A    amsgrad%3A False%0A    betas%3A %280.9%2C 0.999%29%0A    capturable%3A False%0A    differentiable%3A False%0A    eps%3A 1e-08%0A    foreach%3A None%0A    fused%3A False%0A    lr%3A 0.0001%0A    maximize%3A False%0A    weight_decay%3A 0%0A%29" isContainer="True" />
+<var name="out_channels" type="int" qualifier="builtins" value="4" />
+<var name="param" type="int" qualifier="builtins" value="423337" />
+<var name="scaler" type="StandardScaler" qualifier="sklearn.preprocessing._data" value="StandardScaler%28%29" isContainer="True" />
+<var name="test_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="5" />
+<var name="test_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000022E237D3208&gt;" isContainer="True" shape="5" />
+<var name="train_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C ed..." isContainer="True" shape="85" />
+<var name="training_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000022E237D3788&gt;" isContainer="True" shape="85" />
+<var name="val_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="10" />
+<var name="validation_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000022E237D3F48&gt;" isContainer="True" shape="10" />
+</xml>
+Training the model for epoch 0
+Validating the model on unseen Datasets for epoch 0
+Training the model for epoch 1
+Validating the model on unseen Datasets for epoch 1
+Training the model for epoch 2
+Validating the model on unseen Datasets for epoch 2
+Training the model for epoch 3
+Validating the model on unseen Datasets for epoch 3
+Training the model for epoch 4
+Validating the model on unseen Datasets for epoch 4
+Training the model for epoch 5
+Validating the model on unseen Datasets for epoch 5
+Training the model for epoch 6
+Validating the model on unseen Datasets for epoch 6
+Training the model for epoch 7
+Validating the model on unseen Datasets for epoch 7
+Training the model for epoch 8
+Validating the model on unseen Datasets for epoch 8
+Training the model for epoch 9
+Validating the model on unseen Datasets for epoch 9
+Training the model for epoch 10
+Validating the model on unseen Datasets for epoch 10
+Training the model for epoch 11
+Validating the model on unseen Datasets for epoch 11
+Training the model for epoch 12
+Validating the model on unseen Datasets for epoch 12
+Training the model for epoch 13
+Validating the model on unseen Datasets for epoch 13
+Training the model for epoch 14
+Validating the model on unseen Datasets for epoch 14
+Training the model for epoch 15
+Validating the model on unseen Datasets for epoch 15
+Training the model for epoch 16
+Validating the model on unseen Datasets for epoch 16
+Training the model for epoch 17
+Validating the model on unseen Datasets for epoch 17
+Training the model for epoch 18
+Validating the model on unseen Datasets for epoch 18
+Training the model for epoch 19
+Validating the model on unseen Datasets for epoch 19
+Training the model for epoch 20
+Validating the model on unseen Datasets for epoch 20
+Training the model for epoch 21
+Validating the model on unseen Datasets for epoch 21
+Training the model for epoch 22
+Validating the model on unseen Datasets for epoch 22
+Training the model for epoch 23
+Validating the model on unseen Datasets for epoch 23
+Training the model for epoch 24
+Validating the model on unseen Datasets for epoch 24
+Training the model for epoch 25
+Validating the model on unseen Datasets for epoch 25
+Training the model for epoch 26
+Validating the model on unseen Datasets for epoch 26
+Training the model for epoch 27
+Validating the model on unseen Datasets for epoch 27
+Training the model for epoch 28
+Validating the model on unseen Datasets for epoch 28
+Training the model for epoch 29
+Validating the model on unseen Datasets for epoch 29
+Training the model for epoch 30
+Validating the model on unseen Datasets for epoch 30
+Training the model for epoch 31
+Validating the model on unseen Datasets for epoch 31
+Training the model for epoch 32
+Validating the model on unseen Datasets for epoch 32
+Training the model for epoch 33
+Validating the model on unseen Datasets for epoch 33
+Training the model for epoch 34
+Validating the model on unseen Datasets for epoch 34
+Training the model for epoch 35
+Validating the model on unseen Datasets for epoch 35
+Training the model for epoch 36
+Validating the model on unseen Datasets for epoch 36
+Training the model for epoch 37
+Validating the model on unseen Datasets for epoch 37
+Training the model for epoch 38
+Validating the model on unseen Datasets for epoch 38
+Training the model for epoch 39
+Validating the model on unseen Datasets for epoch 39
+Training the model for epoch 40
+Validating the model on unseen Datasets for epoch 40
+Training the model for epoch 41
+Validating the model on unseen Datasets for epoch 41
+Training the model for epoch 42
+Validating the model on unseen Datasets for epoch 42
+Training the model for epoch 43
+Validating the model on unseen Datasets for epoch 43
+Training the model for epoch 44
+Validating the model on unseen Datasets for epoch 44
+Training the model for epoch 45
+Validating the model on unseen Datasets for epoch 45
+Training the model for epoch 46
+Validating the model on unseen Datasets for epoch 46
+Training the model for epoch 47
+Validating the model on unseen Datasets for epoch 47
+Training the model for epoch 48
+Validating the model on unseen Datasets for epoch 48
+Training the model for epoch 49
+Validating the model on unseen Datasets for epoch 49
+Training the model for epoch 50
+Validating the model on unseen Datasets for epoch 50
+Training the model for epoch 51
+Validating the model on unseen Datasets for epoch 51
+Training the model for epoch 52
+Validating the model on unseen Datasets for epoch 52
+Training the model for epoch 53
+Validating the model on unseen Datasets for epoch 53
+Training the model for epoch 54
+Validating the model on unseen Datasets for epoch 54
+Training the model for epoch 55
+Validating the model on unseen Datasets for epoch 55
+Training the model for epoch 56
+Validating the model on unseen Datasets for epoch 56
+Training the model for epoch 57
+Validating the model on unseen Datasets for epoch 57
+Training the model for epoch 58
+Validating the model on unseen Datasets for epoch 58
+Training the model for epoch 59
+Validating the model on unseen Datasets for epoch 59
+Training the model for epoch 60
+Validating the model on unseen Datasets for epoch 60
+Training the model for epoch 61
+Validating the model on unseen Datasets for epoch 61
+Training the model for epoch 62
+Validating the model on unseen Datasets for epoch 62
+Training the model for epoch 63
+Validating the model on unseen Datasets for epoch 63
+Training the model for epoch 64
+Validating the model on unseen Datasets for epoch 64
+Training the model for epoch 65
+Validating the model on unseen Datasets for epoch 65
+Training the model for epoch 66
+Validating the model on unseen Datasets for epoch 66
+Training the model for epoch 67
+Validating the model on unseen Datasets for epoch 67
+Training the model for epoch 68
+Validating the model on unseen Datasets for epoch 68
+Training the model for epoch 69
+Validating the model on unseen Datasets for epoch 69
+Training the model for epoch 70
+Validating the model on unseen Datasets for epoch 70
+Training the model for epoch 71
+Validating the model on unseen Datasets for epoch 71
+Training the model for epoch 72
+Validating the model on unseen Datasets for epoch 72
+Training the model for epoch 73
+Validating the model on unseen Datasets for epoch 73
+Training the model for epoch 74
+Validating the model on unseen Datasets for epoch 74
+Training the model for epoch 75
+Validating the model on unseen Datasets for epoch 75
+Training the model for epoch 76
+Validating the model on unseen Datasets for epoch 76
+Training the model for epoch 77
+Validating the model on unseen Datasets for epoch 77
+Training the model for epoch 78
+Validating the model on unseen Datasets for epoch 78
+Training the model for epoch 79
+Validating the model on unseen Datasets for epoch 79
+Training the model for epoch 80
+Validating the model on unseen Datasets for epoch 80
+Training the model for epoch 81
+Validating the model on unseen Datasets for epoch 81
+Training the model for epoch 82
+Validating the model on unseen Datasets for epoch 82
+Training the model for epoch 83
+Validating the model on unseen Datasets for epoch 83
+Training the model for epoch 84
+Validating the model on unseen Datasets for epoch 84
+Training the model for epoch 85
+Validating the model on unseen Datasets for epoch 85
+Training the model for epoch 86
+Validating the model on unseen Datasets for epoch 86
+Training the model for epoch 87
+Validating the model on unseen Datasets for epoch 87
+Training the model for epoch 88
+Validating the model on unseen Datasets for epoch 88
+Training the model for epoch 89
+Validating the model on unseen Datasets for epoch 89
+Training the model for epoch 90
+Validating the model on unseen Datasets for epoch 90
+Training the model for epoch 91
+Validating the model on unseen Datasets for epoch 91
+Training the model for epoch 92
+Validating the model on unseen Datasets for epoch 92
+Training the model for epoch 93
+Validating the model on unseen Datasets for epoch 93
+Training the model for epoch 94
+Validating the model on unseen Datasets for epoch 94
+Training the model for epoch 95
+Validating the model on unseen Datasets for epoch 95
+Training the model for epoch 96
+Validating the model on unseen Datasets for epoch 96
+Training the model for epoch 97
+Validating the model on unseen Datasets for epoch 97
+Training the model for epoch 98
+Validating the model on unseen Datasets for epoch 98
+Training the model for epoch 99
+Validating the model on unseen Datasets for epoch 99
+Training the model for epoch 100
+Validating the model on unseen Datasets for epoch 100
+Training the model for epoch 101
+Validating the model on unseen Datasets for epoch 101
+Training the model for epoch 102
+Validating the model on unseen Datasets for epoch 102
+Training the model for epoch 103
+Validating the model on unseen Datasets for epoch 103
+Training the model for epoch 104
+Validating the model on unseen Datasets for epoch 104
+Training the model for epoch 105
+Validating the model on unseen Datasets for epoch 105
+Training the model for epoch 106
+Validating the model on unseen Datasets for epoch 106
+Training the model for epoch 107
+Validating the model on unseen Datasets for epoch 107
+Training the model for epoch 108
+Validating the model on unseen Datasets for epoch 108
+Training the model for epoch 109
+Validating the model on unseen Datasets for epoch 109
+Training the model for epoch 110
+Validating the model on unseen Datasets for epoch 110
+Training the model for epoch 111
+Validating the model on unseen Datasets for epoch 111
+Training the model for epoch 112
+Validating the model on unseen Datasets for epoch 112
+Training the model for epoch 113
+Validating the model on unseen Datasets for epoch 113
+Training the model for epoch 114
+Validating the model on unseen Datasets for epoch 114
+Training the model for epoch 115
+Validating the model on unseen Datasets for epoch 115
+Training the model for epoch 116
+Validating the model on unseen Datasets for epoch 116
+Training the model for epoch 117
+Validating the model on unseen Datasets for epoch 117
+Training the model for epoch 118
+Validating the model on unseen Datasets for epoch 118
+Training the model for epoch 119
+Validating the model on unseen Datasets for epoch 119
+Training the model for epoch 120
+Validating the model on unseen Datasets for epoch 120
+Training the model for epoch 121
+Validating the model on unseen Datasets for epoch 121
+Training the model for epoch 122
+Validating the model on unseen Datasets for epoch 122
+Training the model for epoch 123
+Validating the model on unseen Datasets for epoch 123
+Training the model for epoch 124
+Validating the model on unseen Datasets for epoch 124
+Training the model for epoch 125
+Validating the model on unseen Datasets for epoch 125
+Training the model for epoch 126
+Validating the model on unseen Datasets for epoch 126
+Training the model for epoch 127
+Validating the model on unseen Datasets for epoch 127
+Training the model for epoch 128
+Validating the model on unseen Datasets for epoch 128
+Training the model for epoch 129
+Validating the model on unseen Datasets for epoch 129
+Training the model for epoch 130
+Validating the model on unseen Datasets for epoch 130
+Training the model for epoch 131
+Validating the model on unseen Datasets for epoch 131
+Training the model for epoch 132
+Validating the model on unseen Datasets for epoch 132
+Training the model for epoch 133
+Validating the model on unseen Datasets for epoch 133
+Training the model for epoch 134
+Validating the model on unseen Datasets for epoch 134
+Training the model for epoch 135
+Validating the model on unseen Datasets for epoch 135
+Training the model for epoch 136
+Validating the model on unseen Datasets for epoch 136
+Training the model for epoch 137
+Validating the model on unseen Datasets for epoch 137
+Training the model for epoch 138
+Validating the model on unseen Datasets for epoch 138
+Training the model for epoch 139
+Validating the model on unseen Datasets for epoch 139
+Training the model for epoch 140
+Validating the model on unseen Datasets for epoch 140
+Training the model for epoch 141
+Validating the model on unseen Datasets for epoch 141
+Training the model for epoch 142
+Validating the model on unseen Datasets for epoch 142
+Training the model for epoch 143
+Validating the model on unseen Datasets for epoch 143
+Training the model for epoch 144
+Validating the model on unseen Datasets for epoch 144
+Training the model for epoch 145
+Validating the model on unseen Datasets for epoch 145
+Training the model for epoch 146
+Validating the model on unseen Datasets for epoch 146
+Training the model for epoch 147
+Validating the model on unseen Datasets for epoch 147
+Training the model for epoch 148
+Validating the model on unseen Datasets for epoch 148
+Training the model for epoch 149
+Validating the model on unseen Datasets for epoch 149
+Training the model for epoch 150
+Validating the model on unseen Datasets for epoch 150
+Training the model for epoch 151
+Validating the model on unseen Datasets for epoch 151
+Training the model for epoch 152
+Validating the model on unseen Datasets for epoch 152
+Training the model for epoch 153
+Validating the model on unseen Datasets for epoch 153
+Training the model for epoch 154
+Validating the model on unseen Datasets for epoch 154
+Training the model for epoch 155
+Validating the model on unseen Datasets for epoch 155
+Training the model for epoch 156
+Validating the model on unseen Datasets for epoch 156
+Training the model for epoch 157
+Validating the model on unseen Datasets for epoch 157
+Training the model for epoch 158
+Validating the model on unseen Datasets for epoch 158
+Training the model for epoch 159
+Validating the model on unseen Datasets for epoch 159
+Training the model for epoch 160
+Validating the model on unseen Datasets for epoch 160
+Training the model for epoch 161
+Validating the model on unseen Datasets for epoch 161
+Training the model for epoch 162
+Validating the model on unseen Datasets for epoch 162
+Training the model for epoch 163
+Validating the model on unseen Datasets for epoch 163
+Training the model for epoch 164
+Validating the model on unseen Datasets for epoch 164
+Training the model for epoch 165
+Validating the model on unseen Datasets for epoch 165
+Training the model for epoch 166
+Validating the model on unseen Datasets for epoch 166
+Training the model for epoch 167
+Validating the model on unseen Datasets for epoch 167
+Training the model for epoch 168
+Validating the model on unseen Datasets for epoch 168
+Training the model for epoch 169
+Validating the model on unseen Datasets for epoch 169
+Training the model for epoch 170
+Validating the model on unseen Datasets for epoch 170
+Training the model for epoch 171
+Validating the model on unseen Datasets for epoch 171
+Training the model for epoch 172
+Validating the model on unseen Datasets for epoch 172
+Training the model for epoch 173
+Validating the model on unseen Datasets for epoch 173
+Training the model for epoch 174
+Validating the model on unseen Datasets for epoch 174
+Training the model for epoch 175
+Validating the model on unseen Datasets for epoch 175
+Training the model for epoch 176
+Validating the model on unseen Datasets for epoch 176
+Training the model for epoch 177
+Validating the model on unseen Datasets for epoch 177
+Training the model for epoch 178
+Validating the model on unseen Datasets for epoch 178
+Training the model for epoch 179
+Validating the model on unseen Datasets for epoch 179
+Training the model for epoch 180
+Validating the model on unseen Datasets for epoch 180
+Training the model for epoch 181
+Validating the model on unseen Datasets for epoch 181
+Training the model for epoch 182
+Validating the model on unseen Datasets for epoch 182
+Training the model for epoch 183
+Validating the model on unseen Datasets for epoch 183
+Training the model for epoch 184
+Validating the model on unseen Datasets for epoch 184
+Training the model for epoch 185
+Validating the model on unseen Datasets for epoch 185
+Training the model for epoch 186
+Validating the model on unseen Datasets for epoch 186
+Training the model for epoch 187
+Validating the model on unseen Datasets for epoch 187
+Training the model for epoch 188
+Validating the model on unseen Datasets for epoch 188
+Training the model for epoch 189
+Validating the model on unseen Datasets for epoch 189
+Training the model for epoch 190
+Validating the model on unseen Datasets for epoch 190
+Training the model for epoch 191
+Validating the model on unseen Datasets for epoch 191
+Training the model for epoch 192
+Validating the model on unseen Datasets for epoch 192
+Training the model for epoch 193
+Validating the model on unseen Datasets for epoch 193
+Training the model for epoch 194
+Validating the model on unseen Datasets for epoch 194
+Training the model for epoch 195
+Validating the model on unseen Datasets for epoch 195
+Training the model for epoch 196
+Validating the model on unseen Datasets for epoch 196
+Training the model for epoch 197
+Validating the model on unseen Datasets for epoch 197
+Training the model for epoch 198
+Validating the model on unseen Datasets for epoch 198
+Training the model for epoch 199
+Validating the model on unseen Datasets for epoch 199
+Training the model for epoch 200
+Validating the model on unseen Datasets for epoch 200
+Training the model for epoch 201
+Validating the model on unseen Datasets for epoch 201
+Training the model for epoch 202
+Validating the model on unseen Datasets for epoch 202
+Training the model for epoch 203
+Validating the model on unseen Datasets for epoch 203
+Training the model for epoch 204
+Validating the model on unseen Datasets for epoch 204
+Training the model for epoch 205
+Validating the model on unseen Datasets for epoch 205
+Training the model for epoch 206
+Validating the model on unseen Datasets for epoch 206
+Training the model for epoch 207
+Validating the model on unseen Datasets for epoch 207
+Training the model for epoch 208
+Validating the model on unseen Datasets for epoch 208
+Training the model for epoch 209
+Validating the model on unseen Datasets for epoch 209
+Training the model for epoch 210
+Validating the model on unseen Datasets for epoch 210
+Training the model for epoch 211
+Validating the model on unseen Datasets for epoch 211
+Training the model for epoch 212
+Validating the model on unseen Datasets for epoch 212
+Training the model for epoch 213
+Validating the model on unseen Datasets for epoch 213
+Training the model for epoch 214
+Validating the model on unseen Datasets for epoch 214
+Training the model for epoch 215
+Validating the model on unseen Datasets for epoch 215
+Training the model for epoch 216
+Validating the model on unseen Datasets for epoch 216
+Training the model for epoch 217
+Validating the model on unseen Datasets for epoch 217
+Training the model for epoch 218
+Validating the model on unseen Datasets for epoch 218
+Training the model for epoch 219
+Validating the model on unseen Datasets for epoch 219
+Training the model for epoch 220
+Validating the model on unseen Datasets for epoch 220
+Training the model for epoch 221
+Validating the model on unseen Datasets for epoch 221
+Training the model for epoch 222
+Validating the model on unseen Datasets for epoch 222
+Training the model for epoch 223
+Validating the model on unseen Datasets for epoch 223
+Training the model for epoch 224
+Validating the model on unseen Datasets for epoch 224
+Training the model for epoch 225
+Validating the model on unseen Datasets for epoch 225
+Training the model for epoch 226
+Validating the model on unseen Datasets for epoch 226
+Training the model for epoch 227
+Validating the model on unseen Datasets for epoch 227
+Training the model for epoch 228
+Validating the model on unseen Datasets for epoch 228
+Training the model for epoch 229
+Validating the model on unseen Datasets for epoch 229
+Training the model for epoch 230
+Validating the model on unseen Datasets for epoch 230
+Training the model for epoch 231
+Validating the model on unseen Datasets for epoch 231
+Training the model for epoch 232
+Validating the model on unseen Datasets for epoch 232
+Training the model for epoch 233
+Validating the model on unseen Datasets for epoch 233
+Training the model for epoch 234
+Validating the model on unseen Datasets for epoch 234
+Training the model for epoch 235
+Validating the model on unseen Datasets for epoch 235
+Training the model for epoch 236
+Validating the model on unseen Datasets for epoch 236
+Training the model for epoch 237
+Validating the model on unseen Datasets for epoch 237
+Training the model for epoch 238
+Validating the model on unseen Datasets for epoch 238
+Training the model for epoch 239
+Validating the model on unseen Datasets for epoch 239
+Training the model for epoch 240
+Validating the model on unseen Datasets for epoch 240
+Training the model for epoch 241
+Validating the model on unseen Datasets for epoch 241
+Training the model for epoch 242
+Validating the model on unseen Datasets for epoch 242
+Training the model for epoch 243
+Validating the model on unseen Datasets for epoch 243
+Training the model for epoch 244
+Validating the model on unseen Datasets for epoch 244
+Training the model for epoch 245
+Validating the model on unseen Datasets for epoch 245
+Training the model for epoch 246
+Validating the model on unseen Datasets for epoch 246
+Training the model for epoch 247
+Validating the model on unseen Datasets for epoch 247
+Training the model for epoch 248
+Validating the model on unseen Datasets for epoch 248
+Training the model for epoch 249
+Validating the model on unseen Datasets for epoch 249
+Training the model for epoch 250
+Validating the model on unseen Datasets for epoch 250
+Training the model for epoch 251
+Validating the model on unseen Datasets for epoch 251
+Training the model for epoch 252
+Validating the model on unseen Datasets for epoch 252
+Training the model for epoch 253
+Validating the model on unseen Datasets for epoch 253
+Training the model for epoch 254
+Validating the model on unseen Datasets for epoch 254
+Training the model for epoch 255
+Validating the model on unseen Datasets for epoch 255
+Training the model for epoch 256
+Validating the model on unseen Datasets for epoch 256
+Training the model for epoch 257
+Validating the model on unseen Datasets for epoch 257
+Training the model for epoch 258
+Validating the model on unseen Datasets for epoch 258
+Training the model for epoch 259
+Validating the model on unseen Datasets for epoch 259
+Training the model for epoch 260
+Validating the model on unseen Datasets for epoch 260
+Training the model for epoch 261
+Validating the model on unseen Datasets for epoch 261
+Training the model for epoch 262
+Validating the model on unseen Datasets for epoch 262
+Training the model for epoch 263
+Validating the model on unseen Datasets for epoch 263
+Training the model for epoch 264
+Validating the model on unseen Datasets for epoch 264
+Training the model for epoch 265
+Validating the model on unseen Datasets for epoch 265
+Training the model for epoch 266
+Validating the model on unseen Datasets for epoch 266
+Training the model for epoch 267
+Validating the model on unseen Datasets for epoch 267
+Training the model for epoch 268
+Validating the model on unseen Datasets for epoch 268
+Training the model for epoch 269
+Validating the model on unseen Datasets for epoch 269
+Training the model for epoch 270
+Validating the model on unseen Datasets for epoch 270
+Training the model for epoch 271
+Validating the model on unseen Datasets for epoch 271
+Training the model for epoch 272
+Validating the model on unseen Datasets for epoch 272
+Training the model for epoch 273
+Validating the model on unseen Datasets for epoch 273
+Training the model for epoch 274
+Validating the model on unseen Datasets for epoch 274
+Training the model for epoch 275
+Validating the model on unseen Datasets for epoch 275
+Training the model for epoch 276
+Validating the model on unseen Datasets for epoch 276
+Training the model for epoch 277
+Validating the model on unseen Datasets for epoch 277
+Training the model for epoch 278
+Validating the model on unseen Datasets for epoch 278
+Training the model for epoch 279
+Validating the model on unseen Datasets for epoch 279
+Training the model for epoch 280
+Validating the model on unseen Datasets for epoch 280
+Training the model for epoch 281
+Validating the model on unseen Datasets for epoch 281
+Training the model for epoch 282
+Validating the model on unseen Datasets for epoch 282
+Training the model for epoch 283
+Validating the model on unseen Datasets for epoch 283
+Training the model for epoch 284
+Validating the model on unseen Datasets for epoch 284
+Training the model for epoch 285
+Validating the model on unseen Datasets for epoch 285
+Training the model for epoch 286
+Validating the model on unseen Datasets for epoch 286
+Training the model for epoch 287
+Validating the model on unseen Datasets for epoch 287
+Training the model for epoch 288
+Validating the model on unseen Datasets for epoch 288
+Training the model for epoch 289
+Validating the model on unseen Datasets for epoch 289
+Training the model for epoch 290
+Validating the model on unseen Datasets for epoch 290
+Training the model for epoch 291
+Validating the model on unseen Datasets for epoch 291
+Training the model for epoch 292
+Validating the model on unseen Datasets for epoch 292
+Training the model for epoch 293
+Validating the model on unseen Datasets for epoch 293
+Training the model for epoch 294
+Validating the model on unseen Datasets for epoch 294
+Training the model for epoch 295
+Validating the model on unseen Datasets for epoch 295
+Training the model for epoch 296
+Validating the model on unseen Datasets for epoch 296
+Training the model for epoch 297
+Validating the model on unseen Datasets for epoch 297
+Training the model for epoch 298
+Validating the model on unseen Datasets for epoch 298
+Training the model for epoch 299
+Validating the model on unseen Datasets for epoch 299
+Training the model for epoch 300
+Validating the model on unseen Datasets for epoch 300
+Training the model for epoch 301
+Validating the model on unseen Datasets for epoch 301
+Training the model for epoch 302
+Validating the model on unseen Datasets for epoch 302
+Training the model for epoch 303
+Validating the model on unseen Datasets for epoch 303
+Training the model for epoch 304
+Validating the model on unseen Datasets for epoch 304
+Training the model for epoch 305
+Validating the model on unseen Datasets for epoch 305
+Training the model for epoch 306
+Validating the model on unseen Datasets for epoch 306
+Training the model for epoch 307
+Validating the model on unseen Datasets for epoch 307
+Training the model for epoch 308
+Validating the model on unseen Datasets for epoch 308
+Training the model for epoch 309
+Validating the model on unseen Datasets for epoch 309
+Training the model for epoch 310
+Validating the model on unseen Datasets for epoch 310
+Training the model for epoch 311
+Validating the model on unseen Datasets for epoch 311
+Training the model for epoch 312
+Validating the model on unseen Datasets for epoch 312
+Training the model for epoch 313
+Validating the model on unseen Datasets for epoch 313
+Training the model for epoch 314
+Validating the model on unseen Datasets for epoch 314
+Training the model for epoch 315
+Validating the model on unseen Datasets for epoch 315
+Training the model for epoch 316
+Validating the model on unseen Datasets for epoch 316
+Training the model for epoch 317
+Validating the model on unseen Datasets for epoch 317
+Training the model for epoch 318
+Validating the model on unseen Datasets for epoch 318
+Training the model for epoch 319
+Validating the model on unseen Datasets for epoch 319
+Training the model for epoch 320
+Validating the model on unseen Datasets for epoch 320
+Training the model for epoch 321
+Validating the model on unseen Datasets for epoch 321
+Training the model for epoch 322
+Validating the model on unseen Datasets for epoch 322
+Training the model for epoch 323
+Validating the model on unseen Datasets for epoch 323
+Training the model for epoch 324
+Validating the model on unseen Datasets for epoch 324
+Training the model for epoch 325
+Validating the model on unseen Datasets for epoch 325
+Training the model for epoch 326
+Validating the model on unseen Datasets for epoch 326
+Training the model for epoch 327
+Validating the model on unseen Datasets for epoch 327
+Training the model for epoch 328
+Validating the model on unseen Datasets for epoch 328
+Training the model for epoch 329
+Validating the model on unseen Datasets for epoch 329
+Training the model for epoch 330
+Validating the model on unseen Datasets for epoch 330
+Training the model for epoch 331
+Validating the model on unseen Datasets for epoch 331
+Training the model for epoch 332
+Validating the model on unseen Datasets for epoch 332
+Training the model for epoch 333
+Validating the model on unseen Datasets for epoch 333
+Training the model for epoch 334
+Validating the model on unseen Datasets for epoch 334
+Training the model for epoch 335
+Validating the model on unseen Datasets for epoch 335
+Training the model for epoch 336
+Validating the model on unseen Datasets for epoch 336
+Training the model for epoch 337
+Validating the model on unseen Datasets for epoch 337
+Training the model for epoch 338
+Validating the model on unseen Datasets for epoch 338
+Training the model for epoch 339
+Validating the model on unseen Datasets for epoch 339
+Training the model for epoch 340
+Validating the model on unseen Datasets for epoch 340
+Training the model for epoch 341
+Validating the model on unseen Datasets for epoch 341
+Training the model for epoch 342
+Validating the model on unseen Datasets for epoch 342
+Training the model for epoch 343
+Validating the model on unseen Datasets for epoch 343
+Training the model for epoch 344
+Validating the model on unseen Datasets for epoch 344
+Training the model for epoch 345
+Validating the model on unseen Datasets for epoch 345
+Training the model for epoch 346
+Validating the model on unseen Datasets for epoch 346
+Training the model for epoch 347
+Validating the model on unseen Datasets for epoch 347
+Training the model for epoch 348
+Validating the model on unseen Datasets for epoch 348
+Training the model for epoch 349
+Validating the model on unseen Datasets for epoch 349
+Training the model for epoch 350
+Validating the model on unseen Datasets for epoch 350
+Training the model for epoch 351
+Validating the model on unseen Datasets for epoch 351
+Training the model for epoch 352
+Validating the model on unseen Datasets for epoch 352
+Training the model for epoch 353
+Validating the model on unseen Datasets for epoch 353
+Training the model for epoch 354
+Validating the model on unseen Datasets for epoch 354
+Training the model for epoch 355
+Validating the model on unseen Datasets for epoch 355
+Training the model for epoch 356
+Validating the model on unseen Datasets for epoch 356
+Training the model for epoch 357
+Validating the model on unseen Datasets for epoch 357
+Training the model for epoch 358
+Validating the model on unseen Datasets for epoch 358
+Training the model for epoch 359
+Validating the model on unseen Datasets for epoch 359
+Training the model for epoch 360
+Validating the model on unseen Datasets for epoch 360
+Training the model for epoch 361
+Validating the model on unseen Datasets for epoch 361
+Training the model for epoch 362
+Validating the model on unseen Datasets for epoch 362
+Training the model for epoch 363
+Validating the model on unseen Datasets for epoch 363
+Training the model for epoch 364
+Validating the model on unseen Datasets for epoch 364
+Training the model for epoch 365
+Validating the model on unseen Datasets for epoch 365
+Training the model for epoch 366
+Validating the model on unseen Datasets for epoch 366
+Training the model for epoch 367
+Validating the model on unseen Datasets for epoch 367
+Training the model for epoch 368
+Validating the model on unseen Datasets for epoch 368
+Training the model for epoch 369
+Validating the model on unseen Datasets for epoch 369
+Training the model for epoch 370
+Validating the model on unseen Datasets for epoch 370
+Training the model for epoch 371
+Validating the model on unseen Datasets for epoch 371
+Training the model for epoch 372
+Validating the model on unseen Datasets for epoch 372
+Training the model for epoch 373
+Validating the model on unseen Datasets for epoch 373
+Training the model for epoch 374
+Validating the model on unseen Datasets for epoch 374
+Training the model for epoch 375
+Validating the model on unseen Datasets for epoch 375
+Training the model for epoch 376
+Validating the model on unseen Datasets for epoch 376
+Training the model for epoch 377
+Validating the model on unseen Datasets for epoch 377
+Training the model for epoch 378
+Validating the model on unseen Datasets for epoch 378
+Training the model for epoch 379
+Validating the model on unseen Datasets for epoch 379
+Training the model for epoch 380
+Validating the model on unseen Datasets for epoch 380
+Training the model for epoch 381
+Validating the model on unseen Datasets for epoch 381
+Training the model for epoch 382
+Validating the model on unseen Datasets for epoch 382
+Training the model for epoch 383
+Validating the model on unseen Datasets for epoch 383
+Training the model for epoch 384
+Validating the model on unseen Datasets for epoch 384
+Training the model for epoch 385
+Validating the model on unseen Datasets for epoch 385
+Training the model for epoch 386
+Validating the model on unseen Datasets for epoch 386
+Training the model for epoch 387
+Validating the model on unseen Datasets for epoch 387
+Training the model for epoch 388
+Validating the model on unseen Datasets for epoch 388
+Training the model for epoch 389
+Validating the model on unseen Datasets for epoch 389
+Training the model for epoch 390
+Validating the model on unseen Datasets for epoch 390
+Training the model for epoch 391
+Validating the model on unseen Datasets for epoch 391
+Training the model for epoch 392
+Validating the model on unseen Datasets for epoch 392
+Training the model for epoch 393
+Validating the model on unseen Datasets for epoch 393
+Training the model for epoch 394
+Validating the model on unseen Datasets for epoch 394
+Training the model for epoch 395
+Validating the model on unseen Datasets for epoch 395
+Training the model for epoch 396
+Validating the model on unseen Datasets for epoch 396
+Training the model for epoch 397
+Validating the model on unseen Datasets for epoch 397
+Training the model for epoch 398
+Validating the model on unseen Datasets for epoch 398
+Training the model for epoch 399
+Validating the model on unseen Datasets for epoch 399
+<xml><var name="_dummy_ipython_val"  />
+<var name="_dummy_special_var"  />
+<var name="activation" type="str" qualifier="builtins" value="tanh" />
+<var name="dropout" type="float" qualifier="builtins" value="0.0" />
+<var name="edge_index" type="Tensor" qualifier="torch" value="tensor%28%5B%5B 3%2C  3%2C  3%2C  4%2C  5%2C  5%2C  5%2C  5%2C  5%2C  5%2C  6%2C  6%2C  6%2C  6%2C  6%2C  7%2C  7%2C  8%2C%0A          9%2C 10%2C 10%2C 10%2C 10%2C 11%2C 12%2C 12%2C 13%2C 14%2C 14%2C 15%2C 16%2C 16%2C 17%2C 17%2C 18%2C 18%2C%0A         19%2C 20%2C 21%2C 22%2C 23%2C 24%2C 24%2C 25%2C 25%2C 26%2C 26%2C 26%2C 27%2C 27%2C 27%2C 28%2C 29%2C 29%2C%0A         29%2C 30%2C 30%2C 31%2C 31%2C 32%2C 32%2C 33%2C 33%2C 34%2C 34%2C 34%2C 35%2C 36%2C 37%2C 37%2C 38%2C 38%2C%0A         38%2C 39%2C 39%2C 39%2C 40%2C 40%2C 41%2C 41%2C 41%2C 42%2C 43%2C 43%2C 43%2C 44%2C 44%2C 44%2C 45%2C 46%2C%0A         46%2C 46%2C 47%2C 48%2C 48%2C 48%2C 49%2C 50%2C 50%2C 50%2C 51%2C 51%2C 52%2C 52%2C 53%2C 53%2C 53%2C 54%2C%0A         55%2C 55%2C 56%2C 57%2C 57%2C 58%2C 58%2C 59%2C 60%2C 61%2C 61%2C 62%2C 63%2C 63%2C  0%2C  1%2C  2%2C  3%2C%0A          4%2C  5%2C  6%2C  7%2C  8%2C  9%2C 10%2C 11%2C 12%2C 13%2C 14%2C 15%2C 16%2C 17%2C 18%2C 19%2C 20%2C 21%2C%0A         22%2C 23%2C 24%2C 25%2C 26%2C 27%2C 28%2C 29%2C 30%2C 31%2C 32%2C 33%2C 34%2C 35%2C 36%2C 37%2C 38%2C 39%2C%0A         40%2C 41%2C 42%2C 43%2C 44%2C 45%2C 46%2C 47%2C 48%2C 49%2C 50%2C 51%2C 52%2C 53%2C 54%2C 55%2C 56%2C 57%2C%0A         58%2C 59%2C 60%2C 61%2C 62%2C 63%5D%2C%0A        %5B24%2C 25%2C 50%2C 39%2C 26%2C 29%2C 33%2C 38%2C 40%2C 51%2C  7%2C 18%2C 37%2C 54%2C 63%2C  6%2C 39%2C 43%2C%0A         41%2C 28%2C 34%2C 44%2C 62%2C 38%2C 20%2C 27%2C 26%2C 25%2C 32%2C 40%2C 45%2C 48%2C 18%2C 38%2C  6..." isContainer="True" shape="(2, 186)" />
+<var name="edge_weights" type="Tensor" qualifier="torch" value="tensor%28%5B0.0039%2C 0.0023%2C 0.0039%2C 0.0078%2C 0.0041%2C 0.0037%2C 0.0772%2C 0.0055%2C 0.0048%2C%0A        0.0149%2C 0.0148%2C 0.0062%2C 0.0141%2C 0.0587%2C 0.0052%2C 0.0148%2C 0.0154%2C 0.0125%2C%0A        0.0125%2C 0.0017%2C 0.0045%2C 0.0135%2C 0.0022%2C 0.0092%2C 0.0020%2C 0.0099%2C 0.0061%2C%0A        0.0045%2C 0.1439%2C 0.0489%2C 0.0029%2C 0.0102%2C 0.0039%2C 0.0031%2C 0.0062%2C 0.0039%2C%0A        0.0079%2C 0.0020%2C 0.0032%2C 0.0087%2C 0.0035%2C 0.0039%2C 0.0035%2C 0.0023%2C 0.0045%2C%0A        0.0041%2C 0.0061%2C 0.0048%2C 0.0099%2C 0.0048%2C 0.0072%2C 0.0017%2C 0.0037%2C 0.0355%2C%0A        0.0071%2C 0.0052%2C 0.0114%2C 0.0414%2C 0.0085%2C 0.1439%2C 0.0018%2C 0.0772%2C 0.0018%2C%0A        0.0045%2C 0.0032%2C 0.0453%2C 0.0038%2C 0.0072%2C 0.0141%2C 0.0029%2C 0.0055%2C 0.0092%2C%0A        0.0031%2C 0.0078%2C 0.0154%2C 0.0152%2C 0.0048%2C 0.0489%2C 0.0125%2C 0.0257%2C 0.0341%2C%0A        0.0029%2C 0.0125%2C 0.0152%2C 0.0473%2C 0.0135%2C 0.0079%2C 0.0035%2C 0.0029%2C 0.0069%2C%0A        0.0013%2C 0.0389%2C 0.0355%2C 0.0102%2C 0.0069%2C 0.0063%2C 0.0035%2C 0.0039%2C 0.0087%2C%0A        0.0453%2C 0.0149%2C 0.0257%2C 0.0414%2C 0.0055%2C 0.0052%2C 0.0055%2C 0.0570%2C 0.0587%2C%0A        0.0013%2C 0.0258%2C 0.0341%2C 0.0473%2C ..." isContainer="True" shape="(186,)" />
+<var name="grid_name" type="str" qualifier="builtins" value="1-HV-mixed--0-no_sw" />
+<var name="hidden_channels" type="int" qualifier="builtins" value="186" />
+<var name="i" type="int" qualifier="builtins" value="399" />
+<var name="in_channels" type="int" qualifier="builtins" value="4" />
+<var name="jk" type="str" qualifier="builtins" value="last" />
+<var name="layer_type" type="str" qualifier="builtins" value="TransConv" />
+<var name="loss" type="MSELoss" qualifier="torch.nn.modules.loss" value="MSELoss%28%29" isContainer="True" />
+<var name="lr" type="float" qualifier="builtins" value="0.0001" />
+<var name="model" type="GNN" qualifier="gnn" value="GNN%284%2C 4%2C num_layers=4%29" isContainer="True" />
+<var name="name" type="str" qualifier="builtins" value="lin.weight" />
+<var name="num_epochs" type="int" qualifier="builtins" value="400" />
+<var name="num_layers" type="int" qualifier="builtins" value="4" />
+<var name="optimizer" type="Adam" qualifier="torch.optim.adam" value="Adam %28%0AParameter Group 0%0A    amsgrad%3A False%0A    betas%3A %280.9%2C 0.999%29%0A    capturable%3A False%0A    differentiable%3A False%0A    eps%3A 1e-08%0A    foreach%3A None%0A    fused%3A False%0A    lr%3A 0.0001%0A    maximize%3A False%0A    weight_decay%3A 0%0A%29" isContainer="True" />
+<var name="out_channels" type="int" qualifier="builtins" value="4" />
+<var name="param" type="int" qualifier="builtins" value="423337" />
+<var name="scaler" type="StandardScaler" qualifier="sklearn.preprocessing._data" value="StandardScaler%28%29" isContainer="True" />
+<var name="test_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="5" />
+<var name="test_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000022E237D3208&gt;" isContainer="True" shape="5" />
+<var name="train_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C ed..." isContainer="True" shape="85" />
+<var name="training_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000022E237D3788&gt;" isContainer="True" shape="85" />
+<var name="val_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="10" />
+<var name="validation_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000022E237D3F48&gt;" isContainer="True" shape="10" />
+</xml>
+<xml><var name="_dummy_ipython_val"  />
+<var name="_dummy_special_var"  />
+<var name="activation" type="str" qualifier="builtins" value="tanh" />
+<var name="dropout" type="float" qualifier="builtins" value="0.0" />
+<var name="edge_index" type="Tensor" qualifier="torch" value="tensor%28%5B%5B 3%2C  3%2C  3%2C  4%2C  5%2C  5%2C  5%2C  5%2C  5%2C  5%2C  6%2C  6%2C  6%2C  6%2C  6%2C  7%2C  7%2C  8%2C%0A          9%2C 10%2C 10%2C 10%2C 10%2C 11%2C 12%2C 12%2C 13%2C 14%2C 14%2C 15%2C 16%2C 16%2C 17%2C 17%2C 18%2C 18%2C%0A         19%2C 20%2C 21%2C 22%2C 23%2C 24%2C 24%2C 25%2C 25%2C 26%2C 26%2C 26%2C 27%2C 27%2C 27%2C 28%2C 29%2C 29%2C%0A         29%2C 30%2C 30%2C 31%2C 31%2C 32%2C 32%2C 33%2C 33%2C 34%2C 34%2C 34%2C 35%2C 36%2C 37%2C 37%2C 38%2C 38%2C%0A         38%2C 39%2C 39%2C 39%2C 40%2C 40%2C 41%2C 41%2C 41%2C 42%2C 43%2C 43%2C 43%2C 44%2C 44%2C 44%2C 45%2C 46%2C%0A         46%2C 46%2C 47%2C 48%2C 48%2C 48%2C 49%2C 50%2C 50%2C 50%2C 51%2C 51%2C 52%2C 52%2C 53%2C 53%2C 53%2C 54%2C%0A         55%2C 55%2C 56%2C 57%2C 57%2C 58%2C 58%2C 59%2C 60%2C 61%2C 61%2C 62%2C 63%2C 63%2C  0%2C  1%2C  2%2C  3%2C%0A          4%2C  5%2C  6%2C  7%2C  8%2C  9%2C 10%2C 11%2C 12%2C 13%2C 14%2C 15%2C 16%2C 17%2C 18%2C 19%2C 20%2C 21%2C%0A         22%2C 23%2C 24%2C 25%2C 26%2C 27%2C 28%2C 29%2C 30%2C 31%2C 32%2C 33%2C 34%2C 35%2C 36%2C 37%2C 38%2C 39%2C%0A         40%2C 41%2C 42%2C 43%2C 44%2C 45%2C 46%2C 47%2C 48%2C 49%2C 50%2C 51%2C 52%2C 53%2C 54%2C 55%2C 56%2C 57%2C%0A         58%2C 59%2C 60%2C 61%2C 62%2C 63%5D%2C%0A        %5B24%2C 25%2C 50%2C 39%2C 26%2C 29%2C 33%2C 38%2C 40%2C 51%2C  7%2C 18%2C 37%2C 54%2C 63%2C  6%2C 39%2C 43%2C%0A         41%2C 28%2C 34%2C 44%2C 62%2C 38%2C 20%2C 27%2C 26%2C 25%2C 32%2C 40%2C 45%2C 48%2C 18%2C 38%2C  6..." isContainer="True" shape="(2, 186)" />
+<var name="edge_weights" type="Tensor" qualifier="torch" value="tensor%28%5B0.0039%2C 0.0023%2C 0.0039%2C 0.0078%2C 0.0041%2C 0.0037%2C 0.0772%2C 0.0055%2C 0.0048%2C%0A        0.0149%2C 0.0148%2C 0.0062%2C 0.0141%2C 0.0587%2C 0.0052%2C 0.0148%2C 0.0154%2C 0.0125%2C%0A        0.0125%2C 0.0017%2C 0.0045%2C 0.0135%2C 0.0022%2C 0.0092%2C 0.0020%2C 0.0099%2C 0.0061%2C%0A        0.0045%2C 0.1439%2C 0.0489%2C 0.0029%2C 0.0102%2C 0.0039%2C 0.0031%2C 0.0062%2C 0.0039%2C%0A        0.0079%2C 0.0020%2C 0.0032%2C 0.0087%2C 0.0035%2C 0.0039%2C 0.0035%2C 0.0023%2C 0.0045%2C%0A        0.0041%2C 0.0061%2C 0.0048%2C 0.0099%2C 0.0048%2C 0.0072%2C 0.0017%2C 0.0037%2C 0.0355%2C%0A        0.0071%2C 0.0052%2C 0.0114%2C 0.0414%2C 0.0085%2C 0.1439%2C 0.0018%2C 0.0772%2C 0.0018%2C%0A        0.0045%2C 0.0032%2C 0.0453%2C 0.0038%2C 0.0072%2C 0.0141%2C 0.0029%2C 0.0055%2C 0.0092%2C%0A        0.0031%2C 0.0078%2C 0.0154%2C 0.0152%2C 0.0048%2C 0.0489%2C 0.0125%2C 0.0257%2C 0.0341%2C%0A        0.0029%2C 0.0125%2C 0.0152%2C 0.0473%2C 0.0135%2C 0.0079%2C 0.0035%2C 0.0029%2C 0.0069%2C%0A        0.0013%2C 0.0389%2C 0.0355%2C 0.0102%2C 0.0069%2C 0.0063%2C 0.0035%2C 0.0039%2C 0.0087%2C%0A        0.0453%2C 0.0149%2C 0.0257%2C 0.0414%2C 0.0055%2C 0.0052%2C 0.0055%2C 0.0570%2C 0.0587%2C%0A        0.0013%2C 0.0258%2C 0.0341%2C 0.0473%2C ..." isContainer="True" shape="(186,)" />
+<var name="grid_name" type="str" qualifier="builtins" value="1-HV-mixed--0-no_sw" />
+<var name="hidden_channels" type="int" qualifier="builtins" value="186" />
+<var name="i" type="int" qualifier="builtins" value="399" />
+<var name="in_channels" type="int" qualifier="builtins" value="4" />
+<var name="jk" type="str" qualifier="builtins" value="last" />
+<var name="layer_type" type="str" qualifier="builtins" value="TransConv" />
+<var name="loss" type="MSELoss" qualifier="torch.nn.modules.loss" value="MSELoss%28%29" isContainer="True" />
+<var name="lr" type="float" qualifier="builtins" value="0.0001" />
+<var name="model" type="GNN" qualifier="gnn" value="GNN%284%2C 4%2C num_layers=4%29" isContainer="True" />
+<var name="name" type="str" qualifier="builtins" value="lin.weight" />
+<var name="num_epochs" type="int" qualifier="builtins" value="400" />
+<var name="num_layers" type="int" qualifier="builtins" value="4" />
+<var name="optimizer" type="Adam" qualifier="torch.optim.adam" value="Adam %28%0AParameter Group 0%0A    amsgrad%3A False%0A    betas%3A %280.9%2C 0.999%29%0A    capturable%3A False%0A    differentiable%3A False%0A    eps%3A 1e-08%0A    foreach%3A None%0A    fused%3A False%0A    lr%3A 0.0001%0A    maximize%3A False%0A    weight_decay%3A 0%0A%29" isContainer="True" />
+<var name="out_channels" type="int" qualifier="builtins" value="4" />
+<var name="output" type="ndarray" qualifier="numpy" value="%5B%5B 1.09994698e%2B00  2.12795105e%2B01  1.77340469e%2B02 -3.26207886e%2B01%5D%2C %5B 1.09207022e%2B00 -8.38735998e-02  6.88687622e%2B02 -3.31738220e%2B02%5D%2C %5B 1.10003912e%2B00  2.05680752e%2B01 -1.95785332e%2B01 -7.50924683e%2B01%5D%2C %5B 1.06714833e%2B00  2.07636662e%2B01 -9.03712034e-01  3.25097382e-01%5D%2C %5B 1.08428180e%2B00  2.07586155e%2B01  2.96659660e%2B00  1.56497645e%2B00%5D%2C %5B 1.01887703e%2B00  1.12667875e%2B01  3.51221418e%2B00  1.02492929e%2B00%5D%2C %5B 1.08645833e%2B00  2.04598866e%2B01 -3.72558141e%2B00  1.05695510e%2B00%5D%2C %5B 1.08570051e%2B00  2.06506939e%2B01 -1.90028000e%2B01  1.57909465e%2B00%5D%2C %5B 1.08377135e%2B00  2.09434586e%2B01 -7.02144766e%2B00  1.55339265e%2B00%5D%2C %5B 1.01594496e%2B00  1.11942272e%2B01  1.07788677e%2B01  1.29593296e%2B01%5D%2C %5B 1.09233916e%2B00  2.40377083e%2B01 -1.49533737e%2B02 -2.66239066e-02%5D%2C %5B 1.03103292e%2B00  1.36327066e%2B01 -1.49445925e%2B01  6.69437218e%2B00%5D%2C %5B 1.03127718e%2B00  1.60549183e%2B01 -1.25265114e%2B02  1.26051311e%2B01%5D%2C %5B 1.02253175e%2B00  1.37631721e%2B01 -3.35027771e%2B01  1.20543885e%2B00%5D%2C %5B 1.03907430e%2B00  1.58821545e%2B01  2.56611705e-01 -2.94707716e..." isContainer="True" shape="(64, 4)" />
+<var name="param" type="int" qualifier="builtins" value="423337" />
+<var name="scaler" type="StandardScaler" qualifier="sklearn.preprocessing._data" value="StandardScaler%28%29" isContainer="True" />
+<var name="target" type="ndarray" qualifier="numpy" value="%5B%5B 1.09999990e%2B00  2.13925457e%2B01  1.76727890e%2B02 -3.27885513e%2B01%5D%2C %5B 1.09200001e%2B00  1.49011612e-07  6.88670288e%2B02 -3.31443359e%2B02%5D%2C %5B 1.10000002e%2B00  2.05841484e%2B01 -1.99998436e%2B01 -7.45177917e%2B01%5D%2C %5B 1.06724203e%2B00  2.08262367e%2B01 -1.49011612e-08  5.77419996e-08%5D%2C %5B 1.08456862e%2B00  2.07200165e%2B01  3.10688472e%2B00  1.20584941e%2B00%5D%2C %5B 1.01868093e%2B00  1.12852869e%2B01  3.23646975e%2B00  1.27030253e%2B00%5D%2C %5B 1.08644021e%2B00  2.04008236e%2B01 -2.44459224e%2B00  1.09217620e%2B00%5D%2C %5B 1.08578110e%2B00  2.05989361e%2B01 -1.78616982e%2B01  1.08171439e%2B00%5D%2C %5B 1.08396471e%2B00  2.08871899e%2B01 -6.57328176e%2B00  1.23611331e%2B00%5D%2C %5B 1.01585317e%2B00  1.12868519e%2B01  1.01677475e%2B01  1.28238754e%2B01%5D%2C %5B 1.09245586e%2B00  2.40494938e%2B01 -1.49060013e%2B02  5.77419996e-08%5D%2C %5B 1.03067315e%2B00  1.36040487e%2B01 -1.59289417e%2B01  6.61680126e%2B00%5D%2C %5B 1.03128850e%2B00  1.60653172e%2B01 -1.25844734e%2B02  1.23802452e%2B01%5D%2C %5B 1.02253950e%2B00  1.38177662e%2B01 -3.35331650e%2B01  1.29481912e%2B00%5D%2C %5B 1.03845930e%2B00  1.58590755e%2B01 -1.49011612e-08  5.77419996e..." isContainer="True" shape="(64, 4)" />
+<var name="test_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="5" />
+<var name="test_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000022E237D3208&gt;" isContainer="True" shape="5" />
+<var name="train_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C ed..." isContainer="True" shape="85" />
+<var name="training_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000022E237D3788&gt;" isContainer="True" shape="85" />
+<var name="val_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="10" />
+<var name="validation_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000022E237D3F48&gt;" isContainer="True" shape="10" />
+</xml>
+<class 'pandas.core.frame.DataFrame'>
+__pydev_val__
+(64, 4)
+__pydev_val__
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.099947</td>
+      <td>21.279510</td>
+      <td>177.340469</td>
+      <td>-32.620789</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.092070</td>
+      <td>-0.083874</td>
+      <td>688.687622</td>
+      <td>-331.738220</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.100039</td>
+      <td>20.568075</td>
+      <td>-19.578533</td>
+      <td>-75.092468</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.067148</td>
+      <td>20.763666</td>
+      <td>-0.903712</td>
+      <td>0.325097</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.084282</td>
+      <td>20.758615</td>
+      <td>2.966597</td>
+      <td>1.564976</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<xml><var name="_dummy_ipython_val"  />
+<var name="_dummy_special_var"  />
+<var name="activation" type="str" qualifier="builtins" value="tanh" />
+<var name="dropout" type="float" qualifier="builtins" value="0.0" />
+<var name="edge_index" type="Tensor" qualifier="torch" value="tensor%28%5B%5B 3%2C  3%2C  3%2C  4%2C  5%2C  5%2C  5%2C  5%2C  5%2C  5%2C  6%2C  6%2C  6%2C  6%2C  6%2C  7%2C  7%2C  8%2C%0A          9%2C 10%2C 10%2C 10%2C 10%2C 11%2C 12%2C 12%2C 13%2C 14%2C 14%2C 15%2C 16%2C 16%2C 17%2C 17%2C 18%2C 18%2C%0A         19%2C 20%2C 21%2C 22%2C 23%2C 24%2C 24%2C 25%2C 25%2C 26%2C 26%2C 26%2C 27%2C 27%2C 27%2C 28%2C 29%2C 29%2C%0A         29%2C 30%2C 30%2C 31%2C 31%2C 32%2C 32%2C 33%2C 33%2C 34%2C 34%2C 34%2C 35%2C 36%2C 37%2C 37%2C 38%2C 38%2C%0A         38%2C 39%2C 39%2C 39%2C 40%2C 40%2C 41%2C 41%2C 41%2C 42%2C 43%2C 43%2C 43%2C 44%2C 44%2C 44%2C 45%2C 46%2C%0A         46%2C 46%2C 47%2C 48%2C 48%2C 48%2C 49%2C 50%2C 50%2C 50%2C 51%2C 51%2C 52%2C 52%2C 53%2C 53%2C 53%2C 54%2C%0A         55%2C 55%2C 56%2C 57%2C 57%2C 58%2C 58%2C 59%2C 60%2C 61%2C 61%2C 62%2C 63%2C 63%2C  0%2C  1%2C  2%2C  3%2C%0A          4%2C  5%2C  6%2C  7%2C  8%2C  9%2C 10%2C 11%2C 12%2C 13%2C 14%2C 15%2C 16%2C 17%2C 18%2C 19%2C 20%2C 21%2C%0A         22%2C 23%2C 24%2C 25%2C 26%2C 27%2C 28%2C 29%2C 30%2C 31%2C 32%2C 33%2C 34%2C 35%2C 36%2C 37%2C 38%2C 39%2C%0A         40%2C 41%2C 42%2C 43%2C 44%2C 45%2C 46%2C 47%2C 48%2C 49%2C 50%2C 51%2C 52%2C 53%2C 54%2C 55%2C 56%2C 57%2C%0A         58%2C 59%2C 60%2C 61%2C 62%2C 63%5D%2C%0A        %5B24%2C 25%2C 50%2C 39%2C 26%2C 29%2C 33%2C 38%2C 40%2C 51%2C  7%2C 18%2C 37%2C 54%2C 63%2C  6%2C 39%2C 43%2C%0A         41%2C 28%2C 34%2C 44%2C 62%2C 38%2C 20%2C 27%2C 26%2C 25%2C 32%2C 40%2C 45%2C 48%2C 18%2C 38%2C  6..." isContainer="True" shape="(2, 186)" />
+<var name="edge_weights" type="Tensor" qualifier="torch" value="tensor%28%5B0.0039%2C 0.0023%2C 0.0039%2C 0.0078%2C 0.0041%2C 0.0037%2C 0.0772%2C 0.0055%2C 0.0048%2C%0A        0.0149%2C 0.0148%2C 0.0062%2C 0.0141%2C 0.0587%2C 0.0052%2C 0.0148%2C 0.0154%2C 0.0125%2C%0A        0.0125%2C 0.0017%2C 0.0045%2C 0.0135%2C 0.0022%2C 0.0092%2C 0.0020%2C 0.0099%2C 0.0061%2C%0A        0.0045%2C 0.1439%2C 0.0489%2C 0.0029%2C 0.0102%2C 0.0039%2C 0.0031%2C 0.0062%2C 0.0039%2C%0A        0.0079%2C 0.0020%2C 0.0032%2C 0.0087%2C 0.0035%2C 0.0039%2C 0.0035%2C 0.0023%2C 0.0045%2C%0A        0.0041%2C 0.0061%2C 0.0048%2C 0.0099%2C 0.0048%2C 0.0072%2C 0.0017%2C 0.0037%2C 0.0355%2C%0A        0.0071%2C 0.0052%2C 0.0114%2C 0.0414%2C 0.0085%2C 0.1439%2C 0.0018%2C 0.0772%2C 0.0018%2C%0A        0.0045%2C 0.0032%2C 0.0453%2C 0.0038%2C 0.0072%2C 0.0141%2C 0.0029%2C 0.0055%2C 0.0092%2C%0A        0.0031%2C 0.0078%2C 0.0154%2C 0.0152%2C 0.0048%2C 0.0489%2C 0.0125%2C 0.0257%2C 0.0341%2C%0A        0.0029%2C 0.0125%2C 0.0152%2C 0.0473%2C 0.0135%2C 0.0079%2C 0.0035%2C 0.0029%2C 0.0069%2C%0A        0.0013%2C 0.0389%2C 0.0355%2C 0.0102%2C 0.0069%2C 0.0063%2C 0.0035%2C 0.0039%2C 0.0087%2C%0A        0.0453%2C 0.0149%2C 0.0257%2C 0.0414%2C 0.0055%2C 0.0052%2C 0.0055%2C 0.0570%2C 0.0587%2C%0A        0.0013%2C 0.0258%2C 0.0341%2C 0.0473%2C ..." isContainer="True" shape="(186,)" />
+<var name="grid_name" type="str" qualifier="builtins" value="1-HV-mixed--0-no_sw" />
+<var name="hidden_channels" type="int" qualifier="builtins" value="186" />
+<var name="i" type="int" qualifier="builtins" value="399" />
+<var name="in_channels" type="int" qualifier="builtins" value="4" />
+<var name="jk" type="str" qualifier="builtins" value="last" />
+<var name="layer_type" type="str" qualifier="builtins" value="TransConv" />
+<var name="loss" type="MSELoss" qualifier="torch.nn.modules.loss" value="MSELoss%28%29" isContainer="True" />
+<var name="lr" type="float" qualifier="builtins" value="0.0001" />
+<var name="model" type="GNN" qualifier="gnn" value="GNN%284%2C 4%2C num_layers=4%29" isContainer="True" />
+<var name="name" type="str" qualifier="builtins" value="lin.weight" />
+<var name="num_epochs" type="int" qualifier="builtins" value="400" />
+<var name="num_layers" type="int" qualifier="builtins" value="4" />
+<var name="optimizer" type="Adam" qualifier="torch.optim.adam" value="Adam %28%0AParameter Group 0%0A    amsgrad%3A False%0A    betas%3A %280.9%2C 0.999%29%0A    capturable%3A False%0A    differentiable%3A False%0A    eps%3A 1e-08%0A    foreach%3A None%0A    fused%3A False%0A    lr%3A 0.0001%0A    maximize%3A False%0A    weight_decay%3A 0%0A%29" isContainer="True" />
+<var name="out_channels" type="int" qualifier="builtins" value="4" />
+<var name="output" type="ndarray" qualifier="numpy" value="%5B%5B 1.09994698e%2B00  2.12795105e%2B01  1.77340469e%2B02 -3.26207886e%2B01%5D%2C %5B 1.09207022e%2B00 -8.38735998e-02  6.88687622e%2B02 -3.31738220e%2B02%5D%2C %5B 1.10003912e%2B00  2.05680752e%2B01 -1.95785332e%2B01 -7.50924683e%2B01%5D%2C %5B 1.06714833e%2B00  2.07636662e%2B01 -9.03712034e-01  3.25097382e-01%5D%2C %5B 1.08428180e%2B00  2.07586155e%2B01  2.96659660e%2B00  1.56497645e%2B00%5D%2C %5B 1.01887703e%2B00  1.12667875e%2B01  3.51221418e%2B00  1.02492929e%2B00%5D%2C %5B 1.08645833e%2B00  2.04598866e%2B01 -3.72558141e%2B00  1.05695510e%2B00%5D%2C %5B 1.08570051e%2B00  2.06506939e%2B01 -1.90028000e%2B01  1.57909465e%2B00%5D%2C %5B 1.08377135e%2B00  2.09434586e%2B01 -7.02144766e%2B00  1.55339265e%2B00%5D%2C %5B 1.01594496e%2B00  1.11942272e%2B01  1.07788677e%2B01  1.29593296e%2B01%5D%2C %5B 1.09233916e%2B00  2.40377083e%2B01 -1.49533737e%2B02 -2.66239066e-02%5D%2C %5B 1.03103292e%2B00  1.36327066e%2B01 -1.49445925e%2B01  6.69437218e%2B00%5D%2C %5B 1.03127718e%2B00  1.60549183e%2B01 -1.25265114e%2B02  1.26051311e%2B01%5D%2C %5B 1.02253175e%2B00  1.37631721e%2B01 -3.35027771e%2B01  1.20543885e%2B00%5D%2C %5B 1.03907430e%2B00  1.58821545e%2B01  2.56611705e-01 -2.94707716e..." isContainer="True" shape="(64, 4)" />
+<var name="param" type="int" qualifier="builtins" value="423337" />
+<var name="scaler" type="StandardScaler" qualifier="sklearn.preprocessing._data" value="StandardScaler%28%29" isContainer="True" />
+<var name="target" type="ndarray" qualifier="numpy" value="%5B%5B 1.09999990e%2B00  2.13925457e%2B01  1.76727890e%2B02 -3.27885513e%2B01%5D%2C %5B 1.09200001e%2B00  1.49011612e-07  6.88670288e%2B02 -3.31443359e%2B02%5D%2C %5B 1.10000002e%2B00  2.05841484e%2B01 -1.99998436e%2B01 -7.45177917e%2B01%5D%2C %5B 1.06724203e%2B00  2.08262367e%2B01 -1.49011612e-08  5.77419996e-08%5D%2C %5B 1.08456862e%2B00  2.07200165e%2B01  3.10688472e%2B00  1.20584941e%2B00%5D%2C %5B 1.01868093e%2B00  1.12852869e%2B01  3.23646975e%2B00  1.27030253e%2B00%5D%2C %5B 1.08644021e%2B00  2.04008236e%2B01 -2.44459224e%2B00  1.09217620e%2B00%5D%2C %5B 1.08578110e%2B00  2.05989361e%2B01 -1.78616982e%2B01  1.08171439e%2B00%5D%2C %5B 1.08396471e%2B00  2.08871899e%2B01 -6.57328176e%2B00  1.23611331e%2B00%5D%2C %5B 1.01585317e%2B00  1.12868519e%2B01  1.01677475e%2B01  1.28238754e%2B01%5D%2C %5B 1.09245586e%2B00  2.40494938e%2B01 -1.49060013e%2B02  5.77419996e-08%5D%2C %5B 1.03067315e%2B00  1.36040487e%2B01 -1.59289417e%2B01  6.61680126e%2B00%5D%2C %5B 1.03128850e%2B00  1.60653172e%2B01 -1.25844734e%2B02  1.23802452e%2B01%5D%2C %5B 1.02253950e%2B00  1.38177662e%2B01 -3.35331650e%2B01  1.29481912e%2B00%5D%2C %5B 1.03845930e%2B00  1.58590755e%2B01 -1.49011612e-08  5.77419996e..." isContainer="True" shape="(64, 4)" />
+<var name="test_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="5" />
+<var name="test_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000022E237D3208&gt;" isContainer="True" shape="5" />
+<var name="train_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C ed..." isContainer="True" shape="85" />
+<var name="training_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000022E237D3788&gt;" isContainer="True" shape="85" />
+<var name="val_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="10" />
+<var name="validation_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000022E237D3F48&gt;" isContainer="True" shape="10" />
+</xml>
+<class 'pandas.core.frame.DataFrame'>
+__pydev_val__
+(64, 4)
+__pydev_val__
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.100000</td>
+      <td>2.139255e+01</td>
+      <td>1.767279e+02</td>
+      <td>-3.278855e+01</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.092000</td>
+      <td>1.490116e-07</td>
+      <td>6.886703e+02</td>
+      <td>-3.314434e+02</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.100000</td>
+      <td>2.058415e+01</td>
+      <td>-1.999984e+01</td>
+      <td>-7.451779e+01</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.067242</td>
+      <td>2.082624e+01</td>
+      <td>-1.490116e-08</td>
+      <td>5.774200e-08</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.084569</td>
+      <td>2.072002e+01</td>
+      <td>3.106885e+00</td>
+      <td>1.205849e+00</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<xml><var name="_dummy_ipython_val"  />
+<var name="_dummy_special_var"  />
+<var name="activation" type="str" qualifier="builtins" value="tanh" />
+<var name="dropout" type="float" qualifier="builtins" value="0.0" />
+<var name="edge_index" type="Tensor" qualifier="torch" value="tensor%28%5B%5B 3%2C  3%2C  3%2C  4%2C  5%2C  5%2C  5%2C  5%2C  5%2C  5%2C  6%2C  6%2C  6%2C  6%2C  6%2C  7%2C  7%2C  8%2C%0A          9%2C 10%2C 10%2C 10%2C 10%2C 11%2C 12%2C 12%2C 13%2C 14%2C 14%2C 15%2C 16%2C 16%2C 17%2C 17%2C 18%2C 18%2C%0A         19%2C 20%2C 21%2C 22%2C 23%2C 24%2C 24%2C 25%2C 25%2C 26%2C 26%2C 26%2C 27%2C 27%2C 27%2C 28%2C 29%2C 29%2C%0A         29%2C 30%2C 30%2C 31%2C 31%2C 32%2C 32%2C 33%2C 33%2C 34%2C 34%2C 34%2C 35%2C 36%2C 37%2C 37%2C 38%2C 38%2C%0A         38%2C 39%2C 39%2C 39%2C 40%2C 40%2C 41%2C 41%2C 41%2C 42%2C 43%2C 43%2C 43%2C 44%2C 44%2C 44%2C 45%2C 46%2C%0A         46%2C 46%2C 47%2C 48%2C 48%2C 48%2C 49%2C 50%2C 50%2C 50%2C 51%2C 51%2C 52%2C 52%2C 53%2C 53%2C 53%2C 54%2C%0A         55%2C 55%2C 56%2C 57%2C 57%2C 58%2C 58%2C 59%2C 60%2C 61%2C 61%2C 62%2C 63%2C 63%2C  0%2C  1%2C  2%2C  3%2C%0A          4%2C  5%2C  6%2C  7%2C  8%2C  9%2C 10%2C 11%2C 12%2C 13%2C 14%2C 15%2C 16%2C 17%2C 18%2C 19%2C 20%2C 21%2C%0A         22%2C 23%2C 24%2C 25%2C 26%2C 27%2C 28%2C 29%2C 30%2C 31%2C 32%2C 33%2C 34%2C 35%2C 36%2C 37%2C 38%2C 39%2C%0A         40%2C 41%2C 42%2C 43%2C 44%2C 45%2C 46%2C 47%2C 48%2C 49%2C 50%2C 51%2C 52%2C 53%2C 54%2C 55%2C 56%2C 57%2C%0A         58%2C 59%2C 60%2C 61%2C 62%2C 63%5D%2C%0A        %5B24%2C 25%2C 50%2C 39%2C 26%2C 29%2C 33%2C 38%2C 40%2C 51%2C  7%2C 18%2C 37%2C 54%2C 63%2C  6%2C 39%2C 43%2C%0A         41%2C 28%2C 34%2C 44%2C 62%2C 38%2C 20%2C 27%2C 26%2C 25%2C 32%2C 40%2C 45%2C 48%2C 18%2C 38%2C  6..." isContainer="True" shape="(2, 186)" />
+<var name="edge_weights" type="Tensor" qualifier="torch" value="tensor%28%5B0.0039%2C 0.0023%2C 0.0039%2C 0.0078%2C 0.0041%2C 0.0037%2C 0.0772%2C 0.0055%2C 0.0048%2C%0A        0.0149%2C 0.0148%2C 0.0062%2C 0.0141%2C 0.0587%2C 0.0052%2C 0.0148%2C 0.0154%2C 0.0125%2C%0A        0.0125%2C 0.0017%2C 0.0045%2C 0.0135%2C 0.0022%2C 0.0092%2C 0.0020%2C 0.0099%2C 0.0061%2C%0A        0.0045%2C 0.1439%2C 0.0489%2C 0.0029%2C 0.0102%2C 0.0039%2C 0.0031%2C 0.0062%2C 0.0039%2C%0A        0.0079%2C 0.0020%2C 0.0032%2C 0.0087%2C 0.0035%2C 0.0039%2C 0.0035%2C 0.0023%2C 0.0045%2C%0A        0.0041%2C 0.0061%2C 0.0048%2C 0.0099%2C 0.0048%2C 0.0072%2C 0.0017%2C 0.0037%2C 0.0355%2C%0A        0.0071%2C 0.0052%2C 0.0114%2C 0.0414%2C 0.0085%2C 0.1439%2C 0.0018%2C 0.0772%2C 0.0018%2C%0A        0.0045%2C 0.0032%2C 0.0453%2C 0.0038%2C 0.0072%2C 0.0141%2C 0.0029%2C 0.0055%2C 0.0092%2C%0A        0.0031%2C 0.0078%2C 0.0154%2C 0.0152%2C 0.0048%2C 0.0489%2C 0.0125%2C 0.0257%2C 0.0341%2C%0A        0.0029%2C 0.0125%2C 0.0152%2C 0.0473%2C 0.0135%2C 0.0079%2C 0.0035%2C 0.0029%2C 0.0069%2C%0A        0.0013%2C 0.0389%2C 0.0355%2C 0.0102%2C 0.0069%2C 0.0063%2C 0.0035%2C 0.0039%2C 0.0087%2C%0A        0.0453%2C 0.0149%2C 0.0257%2C 0.0414%2C 0.0055%2C 0.0052%2C 0.0055%2C 0.0570%2C 0.0587%2C%0A        0.0013%2C 0.0258%2C 0.0341%2C 0.0473%2C ..." isContainer="True" shape="(186,)" />
+<var name="grid_name" type="str" qualifier="builtins" value="1-HV-mixed--0-no_sw" />
+<var name="hidden_channels" type="int" qualifier="builtins" value="186" />
+<var name="i" type="int" qualifier="builtins" value="399" />
+<var name="in_channels" type="int" qualifier="builtins" value="4" />
+<var name="jk" type="str" qualifier="builtins" value="last" />
+<var name="layer_type" type="str" qualifier="builtins" value="TransConv" />
+<var name="loss" type="MSELoss" qualifier="torch.nn.modules.loss" value="MSELoss%28%29" isContainer="True" />
+<var name="lr" type="float" qualifier="builtins" value="0.0001" />
+<var name="model" type="GNN" qualifier="gnn" value="GNN%284%2C 4%2C num_layers=4%29" isContainer="True" />
+<var name="name" type="str" qualifier="builtins" value="lin.weight" />
+<var name="num_epochs" type="int" qualifier="builtins" value="400" />
+<var name="num_layers" type="int" qualifier="builtins" value="4" />
+<var name="optimizer" type="Adam" qualifier="torch.optim.adam" value="Adam %28%0AParameter Group 0%0A    amsgrad%3A False%0A    betas%3A %280.9%2C 0.999%29%0A    capturable%3A False%0A    differentiable%3A False%0A    eps%3A 1e-08%0A    foreach%3A None%0A    fused%3A False%0A    lr%3A 0.0001%0A    maximize%3A False%0A    weight_decay%3A 0%0A%29" isContainer="True" />
+<var name="out_channels" type="int" qualifier="builtins" value="4" />
+<var name="output" type="ndarray" qualifier="numpy" value="%5B%5B 1.09994698e%2B00  2.12795105e%2B01  1.77340469e%2B02 -3.26207886e%2B01%5D%2C %5B 1.09207022e%2B00 -8.38735998e-02  6.88687622e%2B02 -3.31738220e%2B02%5D%2C %5B 1.10003912e%2B00  2.05680752e%2B01 -1.95785332e%2B01 -7.50924683e%2B01%5D%2C %5B 1.06714833e%2B00  2.07636662e%2B01 -9.03712034e-01  3.25097382e-01%5D%2C %5B 1.08428180e%2B00  2.07586155e%2B01  2.96659660e%2B00  1.56497645e%2B00%5D%2C %5B 1.01887703e%2B00  1.12667875e%2B01  3.51221418e%2B00  1.02492929e%2B00%5D%2C %5B 1.08645833e%2B00  2.04598866e%2B01 -3.72558141e%2B00  1.05695510e%2B00%5D%2C %5B 1.08570051e%2B00  2.06506939e%2B01 -1.90028000e%2B01  1.57909465e%2B00%5D%2C %5B 1.08377135e%2B00  2.09434586e%2B01 -7.02144766e%2B00  1.55339265e%2B00%5D%2C %5B 1.01594496e%2B00  1.11942272e%2B01  1.07788677e%2B01  1.29593296e%2B01%5D%2C %5B 1.09233916e%2B00  2.40377083e%2B01 -1.49533737e%2B02 -2.66239066e-02%5D%2C %5B 1.03103292e%2B00  1.36327066e%2B01 -1.49445925e%2B01  6.69437218e%2B00%5D%2C %5B 1.03127718e%2B00  1.60549183e%2B01 -1.25265114e%2B02  1.26051311e%2B01%5D%2C %5B 1.02253175e%2B00  1.37631721e%2B01 -3.35027771e%2B01  1.20543885e%2B00%5D%2C %5B 1.03907430e%2B00  1.58821545e%2B01  2.56611705e-01 -2.94707716e..." isContainer="True" shape="(64, 4)" />
+<var name="param" type="int" qualifier="builtins" value="423337" />
+<var name="scaler" type="StandardScaler" qualifier="sklearn.preprocessing._data" value="StandardScaler%28%29" isContainer="True" />
+<var name="target" type="ndarray" qualifier="numpy" value="%5B%5B 1.09999990e%2B00  2.13925457e%2B01  1.76727890e%2B02 -3.27885513e%2B01%5D%2C %5B 1.09200001e%2B00  1.49011612e-07  6.88670288e%2B02 -3.31443359e%2B02%5D%2C %5B 1.10000002e%2B00  2.05841484e%2B01 -1.99998436e%2B01 -7.45177917e%2B01%5D%2C %5B 1.06724203e%2B00  2.08262367e%2B01 -1.49011612e-08  5.77419996e-08%5D%2C %5B 1.08456862e%2B00  2.07200165e%2B01  3.10688472e%2B00  1.20584941e%2B00%5D%2C %5B 1.01868093e%2B00  1.12852869e%2B01  3.23646975e%2B00  1.27030253e%2B00%5D%2C %5B 1.08644021e%2B00  2.04008236e%2B01 -2.44459224e%2B00  1.09217620e%2B00%5D%2C %5B 1.08578110e%2B00  2.05989361e%2B01 -1.78616982e%2B01  1.08171439e%2B00%5D%2C %5B 1.08396471e%2B00  2.08871899e%2B01 -6.57328176e%2B00  1.23611331e%2B00%5D%2C %5B 1.01585317e%2B00  1.12868519e%2B01  1.01677475e%2B01  1.28238754e%2B01%5D%2C %5B 1.09245586e%2B00  2.40494938e%2B01 -1.49060013e%2B02  5.77419996e-08%5D%2C %5B 1.03067315e%2B00  1.36040487e%2B01 -1.59289417e%2B01  6.61680126e%2B00%5D%2C %5B 1.03128850e%2B00  1.60653172e%2B01 -1.25844734e%2B02  1.23802452e%2B01%5D%2C %5B 1.02253950e%2B00  1.38177662e%2B01 -3.35331650e%2B01  1.29481912e%2B00%5D%2C %5B 1.03845930e%2B00  1.58590755e%2B01 -1.49011612e-08  5.77419996e..." isContainer="True" shape="(64, 4)" />
+<var name="test_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="5" />
+<var name="test_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000022E237D3208&gt;" isContainer="True" shape="5" />
+<var name="train_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C ed..." isContainer="True" shape="85" />
+<var name="training_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000022E237D3788&gt;" isContainer="True" shape="85" />
+<var name="val_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="10" />
+<var name="validation_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000022E237D3F48&gt;" isContainer="True" shape="10" />
+</xml>
+bias
+torch.Size([])
+convs.0.lin_key.weight
+torch.Size([186, 4])
+convs.0.lin_key.bias
+torch.Size([186])
+convs.0.lin_query.weight
+torch.Size([186, 4])
+convs.0.lin_query.bias
+torch.Size([186])
+convs.0.lin_value.weight
+torch.Size([186, 4])
+convs.0.lin_value.bias
+torch.Size([186])
+convs.0.lin_skip.weight
+torch.Size([186, 4])
+convs.0.lin_skip.bias
+torch.Size([186])
+convs.1.lin_key.weight
+torch.Size([186, 186])
+convs.1.lin_key.bias
+torch.Size([186])
+convs.1.lin_query.weight
+torch.Size([186, 186])
+convs.1.lin_query.bias
+torch.Size([186])
+convs.1.lin_value.weight
+torch.Size([186, 186])
+convs.1.lin_value.bias
+torch.Size([186])
+convs.1.lin_skip.weight
+torch.Size([186, 186])
+convs.1.lin_skip.bias
+torch.Size([186])
+convs.2.lin_key.weight
+torch.Size([186, 186])
+convs.2.lin_key.bias
+torch.Size([186])
+convs.2.lin_query.weight
+torch.Size([186, 186])
+convs.2.lin_query.bias
+torch.Size([186])
+convs.2.lin_value.weight
+torch.Size([186, 186])
+convs.2.lin_value.bias
+torch.Size([186])
+convs.2.lin_skip.weight
+torch.Size([186, 186])
+convs.2.lin_skip.bias
+torch.Size([186])
+convs.3.lin_key.weight
+torch.Size([186, 186])
+convs.3.lin_key.bias
+torch.Size([186])
+convs.3.lin_query.weight
+torch.Size([186, 186])
+convs.3.lin_query.bias
+torch.Size([186])
+convs.3.lin_value.weight
+torch.Size([186, 186])
+convs.3.lin_value.bias
+torch.Size([186])
+convs.3.lin_skip.weight
+torch.Size([186, 186])
+convs.3.lin_skip.bias
+torch.Size([186])
+norms.0.module.weight
+torch.Size([186])
+norms.0.module.bias
+torch.Size([186])
+norms.1.module.weight
+torch.Size([186])
+norms.1.module.bias
+torch.Size([186])
+norms.2.module.weight
+torch.Size([186])
+norms.2.module.bias
+torch.Size([186])
+norms.3.module.weight
+torch.Size([186])
+norms.3.module.bias
+torch.Size([186])
+lin.weight
+torch.Size([4, 186])
+<xml><var name="_dummy_ipython_val"  />
+<var name="_dummy_special_var"  />
+<var name="activation" type="str" qualifier="builtins" value="tanh" />
+<var name="dropout" type="float" qualifier="builtins" value="0.0" />
+<var name="edge_index" type="Tensor" qualifier="torch" value="tensor%28%5B%5B 3%2C  3%2C  3%2C  4%2C  5%2C  5%2C  5%2C  5%2C  5%2C  5%2C  6%2C  6%2C  6%2C  6%2C  6%2C  7%2C  7%2C  8%2C%0A          9%2C 10%2C 10%2C 10%2C 10%2C 11%2C 12%2C 12%2C 13%2C 14%2C 14%2C 15%2C 16%2C 16%2C 17%2C 17%2C 18%2C 18%2C%0A         19%2C 20%2C 21%2C 22%2C 23%2C 24%2C 24%2C 25%2C 25%2C 26%2C 26%2C 26%2C 27%2C 27%2C 27%2C 28%2C 29%2C 29%2C%0A         29%2C 30%2C 30%2C 31%2C 31%2C 32%2C 32%2C 33%2C 33%2C 34%2C 34%2C 34%2C 35%2C 36%2C 37%2C 37%2C 38%2C 38%2C%0A         38%2C 39%2C 39%2C 39%2C 40%2C 40%2C 41%2C 41%2C 41%2C 42%2C 43%2C 43%2C 43%2C 44%2C 44%2C 44%2C 45%2C 46%2C%0A         46%2C 46%2C 47%2C 48%2C 48%2C 48%2C 49%2C 50%2C 50%2C 50%2C 51%2C 51%2C 52%2C 52%2C 53%2C 53%2C 53%2C 54%2C%0A         55%2C 55%2C 56%2C 57%2C 57%2C 58%2C 58%2C 59%2C 60%2C 61%2C 61%2C 62%2C 63%2C 63%2C  0%2C  1%2C  2%2C  3%2C%0A          4%2C  5%2C  6%2C  7%2C  8%2C  9%2C 10%2C 11%2C 12%2C 13%2C 14%2C 15%2C 16%2C 17%2C 18%2C 19%2C 20%2C 21%2C%0A         22%2C 23%2C 24%2C 25%2C 26%2C 27%2C 28%2C 29%2C 30%2C 31%2C 32%2C 33%2C 34%2C 35%2C 36%2C 37%2C 38%2C 39%2C%0A         40%2C 41%2C 42%2C 43%2C 44%2C 45%2C 46%2C 47%2C 48%2C 49%2C 50%2C 51%2C 52%2C 53%2C 54%2C 55%2C 56%2C 57%2C%0A         58%2C 59%2C 60%2C 61%2C 62%2C 63%5D%2C%0A        %5B24%2C 25%2C 50%2C 39%2C 26%2C 29%2C 33%2C 38%2C 40%2C 51%2C  7%2C 18%2C 37%2C 54%2C 63%2C  6%2C 39%2C 43%2C%0A         41%2C 28%2C 34%2C 44%2C 62%2C 38%2C 20%2C 27%2C 26%2C 25%2C 32%2C 40%2C 45%2C 48%2C 18%2C 38%2C  6..." isContainer="True" shape="(2, 186)" />
+<var name="edge_weights" type="Tensor" qualifier="torch" value="tensor%28%5B0.0039%2C 0.0023%2C 0.0039%2C 0.0078%2C 0.0041%2C 0.0037%2C 0.0772%2C 0.0055%2C 0.0048%2C%0A        0.0149%2C 0.0148%2C 0.0062%2C 0.0141%2C 0.0587%2C 0.0052%2C 0.0148%2C 0.0154%2C 0.0125%2C%0A        0.0125%2C 0.0017%2C 0.0045%2C 0.0135%2C 0.0022%2C 0.0092%2C 0.0020%2C 0.0099%2C 0.0061%2C%0A        0.0045%2C 0.1439%2C 0.0489%2C 0.0029%2C 0.0102%2C 0.0039%2C 0.0031%2C 0.0062%2C 0.0039%2C%0A        0.0079%2C 0.0020%2C 0.0032%2C 0.0087%2C 0.0035%2C 0.0039%2C 0.0035%2C 0.0023%2C 0.0045%2C%0A        0.0041%2C 0.0061%2C 0.0048%2C 0.0099%2C 0.0048%2C 0.0072%2C 0.0017%2C 0.0037%2C 0.0355%2C%0A        0.0071%2C 0.0052%2C 0.0114%2C 0.0414%2C 0.0085%2C 0.1439%2C 0.0018%2C 0.0772%2C 0.0018%2C%0A        0.0045%2C 0.0032%2C 0.0453%2C 0.0038%2C 0.0072%2C 0.0141%2C 0.0029%2C 0.0055%2C 0.0092%2C%0A        0.0031%2C 0.0078%2C 0.0154%2C 0.0152%2C 0.0048%2C 0.0489%2C 0.0125%2C 0.0257%2C 0.0341%2C%0A        0.0029%2C 0.0125%2C 0.0152%2C 0.0473%2C 0.0135%2C 0.0079%2C 0.0035%2C 0.0029%2C 0.0069%2C%0A        0.0013%2C 0.0389%2C 0.0355%2C 0.0102%2C 0.0069%2C 0.0063%2C 0.0035%2C 0.0039%2C 0.0087%2C%0A        0.0453%2C 0.0149%2C 0.0257%2C 0.0414%2C 0.0055%2C 0.0052%2C 0.0055%2C 0.0570%2C 0.0587%2C%0A        0.0013%2C 0.0258%2C 0.0341%2C 0.0473%2C ..." isContainer="True" shape="(186,)" />
+<var name="grid_name" type="str" qualifier="builtins" value="1-HV-mixed--0-no_sw" />
+<var name="hidden_channels" type="int" qualifier="builtins" value="186" />
+<var name="i" type="int" qualifier="builtins" value="399" />
+<var name="in_channels" type="int" qualifier="builtins" value="4" />
+<var name="jk" type="str" qualifier="builtins" value="last" />
+<var name="layer_type" type="str" qualifier="builtins" value="TransConv" />
+<var name="loss" type="MSELoss" qualifier="torch.nn.modules.loss" value="MSELoss%28%29" isContainer="True" />
+<var name="lr" type="float" qualifier="builtins" value="0.0001" />
+<var name="model" type="GNN" qualifier="gnn" value="GNN%284%2C 4%2C num_layers=4%29" isContainer="True" />
+<var name="name" type="str" qualifier="builtins" value="lin.weight" />
+<var name="num_epochs" type="int" qualifier="builtins" value="400" />
+<var name="num_layers" type="int" qualifier="builtins" value="4" />
+<var name="optimizer" type="Adam" qualifier="torch.optim.adam" value="Adam %28%0AParameter Group 0%0A    amsgrad%3A False%0A    betas%3A %280.9%2C 0.999%29%0A    capturable%3A False%0A    differentiable%3A False%0A    eps%3A 1e-08%0A    foreach%3A None%0A    fused%3A False%0A    lr%3A 0.0001%0A    maximize%3A False%0A    weight_decay%3A 0%0A%29" isContainer="True" />
+<var name="out_channels" type="int" qualifier="builtins" value="4" />
+<var name="output" type="ndarray" qualifier="numpy" value="%5B%5B 1.09994698e%2B00  2.12795105e%2B01  1.77340469e%2B02 -3.26207886e%2B01%5D%2C %5B 1.09207022e%2B00 -8.38735998e-02  6.88687622e%2B02 -3.31738220e%2B02%5D%2C %5B 1.10003912e%2B00  2.05680752e%2B01 -1.95785332e%2B01 -7.50924683e%2B01%5D%2C %5B 1.06714833e%2B00  2.07636662e%2B01 -9.03712034e-01  3.25097382e-01%5D%2C %5B 1.08428180e%2B00  2.07586155e%2B01  2.96659660e%2B00  1.56497645e%2B00%5D%2C %5B 1.01887703e%2B00  1.12667875e%2B01  3.51221418e%2B00  1.02492929e%2B00%5D%2C %5B 1.08645833e%2B00  2.04598866e%2B01 -3.72558141e%2B00  1.05695510e%2B00%5D%2C %5B 1.08570051e%2B00  2.06506939e%2B01 -1.90028000e%2B01  1.57909465e%2B00%5D%2C %5B 1.08377135e%2B00  2.09434586e%2B01 -7.02144766e%2B00  1.55339265e%2B00%5D%2C %5B 1.01594496e%2B00  1.11942272e%2B01  1.07788677e%2B01  1.29593296e%2B01%5D%2C %5B 1.09233916e%2B00  2.40377083e%2B01 -1.49533737e%2B02 -2.66239066e-02%5D%2C %5B 1.03103292e%2B00  1.36327066e%2B01 -1.49445925e%2B01  6.69437218e%2B00%5D%2C %5B 1.03127718e%2B00  1.60549183e%2B01 -1.25265114e%2B02  1.26051311e%2B01%5D%2C %5B 1.02253175e%2B00  1.37631721e%2B01 -3.35027771e%2B01  1.20543885e%2B00%5D%2C %5B 1.03907430e%2B00  1.58821545e%2B01  2.56611705e-01 -2.94707716e..." isContainer="True" shape="(64, 4)" />
+<var name="param" type="int" qualifier="builtins" value="423337" />
+<var name="scaler" type="RobustScaler" qualifier="sklearn.preprocessing._data" value="RobustScaler%28%29" isContainer="True" />
+<var name="target" type="ndarray" qualifier="numpy" value="%5B%5B 1.09999990e%2B00  2.13925457e%2B01  1.76727890e%2B02 -3.27885513e%2B01%5D%2C %5B 1.09200001e%2B00  1.49011612e-07  6.88670288e%2B02 -3.31443359e%2B02%5D%2C %5B 1.10000002e%2B00  2.05841484e%2B01 -1.99998436e%2B01 -7.45177917e%2B01%5D%2C %5B 1.06724203e%2B00  2.08262367e%2B01 -1.49011612e-08  5.77419996e-08%5D%2C %5B 1.08456862e%2B00  2.07200165e%2B01  3.10688472e%2B00  1.20584941e%2B00%5D%2C %5B 1.01868093e%2B00  1.12852869e%2B01  3.23646975e%2B00  1.27030253e%2B00%5D%2C %5B 1.08644021e%2B00  2.04008236e%2B01 -2.44459224e%2B00  1.09217620e%2B00%5D%2C %5B 1.08578110e%2B00  2.05989361e%2B01 -1.78616982e%2B01  1.08171439e%2B00%5D%2C %5B 1.08396471e%2B00  2.08871899e%2B01 -6.57328176e%2B00  1.23611331e%2B00%5D%2C %5B 1.01585317e%2B00  1.12868519e%2B01  1.01677475e%2B01  1.28238754e%2B01%5D%2C %5B 1.09245586e%2B00  2.40494938e%2B01 -1.49060013e%2B02  5.77419996e-08%5D%2C %5B 1.03067315e%2B00  1.36040487e%2B01 -1.59289417e%2B01  6.61680126e%2B00%5D%2C %5B 1.03128850e%2B00  1.60653172e%2B01 -1.25844734e%2B02  1.23802452e%2B01%5D%2C %5B 1.02253950e%2B00  1.38177662e%2B01 -3.35331650e%2B01  1.29481912e%2B00%5D%2C %5B 1.03845930e%2B00  1.58590755e%2B01 -1.49011612e-08  5.77419996e..." isContainer="True" shape="(64, 4)" />
+<var name="test_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="5" />
+<var name="test_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000022E237D3208&gt;" isContainer="True" shape="5" />
+<var name="train_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C ed..." isContainer="True" shape="85" />
+<var name="training_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000022E237D3788&gt;" isContainer="True" shape="85" />
+<var name="val_data" type="list" qualifier="builtins" value="%5BData%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%2C Data%28x=%5B64%2C 4%5D%2C edge_index=%5B2%2C 186%5D%2C edge_attr=%5B186%5D%2C y=%5B64%2C 4%5D%2C num_nodes=64%29%5D" isContainer="True" shape="10" />
+<var name="validation_loader" type="DataLoader" qualifier="torch_geometric.loader.dataloader" value="%3Ctorch_geometric.loader.dataloader.DataLoader object at 0x0000022E237D3F48&gt;" isContainer="True" shape="10" />
+</xml>

@@ -14,7 +14,7 @@ import pandapower as pp
 #import networkx as nx
 #import pandapower.plotting as plot
 import wandb
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler, PowerTransformer, MaxAbsScaler, QuantileTransformer
 import simbench as sb
 import os
 import random
@@ -351,12 +351,118 @@ def read_supervised_training_data(grid_name):
     return train_data, val_data, test_data, edge_index, edge_weights
 
 
+def read_supervised_training_data_edge_attr(grid_name):
+
+    # Define the graph using Pandapower
+    net = sb.get_simbench_net(grid_name)
+
+    print("Calculating edge index and edge weights for the grid " + grid_name + " ...")
+
+    # Map indices of busses to ascending correct order
+    idx_mapper = dict()
+    for idx_given, idx_real in zip(net.bus.index.values, range(len(net.bus.index))):
+        idx_mapper[idx_given] = idx_real
+
+    edge_attr = []
+    edge_index = [[], []]
+
+    for from_bus, to_bus, r_ohm_per_km, x_ohm_per_km, length_km in zip(net.line.from_bus, net.line.to_bus,
+                                                                       net.line.r_ohm_per_km, net.line.x_ohm_per_km,
+                                                                       net.line.length_km):
+        # Add self loops
+        # edge_index[0].append(idx_mapper[from_bus])
+        # edge_index[1].append(idx_mapper[from_bus])
+
+        # Add interbus connections
+        edge_index[0].append(idx_mapper[from_bus])
+        edge_index[1].append(idx_mapper[to_bus])
+
+        # Calculate R_i and X_i
+        R_i = length_km * r_ohm_per_km
+        X_i = length_km * x_ohm_per_km
+
+        edge_attr.append([R_i, X_i])
+
+    # Convert edge connections to undirected
+    edge_index, edge_attr = to_undirected(edge_index=torch.tensor(edge_index, dtype=torch.int),
+                                             edge_attr=torch.tensor(edge_attr, dtype=torch.float32),
+                                             num_nodes=len(net.bus.index))
+
+    # Add self loops to edge connections
+    edge_index, edge_attr = add_self_loops(edge_index=edge_index, edge_attr=edge_attr,
+                                              num_nodes=len(net.bus.index))
+
+    print("Reading all of the .csv files from the directory of " + grid_name + " ...")
+
+    # Store path to the supervised datasets directory of the specified grid
+    train_data, val_data, test_data = [], [], []
+    path_to_dir = os.path.dirname(os.path.abspath("gnn.ipynb")) + "\\data\\Supervised\\" + grid_name
+    datasets = []
+
+    # Read all the csv files in the directory of the grid_name
+    for dataset_name in os.listdir(path_to_dir):
+        path2dataset = path_to_dir + "\\" + dataset_name
+        datasets.append(pd.read_csv(path2dataset))
+
+    # Process all the data according to  85 - 10 - 5
+    random.shuffle(datasets)
+    training = datasets[:85]
+    validation = datasets[85:95]
+    test = datasets[95:]
+
+    print("Processing Training Data for " + grid_name + " ...")
+    num_busses = int(len(training[0]) / 2)
+
+    for data in training:
+        x = data[:num_busses].drop(columns=["Unnamed: 0"])
+        x_rows, x_cols = np.shape(x)
+        x = np.array(x).reshape(x_rows, x_cols)
+        y = data[num_busses:].drop(columns=["Unnamed: 0"])
+        y_rows, y_cols = np.shape(y)
+        y = np.array(y).reshape(y_rows, y_cols)
+        x = torch.tensor(data=x, dtype=torch.float32)
+        y = torch.tensor(data=y, dtype=torch.float32)
+        assert (np.shape(x)[0] == np.shape(y)[0] and np.shape(x)[1] == np.shape(y)[1])
+        train_data.append(Data(x=x, y=y, edge_index=edge_index, edge_attr=edge_attr, num_nodes=num_busses))
+
+    print("Processing Validation Data for " + grid_name + " ...")
+
+    for data in validation:
+        x = data[:num_busses].drop(columns=["Unnamed: 0"])
+        x_rows, x_cols = np.shape(x)
+        x = np.array(x).reshape(x_rows, x_cols)
+        y = data[num_busses:].drop(columns=["Unnamed: 0"])
+        y_rows, y_cols = np.shape(y)
+        y = np.array(y).reshape(y_rows, y_cols)
+        x = torch.tensor(data=x, dtype=torch.float32)
+        y = torch.tensor(data=y, dtype=torch.float32)
+        assert (np.shape(x)[0] == np.shape(y)[0] and np.shape(x)[1] == np.shape(y)[1])
+        val_data.append(Data(x=x, y=y, edge_index=edge_index, edge_attr=edge_attr, num_nodes=num_busses))
+
+    print("Processing Test Data for " + grid_name + " ...")
+
+    for data in test:
+        x = data[:num_busses].drop(columns=["Unnamed: 0"])
+        x_rows, x_cols = np.shape(x)
+        x = np.array(x).reshape(x_rows, x_cols)
+        y = data[num_busses:].drop(columns=["Unnamed: 0"])
+        y_rows, y_cols = np.shape(y)
+        y = np.array(y).reshape(y_rows, y_cols)
+        x = torch.tensor(data=x, dtype=torch.float32)
+        y = torch.tensor(data=y, dtype=torch.float32)
+        assert (np.shape(x)[0] == np.shape(y)[0] and np.shape(x)[1] == np.shape(y)[1])
+        test_data.append(Data(x=x, y=y, edge_index=edge_index, edge_attr=edge_attr, num_nodes=num_busses))
+
+    print("Processing complete.")
+    return train_data, val_data, test_data, edge_index, edge_attr
+
+
 def normalize(lst):
     _sum_ = sum(lst)
     return [float(i) / _sum_ for i in lst]
 
 
-def train_one_epoch(epoch, optimizer, training_loader, model, loss_fn, edge_index, edge_weights):
+def train_one_epoch(epoch, optimizer, training_loader, model, loss_fn, edge_index, edge_weights, scaler):
 
     train_rmse_loss = 0.0
     train_mae_loss = 0.0
@@ -378,7 +484,6 @@ def train_one_epoch(epoch, optimizer, training_loader, model, loss_fn, edge_inde
         inputs, targets = data.x, data.y
 
         # Define Scaler and standardize inputs and targets
-        scaler = MinMaxScaler()
         targets = torch.tensor(scaler.fit_transform(targets), dtype=torch.float32)
         inputs = torch.tensor(scaler.transform(inputs), dtype=torch.float32)
 
@@ -427,7 +532,7 @@ def train_one_epoch(epoch, optimizer, training_loader, model, loss_fn, edge_inde
     })
 
 
-def validate_one_epoch(epoch, validation_loader, model, loss_fn, edge_index, edge_weights):
+def validate_one_epoch(epoch, validation_loader, model, loss_fn, edge_index, edge_weights, scaler):
 
     val_rmse_loss = 0.0
     val_mae_loss = 0.0
@@ -448,7 +553,6 @@ def validate_one_epoch(epoch, validation_loader, model, loss_fn, edge_index, edg
         inputs, targets = data.x, data.y
 
         # Define Scaler and standardize inputs and targets
-        scaler = MinMaxScaler()
         targets = torch.tensor(scaler.fit_transform(targets), dtype=torch.float32)
         inputs = torch.tensor(scaler.transform(inputs), dtype=torch.float32)
 
@@ -480,16 +584,17 @@ def validate_one_epoch(epoch, validation_loader, model, loss_fn, edge_index, edg
     })
 
 
-def train_validate_one_epoch(epoch, optimizer, training_loader, validation_loader, model, loss_fn, edge_index, edge_weights):
+def train_validate_one_epoch(epoch, optimizer, training_loader, validation_loader, model, loss_fn, edge_index, edge_weights, scaler):
 
     print("Training the model for epoch " + str(epoch))
     # Train for an epoch
-    train_one_epoch(epoch, optimizer, training_loader, model, loss_fn, edge_index, edge_weights)
+    train_one_epoch(epoch, optimizer, training_loader, model, loss_fn, edge_index, edge_weights, scaler)
     print("Validating the model on unseen Datasets for epoch " + str(epoch))
     # Validate for an epoch
-    validate_one_epoch(epoch, validation_loader, model, loss_fn, edge_index, edge_weights)
+    validate_one_epoch(epoch, validation_loader, model, loss_fn, edge_index, edge_weights, scaler)
 
-def test_one_epoch(test_loader, model, loss_fn, edge_index, edge_weights):
+
+def test_one_epoch(test_loader, model, loss_fn, edge_index, edge_weights, scaler):
 
     test_rmse_loss = 0.0
     test_mae_loss = 0.0
@@ -512,7 +617,6 @@ def test_one_epoch(test_loader, model, loss_fn, edge_index, edge_weights):
         inputs, targets = data.x, data.y
 
         # Define Scaler and standardize inputs and targets
-        scaler = MinMaxScaler()
         targets = torch.tensor(scaler.fit_transform(targets), dtype=torch.float32)
         inputs = torch.tensor(scaler.transform(inputs), dtype=torch.float32)
 
