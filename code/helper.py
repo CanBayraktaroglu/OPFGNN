@@ -11,14 +11,14 @@ from torch_geometric.loader import DataLoader
 import pandas as pd
 import numpy as np
 import pandapower as pp
-#import networkx as nx
+import networkx as nx
 #import pandapower.plotting as plot
 import wandb
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler, PowerTransformer, MaxAbsScaler, QuantileTransformer
 import simbench as sb
 import os
 import random
-import julia
+from graphdata import GraphData
 
 
 def sample_uniform_from_df(load):
@@ -356,7 +356,7 @@ def read_supervised_training_data_edge_attr(grid_name):
     # Define the graph using Pandapower
     net = sb.get_simbench_net(grid_name)
 
-    print("Calculating edge index and edge weights for the grid " + grid_name + " ...")
+    print("Calculating edge index and edge attributes for the grid " + grid_name + " ...")
 
     # Map indices of busses to ascending correct order
     idx_mapper = dict()
@@ -382,6 +382,8 @@ def read_supervised_training_data_edge_attr(grid_name):
         X_i = length_km * x_ohm_per_km
 
         edge_attr.append([R_i, X_i])
+
+    #edge_attr = torch.tensor(StandardScaler().fit_transform(edge_attr), dtype=torch.float32)
 
     # Convert edge connections to undirected
     edge_index, edge_attr = to_undirected(edge_index=torch.tensor(edge_index, dtype=torch.int),
@@ -457,12 +459,20 @@ def read_supervised_training_data_edge_attr(grid_name):
     return train_data, val_data, test_data, edge_index, edge_attr
 
 
+def read_multiple_supervised_datasets(grid_names):
+    graphdata_lst = []
+    for _ in grid_names:
+        train_data, val_data, test_data, edge_index, edge_attr = read_supervised_training_data_edge_attr(_)
+        # edge_attr = torch.tensor(StandardScaler().fit_transform(edge_attr), dtype=torch.float32)
+        graphdata_lst.append(GraphData(_,train_data, val_data, test_data, edge_index, edge_attr))
+    return graphdata_lst
+
 def normalize(lst):
     _sum_ = sum(lst)
     return [float(i) / _sum_ for i in lst]
 
 
-def train_one_epoch(epoch, optimizer, training_loader, model, loss_fn, edge_index, edge_weights, scaler):
+def train_one_epoch(epoch, grid_name, optimizer, training_loader, model, loss_fn, scaler):
 
     train_rmse_loss = 0.0
     train_mae_loss = 0.0
@@ -483,6 +493,10 @@ def train_one_epoch(epoch, optimizer, training_loader, model, loss_fn, edge_inde
         # Every data instance is an input + label pair
         inputs, targets = data.x, data.y
 
+        # Get edge_index and edge_attr from DataLoader
+        edge_index = training_loader.dataset[i].edge_index
+        edge_attr = training_loader.dataset[i].edge_attr
+
         # Define Scaler and standardize inputs and targets
         targets = torch.tensor(scaler.fit_transform(targets), dtype=torch.float32)
         inputs = torch.tensor(scaler.transform(inputs), dtype=torch.float32)
@@ -491,7 +505,7 @@ def train_one_epoch(epoch, optimizer, training_loader, model, loss_fn, edge_inde
         optimizer.zero_grad()
 
         # Make predictions for this batch
-        outputs = model(inputs, edge_index, edge_weights, edge_weights)
+        outputs = model(inputs, edge_index, edge_attr=edge_attr)
 
         # Compute the loss and its gradients for RMSE loss
         rmse_loss = torch.sqrt(loss_fn(outputs, targets))
@@ -524,6 +538,7 @@ def train_one_epoch(epoch, optimizer, training_loader, model, loss_fn, edge_inde
         """
 
     wandb.log({
+        'grid name' : grid_name,
         'epoch': epoch,
         'train_rmse_loss': train_rmse_loss/ last_idx,
         'train_mae_loss': train_mae_loss / last_idx,
@@ -532,7 +547,7 @@ def train_one_epoch(epoch, optimizer, training_loader, model, loss_fn, edge_inde
     })
 
 
-def validate_one_epoch(epoch, validation_loader, model, loss_fn, edge_index, edge_weights, scaler):
+def validate_one_epoch(epoch, grid_name, validation_loader, model, loss_fn, scaler):
 
     val_rmse_loss = 0.0
     val_mae_loss = 0.0
@@ -552,12 +567,16 @@ def validate_one_epoch(epoch, validation_loader, model, loss_fn, edge_index, edg
     for i, data in enumerate(validation_loader):
         inputs, targets = data.x, data.y
 
+        # Get edge_index and edge_attr from DataLoader
+        edge_index = validation_loader.dataset[i].edge_index
+        edge_attr = validation_loader.dataset[i].edge_attr
+
         # Define Scaler and standardize inputs and targets
         targets = torch.tensor(scaler.fit_transform(targets), dtype=torch.float32)
         inputs = torch.tensor(scaler.transform(inputs), dtype=torch.float32)
 
         # Make predictions for this batch
-        outputs = model(inputs, edge_index, edge_weights, edge_weights)
+        outputs = model(inputs, edge_index, edge_attr=edge_attr)
 
         # Compute the loss and its gradients
         rmse_loss = torch.sqrt(loss_fn(outputs, targets))
@@ -576,6 +595,7 @@ def validate_one_epoch(epoch, validation_loader, model, loss_fn, edge_index, edg
         last_idx = i + 1
 
     wandb.log({
+        'grid name': grid_name,
         'epoch': epoch,
         'val_rmse_loss': val_rmse_loss / last_idx,
         'val_mae_loss': val_mae_loss / last_idx,
@@ -584,17 +604,19 @@ def validate_one_epoch(epoch, validation_loader, model, loss_fn, edge_index, edg
     })
 
 
-def train_validate_one_epoch(epoch, optimizer, training_loader, validation_loader, model, loss_fn, edge_index, edge_weights, scaler):
+def train_validate_one_epoch(epoch, grid_name, optimizer, training_loader, validation_loader, model, loss_fn, scaler):
 
     print("Training the model for epoch " + str(epoch))
     # Train for an epoch
-    train_one_epoch(epoch, optimizer, training_loader, model, loss_fn, edge_index, edge_weights, scaler)
+    #model.train()
+    train_one_epoch(epoch, grid_name, optimizer, training_loader, model, loss_fn, scaler)
     print("Validating the model on unseen Datasets for epoch " + str(epoch))
     # Validate for an epoch
-    validate_one_epoch(epoch, validation_loader, model, loss_fn, edge_index, edge_weights, scaler)
+    #model.eval()
+    validate_one_epoch(epoch, grid_name, validation_loader, model, loss_fn, scaler)
 
 
-def test_one_epoch(test_loader, model, loss_fn, edge_index, edge_weights, scaler):
+def test_one_epoch(test_loader, grid_name, model, loss_fn, scaler):
 
     test_rmse_loss = 0.0
     test_mae_loss = 0.0
@@ -616,12 +638,16 @@ def test_one_epoch(test_loader, model, loss_fn, edge_index, edge_weights, scaler
     for i, data in enumerate(test_loader):
         inputs, targets = data.x, data.y
 
+        # Get edge_index and edge_attr from DataLoader
+        edge_index = test_loader.dataset[i].edge_index
+        edge_attr = test_loader.dataset[i].edge_attr
+
         # Define Scaler and standardize inputs and targets
         targets = torch.tensor(scaler.fit_transform(targets), dtype=torch.float32)
         inputs = torch.tensor(scaler.transform(inputs), dtype=torch.float32)
 
         # Make predictions for this batch
-        outputs = model(inputs, edge_index, edge_weights)
+        outputs = model(inputs, edge_index, edge_attr=edge_attr)
 
         # Compute the loss and its gradients
         rmse_loss = torch.sqrt(loss_fn(outputs, targets))
@@ -643,13 +669,17 @@ def test_one_epoch(test_loader, model, loss_fn, edge_index, edge_weights, scaler
             output = scaler.inverse_transform(outputs.detach().numpy())
             target = scaler.inverse_transform(targets.detach().numpy())
 
+    rmse = test_rmse_loss / last_idx
+    mae = test_mae_loss / last_idx
+    mre = test_mre_loss / last_idx
     wandb.log({
-        'test_rmse_loss': test_rmse_loss / last_idx,
-        'test_mae_loss': test_mae_loss / last_idx,
-        'test_mre_loss': test_mre_loss / last_idx
+        'grid name': grid_name,
+        'test_rmse_loss': rmse,
+        'test_mae_loss': mae,
+        'test_mre_loss': mre
     })
 
-    return output, target
+    return output,target, rmse, mae, mre
 
 
 
@@ -676,3 +706,200 @@ def print_model(model):
         print("Weights:", params[j - 2][0], "x", params[j - 2][1],
               "\tBias: ", params[j - 1][0], "\tParameters: ", param)
     print("\nTotal Params: ", total_params)
+
+
+# Yield successive n-sized
+# chunks from l.
+def divide_chunks(l, n):
+    # looping till length l
+    for i in range(0, len(l), n):
+        yield l[i:i + n]
+
+
+def train_all_one_epoch(epoch, optimizer, training_loader_lst, model, loss_fn):
+
+    train_rmse_loss = 0.0
+    train_mae_loss = 0.0
+    train_mre_loss = 0.0
+
+    # create a criterion to measure the mean absolute error (MAE)
+    mae_loss_fn = nn.L1Loss()
+
+    # create a criterion to measure the mean relative error (MRE), inputs_targets: List
+    mre_loss_fn = lambda outputs, targets : get_mre_loss(outputs, targets)
+
+    for i, training_loader in enumerate(training_loader_lst):
+
+
+        # Here, we use enumerate(training_loader) instead of
+        # iter(training_loader) so that we can track the batch
+        # index and do some intra-epoch reporting
+        for j, data in enumerate(training_loader):
+            scaler = StandardScaler()
+
+            # Every data instance is an input + label pair
+            inputs, targets = data.x, data.y
+
+            # Get edge_index and edge_attr from DataLoader
+            edge_index = training_loader.dataset[j].edge_index
+            edge_attr = training_loader.dataset[j].edge_attr
+
+            # Define Scaler and standardize inputs and targets
+            targets = torch.tensor(scaler.fit_transform(targets), dtype=torch.float32)
+            inputs = torch.tensor(scaler.transform(inputs), dtype=torch.float32)
+
+            # Zero your gradients for every batch!
+            optimizer.zero_grad()
+
+            # Make predictions for this batch
+            outputs = model(inputs, edge_index, edge_attr=edge_attr)
+
+            # Compute the loss and its gradients for RMSE loss
+            rmse_loss = torch.sqrt(loss_fn(outputs, targets))
+            rmse_loss.backward()
+
+            # Compute MAE loss
+            mae_loss = mae_loss_fn(outputs, targets)
+            #mae_loss.backward()
+
+            # Compute MRE loss
+            mre_loss = mre_loss_fn(outputs, targets)
+
+            # Adjust learning weights
+            optimizer.step()
+
+            # Gather data and report
+            train_rmse_loss += rmse_loss.item()
+            train_mae_loss += mae_loss.item()
+            train_mre_loss += mre_loss.item()
+
+    num_samples = len(training_loader_lst) * len(training_loader_lst[0].dataset)
+    wandb.log({
+        'epoch': epoch,
+        'train_rmse_loss': train_rmse_loss/ num_samples,
+        'train_mae_loss': train_mae_loss / num_samples,
+        'train_mre_loss': train_mre_loss / num_samples
+
+    })
+
+
+def validate_all_one_epoch(epoch, validation_loader_lst, model, loss_fn):
+
+    val_rmse_loss = 0.0
+    val_mae_loss = 0.0
+    val_mre_loss = 0.0
+
+    # create a criterion to measure the mean absolute error
+    mae_loss_fn = nn.L1Loss()
+
+    # create a criterion to measure the mean relative error (MRE), outputs, targets : Torch.Tensor
+    mre_loss_fn = lambda outputs, targets: get_mre_loss(outputs, targets)
+
+    for i, validation_loader in enumerate(validation_loader_lst):
+
+        # Here, we use enumerate(validation_loader) instead of
+        # iter(validation_loader) so that we can track the batch
+        # index and do some intra-epoch reporting
+        for j, data in enumerate(validation_loader):
+
+            scaler = StandardScaler()
+            inputs, targets = data.x, data.y
+
+            # Get edge_index and edge_attr from DataLoader
+            edge_index = validation_loader.dataset[j].edge_index
+            edge_attr = validation_loader.dataset[j].edge_attr
+
+            # Define Scaler and standardize inputs and targets
+            targets = torch.tensor(scaler.fit_transform(targets), dtype=torch.float32)
+            inputs = torch.tensor(scaler.transform(inputs), dtype=torch.float32)
+
+            # Make predictions for this batch
+            outputs = model(inputs, edge_index, edge_attr=edge_attr)
+
+            # Compute the loss and its gradients
+            rmse_loss = torch.sqrt(loss_fn(outputs, targets))
+
+            # Compute MAE loss
+            mae_loss = mae_loss_fn(outputs, targets)
+
+            # Compute MRE loss
+            mre_loss = mre_loss_fn(outputs, targets)
+
+            # Gather data and report
+            val_rmse_loss += rmse_loss.item()
+            val_mae_loss += mae_loss.item()
+            val_mre_loss += mre_loss.item()
+
+    num_samples = len(validation_loader_lst) * len(validation_loader_lst[0].dataset)
+    wandb.log({
+        'epoch': epoch,
+        'val_rmse_loss': val_rmse_loss / num_samples,
+        'val_mae_loss': val_mae_loss / num_samples,
+        'val_mre_loss': val_mre_loss / num_samples
+
+    })
+
+def test_all_one_epoch(test_loader_lst, model, loss_fn):
+
+    test_rmse_loss = 0.0
+    test_mae_loss = 0.0
+    test_mre_loss = 0.0
+    out = []
+
+    # create a criterion to measure the mean absolute error
+    mae_loss_fn = nn.L1Loss()
+
+    # create a criterion to measure the mean relative error (MRE), outputs, targets : Torch.Tensor
+    mre_loss_fn = lambda outputs, targets: get_mre_loss(outputs, targets)
+
+    for i, test_loader in enumerate(test_loader_lst):
+
+        # Here, we use enumerate(validation_loader) instead of
+        # iter(validation_loader) so that we can track the batch
+        # index and do some intra-epoch reporting
+        for j, data in enumerate(test_loader):
+            scaler = StandardScaler()
+            inputs, targets = data.x, data.y
+
+            # Get edge_index and edge_attr from DataLoader
+            edge_index = test_loader.dataset[j].edge_index
+            edge_attr = test_loader.dataset[j].edge_attr
+
+            # Define Scaler and standardize inputs and targets
+            targets = torch.tensor(scaler.fit_transform(targets), dtype=torch.float32)
+            inputs = torch.tensor(scaler.transform(inputs), dtype=torch.float32)
+
+            # Make predictions for this batch
+            outputs = model(inputs, edge_index, edge_attr=edge_attr)
+
+            # Compute the loss and its gradients
+            rmse_loss = torch.sqrt(loss_fn(outputs, targets))
+
+            # Compute MAE loss
+            mae_loss = mae_loss_fn(outputs, targets)
+
+            # Compute MRE loss
+            mre_loss = mre_loss_fn(outputs, targets)
+
+            # Gather data and report
+            test_rmse_loss += rmse_loss.item()
+            test_mae_loss += mae_loss.item()
+            test_mre_loss += mre_loss.item()
+
+
+            if j + 1 == len(test_loader.dataset):
+                output = scaler.inverse_transform(outputs.detach().numpy())
+                target = scaler.inverse_transform(targets.detach().numpy())
+                out.append((output, target))
+
+    num_samples = len(test_loader_lst) * len(test_loader_lst[0].dataset)
+    rmse = test_rmse_loss / num_samples
+    mae = test_mae_loss / num_samples
+    mre = test_mre_loss / num_samples
+    wandb.log({
+        'test_rmse_loss': rmse,
+        'test_mae_loss': mae,
+        'test_mre_loss': mre
+    })
+
+    return out

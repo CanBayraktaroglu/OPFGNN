@@ -1,4 +1,3 @@
-from abc import ABC
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -16,8 +15,7 @@ import copy
 from typing import Optional, Tuple, Union
 from torch_geometric.nn.dense.linear import Linear
 from torch_geometric.typing import Adj, OptTensor, PairTensor, SparseTensor
-from torch_geometric.utils import softmax
-import math
+
 
 class GNN(BasicGNN):
     r"""An abstract class for implementing basic GNN models.
@@ -178,11 +176,11 @@ class GNN(BasicGNN):
             # weights and edge attributes to the module.
             if self.supports_edge_weight and self.supports_edge_attr:
                 x = self.convs[i](x, edge_index, edge_weight=edge_weight,
-                                  edge_attr=edge_weight)
+                                  edge_attr=edge_attr)
             elif self.supports_edge_weight:
                 x = self.convs[i](x, edge_index, edge_weight=edge_weight)
             elif self.supports_edge_attr:
-                x = self.convs[i](x, edge_index, edge_attr=edge_weight)
+                x = self.convs[i](x, edge_index, edge_attr=edge_attr)
             else:
                 x = self.convs[i](x, edge_index)
             if i == self.num_layers - 1 and self.jk_mode is None:
