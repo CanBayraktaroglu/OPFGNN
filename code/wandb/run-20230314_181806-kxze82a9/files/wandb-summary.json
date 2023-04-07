@@ -1,1 +1,0 @@
-{"epoch": 172, "train_rmse_loss": 0.009858729756053756, "train_mae_loss": 0.007516640397336553, "train_mre_loss": Infinity, "_timestamp": 1678814537.0047202, "_runtime": 250.98863816261292, "_step": 345, "val_rmse_loss": 0.053662132332101466, "val_mae_loss": 0.030601775646209715, "val_mre_loss": Infinity, "_wandb": {"runtime": 239}}

@@ -1,12 +1,12 @@
-import pandapower.topology
+import pandapower.topology as pptop
 import simbench
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchvision
-from torch_geometric.data import Data
+from torch_geometric.data import Data, HeteroData
 import sklearn.metrics as metrics
-from torch_geometric.utils import add_self_loops, to_undirected
+from torch_geometric.utils import to_undirected
 from torch_geometric.loader import DataLoader
 import pandas as pd
 import numpy as np
@@ -19,7 +19,8 @@ import simbench as sb
 import os
 import random
 from graphdata import GraphData
-
+from typing import Tuple
+from ctypes import c_byte
 
 def sample_uniform_from_df(load):
     # Create Datasets from sampling reference active power and reactive power demands of loads uniformly
@@ -903,3 +904,229 @@ def test_all_one_epoch(test_loader_lst, model, loss_fn):
     })
 
     return out
+
+
+def extract_node_types_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
+    node_type_bus_idx_dict = dict()
+    node_type_bus_idx_dict["SB"] = []  # Slack Bus
+    node_type_bus_idx_dict["PQ"] = []  # Load Busses
+    node_type_bus_idx_dict["PV"] = []  # Generator Busses
+    node_type_bus_idx_dict["NB"] = []  # Neutral Busses
+
+    # Map indices of busses to ascending correct order
+    idx_mapper = dict()
+    for idx_given, idx_real in zip(net.bus.index.values, range(len(net.bus.index))):
+        idx_mapper[idx_given] = idx_real
+
+    # Set the bus indices list and remove the slack bus index
+    bus_indices = list(net.bus.index.values)
+
+    # Store the index of the slack bus
+    slack_bus_dict = pp.get_connected_elements_dict(net, net.ext_grid.iloc[0].bus)
+    if "bus" in slack_bus_dict:
+        node_type_bus_idx_dict["SB"].append(slack_bus_dict["bus"][0])
+        # Remove the slack bus node idx from the list
+        bus_indices.remove(slack_bus_dict["bus"][0])
+
+    # Interate over all bus indices as given in the PP framework
+    for idx_given in bus_indices:
+
+        # Get all generator indices connected to this bus
+        gen_idx_set = pp.get_connected_elements(net, "gen", idx_given)
+
+        # Get all load indices connected to this bus
+        load_idx_set = pp.get_connected_elements(net, "load", idx_given)
+
+        # Get the number of generators connected to the bus
+        gen_count = len(gen_idx_set)
+
+        # Get the number of loads connected to the bus
+        load_count = len(load_idx_set)
+
+        sum_nominal_power_supply, sum_nominal_power_demand = 0.0, 0.0
+
+        if idx_given in net.sgen.bus.values:
+            sum_nominal_power_supply += list(net.sgen.loc[net.sgen.bus.values == idx_given].sn_mva).pop()
+
+        if gen_count and load_count:
+
+            for gen_idx in gen_idx_set:
+                sum_nominal_power_supply += net.gen.iloc[gen_idx].sn_mva
+
+            for load_idx in load_idx_set:
+                sum_nominal_power_demand += net.load.iloc[load_idx].sn_mva
+
+            total_sn_mva = sum_nominal_power_supply - sum_nominal_power_demand
+
+            if total_sn_mva > 0.0:
+                node_type_bus_idx_dict["PV"].append(idx_given)
+            elif total_sn_mva == 0.0:
+                node_type_bus_idx_dict["NB"].append(idx_given)
+            else:
+                node_type_bus_idx_dict["PQ"].append(idx_given)
+
+        elif gen_count:
+            node_type_bus_idx_dict["PV"].append(idx_given)
+
+        elif load_count:
+
+            for load_idx in load_idx_set:
+                sum_nominal_power_demand += net.load.iloc[load_idx].sn_mva
+
+            total_sn_mva = sum_nominal_power_supply - sum_nominal_power_demand
+
+            if total_sn_mva > 0.0:
+                node_type_bus_idx_dict["PV"].append(idx_given)
+            elif total_sn_mva == 0.0:
+                node_type_bus_idx_dict["NB"].append(idx_given)
+            else:
+                node_type_bus_idx_dict["PQ"].append(idx_given)
+
+        else:
+            if sum_nominal_power_supply == 0.0:
+                node_type_bus_idx_dict["NB"].append(idx_given)
+            else:
+                node_type_bus_idx_dict["PV"].append(idx_given)
+
+    return idx_mapper, node_type_bus_idx_dict
+
+
+
+def create_hetero_data(net: pp.pandapowerNet) -> HeteroData:
+    """
+    Bus Types: SB, PV, PQ, NB ( 4 Classes in total)
+    Edge Types: undirected Edges (9 edge classes in total)
+        SB - PV, SB - PQ, SB - NB
+        PV - PQ, PV - NB, PV - PV
+        PQ - NB; PQ - PQ
+        NB - NB
+    Args:
+        net: pandapowerNet
+
+    Returns:
+        HeteroData
+
+    """
+    # Create and assign HeteroData instance
+    hetero_data = HeteroData()
+
+    # Replace all ext_grids but the first one with generators and set the generators to slack= false
+    ext_grids = [i for i in range(1, len(net.ext_grid.name.values))]
+    pp.replace_ext_grid_by_gen(net, ext_grids=ext_grids, slack=False)
+
+    # Get node types and idx mapper
+    print("Extracting Node Types and Index Mapper..")
+    idx_mapper, node_types_idx_dict = extract_node_types_as_dict(net)
+
+    # Extract edge types
+    edge_types_idx_dict = dict()
+
+    edge_types_idx_dict["SB-PV"] = [[], []]
+    edge_types_idx_dict["SB-PQ"] = [[], []]
+    edge_types_idx_dict["SB-NB"] = [[], []]
+    edge_types_idx_dict["PV-PQ"] = [[], []]
+    edge_types_idx_dict["PV-NB"] = [[], []]
+    edge_types_idx_dict["PV-PV"] = [[], []]
+    edge_types_idx_dict["PQ-NB"] = [[], []]
+    edge_types_idx_dict["PQ-PQ"] = [[], []]
+    edge_types_idx_dict["NB-NB"] = [[], []]
+
+
+    # Store Edge Attributes
+    edge_types_attr_dict = dict()
+
+    edge_types_attr_dict["SB-PV"] = []
+    edge_types_attr_dict["SB-PQ"] = []
+    edge_types_attr_dict["SB-NB"] = []
+    edge_types_attr_dict["PV-PQ"] = []
+    edge_types_attr_dict["PV-NB"] = []
+    edge_types_attr_dict["PV-PV"] = []
+    edge_types_attr_dict["PQ-NB"] = []
+    edge_types_attr_dict["PQ-PQ"] = []
+    edge_types_attr_dict["NB-NB"] = []
+
+    print("Extracting Edge Index and Edge Attributes..")
+
+    for from_bus, to_bus, r_ohm_per_km, x_ohm_per_km, length_km in zip(net.line.from_bus, net.line.to_bus, net.line.r_ohm_per_km, net.line.x_ohm_per_km, net.line.length_km):
+
+        # Calculate R_i and X_i
+        R_i = length_km * r_ohm_per_km
+        X_i = length_km * x_ohm_per_km
+
+        # Get the types of from and to busses, thus the edge type
+        from_bus_type = get_node_type(from_bus, node_types_idx_dict)
+        to_bus_type = get_node_type(to_bus, node_types_idx_dict)
+        edge_type = from_bus_type + '-' + to_bus_type
+
+        if edge_type not in edge_types_attr_dict:
+            str_lst = edge_type.split('-')
+            edge_type = str_lst.pop() + "-" + str_lst.pop()
+
+        # Add Edge indices to corresponding Edge Types
+        # add self loop first
+        #edge_types_idx_dict[edge_type][0].append(idx_mapper[from_bus])
+        #edge_types_idx_dict[edge_type][1].append(idx_mapper[from_bus])
+        edge_types_idx_dict[edge_type][0].append(idx_mapper[from_bus])
+        edge_types_idx_dict[edge_type][1].append(idx_mapper[to_bus])
+
+        # Add Edge Attributes to corresponding Edge Types
+        edge_types_attr_dict[edge_type].append([R_i, X_i])
+
+    print("Adding Self Loops and Converting Edges to Undirected..")
+
+    for key in edge_types_idx_dict:
+        # Convert edge connections to undirected
+        n = len(edge_types_idx_dict[key][0])
+        edge_index, edge_attr = to_undirected(edge_index=torch.tensor(edge_types_idx_dict[key], dtype=torch.int),
+                                              edge_attr=torch.tensor(edge_types_attr_dict[key], dtype=torch.float32),
+                                              num_nodes=n)
+
+        # Add self loops to edge connections
+        edge_index, edge_attr = add_self_loops(edge_index=edge_index, edge_attr=edge_attr, fill_val=1.)
+
+        edge_types_idx_dict[key] = edge_index
+        edge_types_attr_dict[key] = edge_attr
+
+    print("Hetero Data Created.")
+
+    return edge_types_idx_dict, edge_types_attr_dict
+
+
+
+def get_node_type(bus_idx: int, node_types_idx_dict: dict) -> str:
+    for key in node_types_idx_dict:
+        for idx in node_types_idx_dict[key]:
+            if bus_idx == idx:
+                return key
+
+    return None
+
+def add_self_loops(edge_index: torch.Tensor, edge_attr: torch.Tensor, fill_val = 1.) -> Tuple[torch.Tensor, torch.Tensor]:
+    """
+    Must be applied after converting the edges to "undirected"
+    Args:
+        edge_index: Tensor
+        edge_attr: Tensor
+
+    Returns:
+        edge_index_with_self_loops: Tensor
+        edge_attr_with_self_loops: Tensor
+
+    """
+    idx_lst = edge_index.tolist()
+    attr_lst = edge_attr.tolist()
+
+    n = int(len(idx_lst[0])/2)
+    s = set(idx_lst[0][:n])
+    for i in s:
+
+        # Add Self-Loops to Edge Index
+        idx_lst[0].append(i)
+        idx_lst[1].append(i)
+
+        # Add the additional edge attributes
+        attr_lst.append([fill_val, fill_val])
+
+
+    return torch.tensor(idx_lst, dtype=torch.int), torch.tensor(attr_lst, dtype=torch.float32)
+
