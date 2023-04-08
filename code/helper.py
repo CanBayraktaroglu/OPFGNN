@@ -992,7 +992,7 @@ def extract_node_types_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
 
 
 
-def create_hetero_data(net: pp.pandapowerNet) -> HeteroData:
+def extract_edge_features_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
     """
     Bus Types: SB, PV, PQ, NB ( 4 Classes in total)
     Edge Types: undirected Edges (9 edge classes in total)
@@ -1007,8 +1007,7 @@ def create_hetero_data(net: pp.pandapowerNet) -> HeteroData:
         HeteroData
 
     """
-    # Create and assign HeteroData instance
-    hetero_data = HeteroData()
+
 
     # Replace all ext_grids but the first one with generators and set the generators to slack= false
     ext_grids = [i for i in range(1, len(net.ext_grid.name.values))]
@@ -1130,3 +1129,132 @@ def add_self_loops(edge_index: torch.Tensor, edge_attr: torch.Tensor, fill_val =
 
     return torch.tensor(idx_lst, dtype=torch.int), torch.tensor(attr_lst, dtype=torch.float32)
 
+def read_unsupervised_dataset(grid_name: str) -> Tuple[list, list, list]:
+    """
+    Reads unsupervised datasets and returns HeteroData
+    Args:
+        grid_name: string
+
+    Returns:
+        HeteroData
+
+    """
+    # Define the graph using Pandapower
+    net = sb.get_simbench_net(grid_name)
+
+    print(f"Extracting Node Types for the grid {grid_name}..")
+
+    idx_mapper, node_types_idx_dict = extract_node_types_as_dict(net)
+
+    print(f"Extracting Edge Index and Edge Attributes for each Node Type for the grid {grid_name}")
+
+    edge_types_idx_dict, edge_types_attr_dict = extract_edge_features_as_dict(net)
+
+    print("Reading all of the .csv files from the directory of " + grid_name + " ...")
+
+    # Store path to the supervised datasets directory of the specified grid
+    train_data, val_data, test_data = [], [], []
+    path_to_dir = os.path.dirname(os.path.abspath("gnn.ipynb")) + "\\data\\Unsupervised\\Training\\" + grid_name
+    datasets = []
+
+    # Read all the csv files in the directory of the grid_name
+    for dataset_name in os.listdir(path_to_dir):
+        path2dataset = path_to_dir + "\\" + dataset_name
+        datasets.append(pd.read_csv(path2dataset))
+
+    # Process all the data according to  85 - 10 - 5
+    random.shuffle(datasets)
+    training = datasets[:85]
+    validation = datasets[85:95]
+    test = datasets[95:]
+
+    print("Processing Training Data for " + grid_name + " ...")
+    num_busses = int(len(training[0]))
+
+    for data in training:
+        hetero_data = HeteroData()
+        x = data.drop(columns=["Unnamed: 0"])
+        x_rows, x_cols = np.shape(x)
+        x = np.array(x).reshape(x_rows, x_cols)
+
+        # Store the Feature Matrices for each bus type
+        for bus_type in node_types_idx_dict:
+            lst = []
+            # Get the bus indices of the corresponding bus type
+            type_idx_lst = node_types_idx_dict[bus_type]
+
+            # For each index given, map it to the true index and append the corresponding feature vector
+            for idx_given in type_idx_lst:
+                lst.append(x[idx_mapper[idx_given], :])
+
+            lst_rows, lst_cols = np.shape(lst)
+            lst_np = np.array(lst).reshape(lst_rows, lst_cols)
+            hetero_data[bus_type].x = torch.tensor(data=lst_np, dtype=torch.float32)
+
+        # Store the Edge Attributes and Index for each edge type
+        for edge_type in edge_types_idx_dict:
+            hetero_data[edge_type].edge_index = edge_types_idx_dict[edge_type]
+            hetero_data[edge_type].edge_attr = edge_types_attr_dict[edge_type]
+
+        train_data.append(hetero_data)
+
+    print("Processing Validation Data for " + grid_name + " ...")
+
+    for data in validation:
+        hetero_data = HeteroData()
+        x = data.drop(columns=["Unnamed: 0"])
+        x_rows, x_cols = np.shape(x)
+        x = np.array(x).reshape(x_rows, x_cols)
+
+        # Store the Feature Matrices for each bus type
+        for bus_type in node_types_idx_dict:
+            lst = []
+            # Get the bus indices of the corresponding bus type
+            type_idx_lst = node_types_idx_dict[bus_type]
+
+            # For each index given, map it to the true index and append the corresponding feature vector
+            for idx_given in type_idx_lst:
+                lst.append(x[idx_mapper[idx_given], :])
+
+            lst_rows, lst_cols = np.shape(lst)
+            lst_np = np.array(lst).reshape(lst_rows, lst_cols)
+            hetero_data[bus_type].x = torch.tensor(data=lst_np, dtype=torch.float32)
+
+        # Store the Edge Attributes and Index for each edge type
+        for edge_type in edge_types_idx_dict:
+            hetero_data[edge_type].edge_index = edge_types_idx_dict[edge_type]
+            hetero_data[edge_type].edge_attr = edge_types_attr_dict[edge_type]
+
+        val_data.append(hetero_data)
+
+    print("Processing Test Data for " + grid_name + " ...")
+
+    for data in test:
+        hetero_data = HeteroData()
+        x = data.drop(columns=["Unnamed: 0"])
+        x_rows, x_cols = np.shape(x)
+        x = np.array(x).reshape(x_rows, x_cols)
+
+        # Store the Feature Matrices for each bus type
+        for bus_type in node_types_idx_dict:
+            lst = []
+            # Get the bus indices of the corresponding bus type
+            type_idx_lst = node_types_idx_dict[bus_type]
+
+            # For each index given, map it to the true index and append the corresponding feature vector
+            for idx_given in type_idx_lst:
+                lst.append(x[idx_mapper[idx_given], :])
+
+            lst_rows, lst_cols = np.shape(lst)
+            lst_np = np.array(lst).reshape(lst_rows, lst_cols)
+            hetero_data[bus_type].x = torch.tensor(data=lst_np, dtype=torch.float32)
+
+        # Store the Edge Attributes and Index for each edge type
+        for edge_type in edge_types_idx_dict:
+            hetero_data[edge_type].edge_index = edge_types_idx_dict[edge_type]
+            hetero_data[edge_type].edge_attr = edge_types_attr_dict[edge_type]
+
+        test_data.append(hetero_data)
+
+    print("Processing complete.")
+    return train_data, val_data, test_data
