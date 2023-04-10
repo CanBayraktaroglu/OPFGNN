@@ -12,7 +12,6 @@ import pandas as pd
 import numpy as np
 import pandapower as pp
 import networkx as nx
-#import pandapower.plotting as plot
 import wandb
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler, PowerTransformer, MaxAbsScaler, QuantileTransformer
 import simbench as sb
@@ -20,7 +19,7 @@ import os
 import random
 from graphdata import GraphData
 from typing import Tuple
-from ctypes import c_byte
+import torch_geometric.transforms as T
 
 def sample_uniform_from_df(load):
     # Create Datasets from sampling reference active power and reactive power demands of loads uniformly
@@ -1193,8 +1192,11 @@ def read_unsupervised_dataset(grid_name: str) -> Tuple[list, list, list]:
 
         # Store the Edge Attributes and Index for each edge type
         for edge_type in edge_types_idx_dict:
-            hetero_data[edge_type].edge_index = edge_types_idx_dict[edge_type]
-            hetero_data[edge_type].edge_attr = edge_types_attr_dict[edge_type]
+            str_lst = edge_type.split('-')
+            new_edge_type = str_lst[0], "-", str_lst[1]
+            hetero_data[new_edge_type].edge_index = edge_types_idx_dict[edge_type]
+            hetero_data[new_edge_type].edge_attr = edge_types_attr_dict[edge_type]
+
 
         train_data.append(hetero_data)
 
@@ -1222,8 +1224,10 @@ def read_unsupervised_dataset(grid_name: str) -> Tuple[list, list, list]:
 
         # Store the Edge Attributes and Index for each edge type
         for edge_type in edge_types_idx_dict:
-            hetero_data[edge_type].edge_index = edge_types_idx_dict[edge_type]
-            hetero_data[edge_type].edge_attr = edge_types_attr_dict[edge_type]
+            str_lst = edge_type.split('-')
+            new_edge_type = str_lst[0], "-", str_lst[1]
+            hetero_data[new_edge_type].edge_index = edge_types_idx_dict[edge_type]
+            hetero_data[new_edge_type].edge_attr = edge_types_attr_dict[edge_type]
 
         val_data.append(hetero_data)
 
@@ -1251,8 +1255,10 @@ def read_unsupervised_dataset(grid_name: str) -> Tuple[list, list, list]:
 
         # Store the Edge Attributes and Index for each edge type
         for edge_type in edge_types_idx_dict:
-            hetero_data[edge_type].edge_index = edge_types_idx_dict[edge_type]
-            hetero_data[edge_type].edge_attr = edge_types_attr_dict[edge_type]
+            str_lst = edge_type.split('-')
+            new_edge_type = str_lst[0], "-", str_lst[1]
+            hetero_data[new_edge_type].edge_index = edge_types_idx_dict[edge_type]
+            hetero_data[new_edge_type].edge_attr = edge_types_attr_dict[edge_type]
 
         test_data.append(hetero_data)
 
