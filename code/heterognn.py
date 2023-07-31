@@ -18,7 +18,8 @@ from torch_geometric.nn import HeteroConv
 
 
 class HeteroGNN(torch.nn.Module):
-    def __init__(self, hidden_channels: int, out_channels: int, num_layers: int, dropout: float, act_fn: str, norm: torch_geometric.nn.norm.HeteroLayerNorm):
+    def __init__(self, hidden_channels: int, out_channels: int, num_layers: int, dropout: float, act_fn: str,
+                 norm: torch_geometric.nn.norm.HeteroLayerNorm, idx_mapper: dict, node_types_as_dict: dict):
         """
         Edge Types:
             SB - PV, SB - PQ, SB - NB
@@ -41,6 +42,12 @@ class HeteroGNN(torch.nn.Module):
         self.norm = norm if isinstance(norm, str) else None
         self.edge_types = [['SB', '-', 'PV'], ['SB', '-', 'PQ'], ['SB', '-', 'NB'], ['PV', '-', 'PQ'], ['PV', '-', 'NB']
                            , ['PV', '-', 'PV'], ['PQ', '-', 'NB'], ['PQ', '-', 'PQ'], ['NB', '-', 'NB']]
+
+        # Map the given indices to real indices
+        for key in node_types_as_dict:
+            for i in range(len(node_types_as_dict[key])):
+                node_types_as_dict[key][i] = idx_mapper[node_types_as_dict[key][i]]
+        self.node_types_as_dict = node_types_as_dict
 
         self.convs = ModuleList()
 

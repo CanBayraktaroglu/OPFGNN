@@ -3,6 +3,7 @@ import simbench
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import torch_geometric
 import torchvision
 from torch_geometric.data import Data, HeteroData
 import sklearn.metrics as metrics
@@ -20,6 +21,7 @@ import random
 from graphdata import GraphData
 from typing import Tuple
 import torch_geometric.transforms as T
+import json
 
 def sample_uniform_from_df(load):
     # Create Datasets from sampling reference active power and reactive power demands of loads uniformly
@@ -391,7 +393,7 @@ def read_supervised_training_data_edge_attr(grid_name):
                                              num_nodes=len(net.bus.index))
 
     # Add self loops to edge connections
-    edge_index, edge_attr = add_self_loops(edge_index=edge_index, edge_attr=edge_attr,
+    edge_index, edge_attr = torch_geometric.utils.add_self_loops(edge_index=edge_index, edge_attr=edge_attr,
                                               num_nodes=len(net.bus.index))
 
     print("Reading all of the .csv files from the directory of " + grid_name + " ...")
@@ -921,11 +923,17 @@ def extract_node_types_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
     bus_indices = list(net.bus.index.values)
 
     # Store the index of the slack bus
+    """
     slack_bus_dict = pp.get_connected_elements_dict(net, net.ext_grid.iloc[0].bus)
     if "bus" in slack_bus_dict:
         node_type_bus_idx_dict["SB"].append(slack_bus_dict["bus"][0])
         # Remove the slack bus node idx from the list
         bus_indices.remove(slack_bus_dict["bus"][0])
+    """
+    if net.ext_grid.iloc[0].bus is not None:
+        node_type_bus_idx_dict["SB"].append(net.ext_grid.iloc[0].bus)
+        # Remove the slack bus node idx from the list
+        bus_indices.remove(net.ext_grid.iloc[0].bus)
 
     # Interate over all bus indices as given in the PP framework
     for idx_given in bus_indices:
@@ -942,6 +950,7 @@ def extract_node_types_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
         # Get the number of loads connected to the bus
         load_count = len(load_idx_set)
 
+        """
         sum_nominal_power_supply, sum_nominal_power_demand = 0.0, 0.0
 
         if idx_given in net.sgen.bus.values:
@@ -986,6 +995,14 @@ def extract_node_types_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
                 node_type_bus_idx_dict["NB"].append(idx_given)
             else:
                 node_type_bus_idx_dict["PV"].append(idx_given)
+        """
+
+        if gen_count:
+            node_type_bus_idx_dict["PV"].append(idx_given)
+        elif load_count:
+            node_type_bus_idx_dict["PQ"].append(idx_given)
+        else:
+            node_type_bus_idx_dict["NB"].append(idx_given)
 
     return idx_mapper, node_type_bus_idx_dict
 
@@ -1186,6 +1203,9 @@ def read_unsupervised_dataset(grid_name: str) -> Tuple[list, list, list]:
             for idx_given in type_idx_lst:
                 lst.append(x[idx_mapper[idx_given], :])
 
+            if len(lst) == 0:
+                continue
+
             lst_rows, lst_cols = np.shape(lst)
             lst_np = np.array(lst).reshape(lst_rows, lst_cols)
             hetero_data[bus_type].x = torch.tensor(data=lst_np, dtype=torch.float32)
@@ -1218,6 +1238,9 @@ def read_unsupervised_dataset(grid_name: str) -> Tuple[list, list, list]:
             for idx_given in type_idx_lst:
                 lst.append(x[idx_mapper[idx_given], :])
 
+            if len(lst) == 0:
+                continue
+
             lst_rows, lst_cols = np.shape(lst)
             lst_np = np.array(lst).reshape(lst_rows, lst_cols)
             hetero_data[bus_type].x = torch.tensor(data=lst_np, dtype=torch.float32)
@@ -1249,6 +1272,9 @@ def read_unsupervised_dataset(grid_name: str) -> Tuple[list, list, list]:
             for idx_given in type_idx_lst:
                 lst.append(x[idx_mapper[idx_given], :])
 
+            if len(lst) == 0:
+                continue
+
             lst_rows, lst_cols = np.shape(lst)
             lst_np = np.array(lst).reshape(lst_rows, lst_cols)
             hetero_data[bus_type].x = torch.tensor(data=lst_np, dtype=torch.float32)
@@ -1264,3 +1290,139 @@ def read_unsupervised_dataset(grid_name: str) -> Tuple[list, list, list]:
 
     print("Processing complete.")
     return train_data, val_data, test_data
+
+def to_json(grid_name: str):
+    """
+
+    Args:
+        grid_name:
+
+    Returns: None
+
+    """
+
+    # Define the graph using Pandapower
+    net = sb.get_simbench_net(grid_name)
+
+    # Map indices of busses to ascending correct order
+    idx_mapper = dict()
+
+    for idx_given, idx_real in zip(net.bus.index.values, range(len(net.bus.index))):
+        idx_mapper[idx_given] = idx_real
+
+    # Set the bus indices list and remove the slack bus index
+    bus_indices = list(net.bus.index.values)
+    x_dict = dict()
+    x_dict["busses"] = dict()
+    x_dict["lines"] = dict()
+
+    # Interate over all bus indices as given in the PP framework
+    for idx_given in bus_indices:
+        idx = idx_mapper[idx_given]
+
+        # Get all generator indices connected to this bus
+        gen_idx_set = pp.get_connected_elements(net, "gen", idx_given)
+
+        # Get all load indices connected to this bus
+        load_idx_set = pp.get_connected_elements(net, "load", idx_given)
+
+        # Get the number of generators connected to the bus
+        gen_count = len(gen_idx_set)
+
+        # Get the number of loads connected to the bus
+        load_count = len(load_idx_set)
+
+        x_dict["busses"][str(idx)] = dict()
+
+        if idx_given == net.ext_grid.iloc[0].bus:
+            x_dict["busses"][str(idx)]["Bus Type"] = "SB"
+        elif gen_count:
+            x_dict["busses"][str(idx)]["Bus Type"] = "PV"
+        elif load_count:
+            x_dict["busses"][str(idx)]["Bus Type"] = "PQ"
+        else:
+            x_dict["busses"][str(idx)]["Bus Type"] = "NB"
+
+    edge_attr = []
+    edge_index = []
+
+    for from_bus, to_bus, r_ohm_per_km, x_ohm_per_km, length_km in zip(net.line.from_bus, net.line.to_bus,
+                                                                       net.line.r_ohm_per_km, net.line.x_ohm_per_km,
+                                                                       net.line.length_km):
+        # Add self loops
+        # edge_index[0].append(idx_mapper[from_bus])
+        # edge_index[1].append(idx_mapper[from_bus])
+
+        # Add interbus connections
+        edge_index.append([idx_mapper[from_bus], idx_mapper[to_bus]])
+
+        # Calculate R_i and X_i
+        R_i = length_km * r_ohm_per_km
+        X_i = length_km * x_ohm_per_km
+
+        edge_attr.append([R_i, X_i])
+
+    x_dict["lines"]["edge_index"] = edge_index
+    x_dict["lines"]["edge_attr"] = edge_attr
+
+    # Store path to the supervised datasets directory of the specified grid
+    path_to_dir = os.path.dirname(os.path.abspath("gnn.ipynb")) + "\\data\\Supervised\\" + grid_name
+
+    # Read all the csv files in the directory of the grid_name
+    dataset_name = os.listdir(path_to_dir)[0]
+    path2dataset = path_to_dir + "\\" + dataset_name
+    data = pd.read_csv(path2dataset)
+
+    num_busses = int(len(data) / 2)
+
+    x = data[:num_busses].drop(columns=["Unnamed: 0"])
+    x_rows, x_cols = np.shape(x)
+    x = np.array(x).reshape(x_rows, x_cols)
+
+    for i in range(num_busses):
+        #x_dict["busses"][str(i)] = dict()
+        x_dict["busses"][str(i)]["Node Features"] = list(x[i])
+
+    json_object = json.dumps(x_dict, indent=1)
+    with open("data.json", "w") as outfile:
+        outfile.write(json_object)
+
+def get_edge_idx_edge_attr(net):
+
+    # Map indices of busses to ascending correct order
+    idx_mapper = dict()
+    for idx_given, idx_real in zip(net.bus.index.values, range(len(net.bus.index))):
+        idx_mapper[idx_given] = idx_real
+
+    edge_attr = []
+    edge_index = [[], []]
+
+    for from_bus, to_bus, r_ohm_per_km, x_ohm_per_km, length_km in zip(net.line.from_bus, net.line.to_bus,
+                                                                       net.line.r_ohm_per_km, net.line.x_ohm_per_km,
+                                                                       net.line.length_km):
+        # Add self loops
+        # edge_index[0].append(idx_mapper[from_bus])
+        # edge_index[1].append(idx_mapper[from_bus])
+
+        # Add interbus connections
+        edge_index[0].append(idx_mapper[from_bus])
+        edge_index[1].append(idx_mapper[to_bus])
+
+        # Calculate R_i and X_i
+        R_i = length_km * r_ohm_per_km
+        X_i = length_km * x_ohm_per_km
+
+        edge_attr.append([R_i, X_i])
+
+    # edge_attr = torch.tensor(StandardScaler().fit_transform(edge_attr), dtype=torch.float32)
+
+    # Convert edge connections to undirected
+    edge_index, edge_attr = to_undirected(edge_index=torch.tensor(edge_index, dtype=torch.int),
+                                          edge_attr=torch.tensor(edge_attr, dtype=torch.float32),
+                                          num_nodes=len(net.bus.index))
+
+    # Add self loops to edge connections
+    edge_index, edge_attr = torch_geometric.utils.add_self_loops(edge_index=edge_index, edge_attr=edge_attr,
+                                                                 num_nodes=len(net.bus.index))
+
+    return edge_index, edge_attr
