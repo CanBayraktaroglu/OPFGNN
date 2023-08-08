@@ -18,8 +18,8 @@ from torch_geometric.nn import HeteroConv
 
 
 class HeteroGNN(torch.nn.Module):
-    def __init__(self, hidden_channels: int, out_channels: int, num_layers: int, dropout: float, act_fn: str,
-                 norm: torch_geometric.nn.norm.HeteroLayerNorm, idx_mapper: dict, node_types_as_dict: dict):
+    def __init__(self, hidden_channels: int, out_channels: int, num_layers: int, dropout: float, act_fn: str
+                 , norm: Union[str, Callable, None] = None):
         """
         Edge Types:
             SB - PV, SB - PQ, SB - NB
@@ -40,43 +40,60 @@ class HeteroGNN(torch.nn.Module):
         self.act_first = False
         self.jk_mode = "last"
         self.norm = norm if isinstance(norm, str) else None
-        self.edge_types = [['SB', '-', 'PV'], ['SB', '-', 'PQ'], ['SB', '-', 'NB'], ['PV', '-', 'PQ'], ['PV', '-', 'NB']
-                           , ['PV', '-', 'PV'], ['PQ', '-', 'NB'], ['PQ', '-', 'PQ'], ['NB', '-', 'NB']]
 
-        # Map the given indices to real indices
-        for key in node_types_as_dict:
-            for i in range(len(node_types_as_dict[key])):
-                node_types_as_dict[key][i] = idx_mapper[node_types_as_dict[key][i]]
-        self.node_types_as_dict = node_types_as_dict
+        self.edge_types = [
+            ('PV', "isConnected", 'SB'),
+            ('SB', "isConnected", 'PQ'),
+            ('SB', "isConnected", 'NB'),
+            ('PV', "isConnected", 'PQ'),
+            ('NB', "isConnected", 'PQ'),
+            ('PQ', "isConnected", 'NB'),
+
+            ('SB', "isConnected", 'PV'),
+            ('PQ', "isConnected", 'SB'),
+            ('NB', "isConnected", 'SB'),
+            ('PQ', "isConnected", 'PV'),
+            ('PQ', "isConnected", 'NB'),
+            ('NB', "isConnected", 'PQ'),
+
+            ('PV', "isConnected", 'PV'),
+            ('PQ', "isConnected", 'PQ'),
+            ('NB', "isConnected", 'NB'),
+
+        ]
+
 
         self.convs = ModuleList()
 
-        for _ in range(num_layers):
+        for _ in range(self.num_layers):
+
             conv = HeteroConv({
-                ('SB', '-', 'PV'): TransformerConv(-1, hidden_channels, edge_dim=2),
-                ('SB', '-', 'PQ'): TransformerConv(-1, hidden_channels, edge_dim=2),
-                ('SB', '-', 'NB'): TransformerConv(-1, hidden_channels, edge_dim=2),
-                ('PV', '-', 'PQ'): TransformerConv(-1, hidden_channels, edge_dim=2),
-                ('PV', '-', 'NB'): TransformerConv(-1, hidden_channels, edge_dim=2),
-                ('PV', '-', 'PV'): TransformerConv(-1, hidden_channels, edge_dim=2),
-                ('PQ', '-', 'NB'): TransformerConv(-1, hidden_channels, edge_dim=2),
-                ('PQ', '-', 'PQ'): TransformerConv(-1, hidden_channels, edge_dim=2),
-                ('NB', '-', 'NB'): TransformerConv(-1, hidden_channels, edge_dim=2),
+                ('SB', "isConnected", 'PV'): TransformerConv(-1, hidden_channels, edge_dim=2),
+                ('SB', "isConnected", 'PQ'): TransformerConv(-1, hidden_channels, edge_dim=2),
+                ('SB', "isConnected", 'NB'): TransformerConv(-1, hidden_channels, edge_dim=2),
+                ('PV', "isConnected", 'PQ'): TransformerConv(-1, hidden_channels, edge_dim=2),
+                ('PV', "isConnected", 'NB'): TransformerConv(-1, hidden_channels, edge_dim=2),
+                ('PQ', "isConnected", 'NB'): TransformerConv(-1, hidden_channels, edge_dim=2),
+
+                ('PV', "isConnected", 'SB'): TransformerConv(-1, hidden_channels, edge_dim=2),
+                ('PQ', "isConnected", 'SB'): TransformerConv(-1, hidden_channels, edge_dim=2),
+                ('NB', "isConnected", 'SB'): TransformerConv(-1, hidden_channels, edge_dim=2),
+                ('PQ', "isConnected", 'PV'): TransformerConv(-1, hidden_channels, edge_dim=2),
+                ('PQ', "isConnected", 'NB'): TransformerConv(-1, hidden_channels, edge_dim=2),
+                ('NB', "isConnected", 'PQ'): TransformerConv(-1, hidden_channels, edge_dim=2),
+
+                ('PV', "isConnected", 'PV'): TransformerConv(-1, hidden_channels, edge_dim=2),
+                ('PQ', "isConnected", 'PQ'): TransformerConv(-1, hidden_channels, edge_dim=2),
+                ('NB', "isConnected", 'NB'): TransformerConv(-1, hidden_channels, edge_dim=2),
             }, aggr='sum')
             self.convs.append(conv)
 
         self.lin = Linear(hidden_channels, out_channels)
 
-    def forward(self, x_dict):
-        edge_idx_dict = dict()
-        edge_attr_dict = dict()
-
-        for key in self.edge_types:
-            edge_idx_dict[key] = x_dict[key]["edge_index"]
-            edge_attr_dict[key] = x_dict[key]["edge_attr"]
-
-        for conv in self.convs:
+    def forward(self, x_dict, edge_idx_dict, edge_attr_dict):
+        # All calls of the forward function must support edge_attr & edge_idx for this model
+        for conv in self.convs.children():
             x_dict = conv(x_dict, edge_idx_dict, edge_attr_dict)
-            x_dict = {key: x.relu() for key, x in x_dict.items()}
 
-        return self.lin(x_dict['author'])
+        return x_dict
+

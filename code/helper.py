@@ -931,9 +931,10 @@ def extract_node_types_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
         bus_indices.remove(slack_bus_dict["bus"][0])
     """
     if net.ext_grid.iloc[0].bus is not None:
-        node_type_bus_idx_dict["SB"].append(net.ext_grid.iloc[0].bus)
+        ext_grid_bus = pp.get_connected_buses(net, net.ext_grid.iloc[0].bus).pop()
+        node_type_bus_idx_dict["SB"].append(ext_grid_bus)
         # Remove the slack bus node idx from the list
-        bus_indices.remove(net.ext_grid.iloc[0].bus)
+        bus_indices.remove(ext_grid_bus)
 
     # Interate over all bus indices as given in the PP framework
     for idx_given in bus_indices:
@@ -1033,6 +1034,14 @@ def extract_edge_features_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
     print("Extracting Node Types and Index Mapper..")
     idx_mapper, node_types_idx_dict = extract_node_types_as_dict(net)
 
+    node_type_idx_mapper = dict()
+    for node_type in node_types_idx_dict:
+        length = len(node_types_idx_dict[node_type])
+        for bus_idx, map_idx in zip(node_types_idx_dict[node_type], range(length)):
+            real_idx = idx_mapper[bus_idx]
+            node_type_idx_mapper[real_idx] = map_idx
+
+
     # Extract edge types
     edge_types_idx_dict = dict()
 
@@ -1041,8 +1050,16 @@ def extract_edge_features_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
     edge_types_idx_dict["SB-NB"] = [[], []]
     edge_types_idx_dict["PV-PQ"] = [[], []]
     edge_types_idx_dict["PV-NB"] = [[], []]
-    edge_types_idx_dict["PV-PV"] = [[], []]
     edge_types_idx_dict["PQ-NB"] = [[], []]
+
+    edge_types_idx_dict["PV-SB"] = [[], []]
+    edge_types_idx_dict["PQ-SB"] = [[], []]
+    edge_types_idx_dict["NB-SB"] = [[], []]
+    edge_types_idx_dict["PQ-PV"] = [[], []]
+    edge_types_idx_dict["NB-PV"] = [[], []]
+    edge_types_idx_dict["NB-PQ"] = [[], []]
+
+    edge_types_idx_dict["PV-PV"] = [[], []]
     edge_types_idx_dict["PQ-PQ"] = [[], []]
     edge_types_idx_dict["NB-NB"] = [[], []]
 
@@ -1055,8 +1072,16 @@ def extract_edge_features_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
     edge_types_attr_dict["SB-NB"] = []
     edge_types_attr_dict["PV-PQ"] = []
     edge_types_attr_dict["PV-NB"] = []
-    edge_types_attr_dict["PV-PV"] = []
     edge_types_attr_dict["PQ-NB"] = []
+
+    edge_types_attr_dict["PV-SB"] = []
+    edge_types_attr_dict["PQ-SB"] = []
+    edge_types_attr_dict["NB-SB"] = []
+    edge_types_attr_dict["PQ-PV"] = []
+    edge_types_attr_dict["NB-PV"] = []
+    edge_types_attr_dict["NB-PQ"] = []
+
+    edge_types_attr_dict["PV-PV"] = []
     edge_types_attr_dict["PQ-PQ"] = []
     edge_types_attr_dict["NB-NB"] = []
 
@@ -1073,36 +1098,66 @@ def extract_edge_features_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
         to_bus_type = get_node_type(to_bus, node_types_idx_dict)
         edge_type = from_bus_type + '-' + to_bus_type
 
-        if edge_type not in edge_types_attr_dict:
-            str_lst = edge_type.split('-')
-            edge_type = str_lst.pop() + "-" + str_lst.pop()
+        # if edge_type not in edge_types_attr_dict:
+        #     str_lst = edge_type.split('-')
+        #     edge_type = str_lst.pop() + "-" + str_lst.pop()
 
         # Add Edge indices to corresponding Edge Types
-        # add self loop first
-        #edge_types_idx_dict[edge_type][0].append(idx_mapper[from_bus])
-        #edge_types_idx_dict[edge_type][1].append(idx_mapper[from_bus])
-        edge_types_idx_dict[edge_type][0].append(idx_mapper[from_bus])
-        edge_types_idx_dict[edge_type][1].append(idx_mapper[to_bus])
+        from_bus_edge_idx = node_type_idx_mapper[idx_mapper[from_bus]]
+        to_bus_edge_idx = node_type_idx_mapper[idx_mapper[to_bus]]
+
+        #from_bus_edge_idx = idx_mapper[from_bus]
+        #to_bus_edge_idx = idx_mapper[to_bus]
+
+        edge_types_idx_dict[edge_type][0].append(from_bus_edge_idx)
+        edge_types_idx_dict[edge_type][1].append(to_bus_edge_idx)
 
         # Add Edge Attributes to corresponding Edge Types
         edge_types_attr_dict[edge_type].append([R_i, X_i])
+
+        if from_bus_type != to_bus_type:
+            edge_type = to_bus_type + '-' + from_bus_type
+            edge_types_idx_dict[edge_type][0].append(to_bus_edge_idx)
+            edge_types_idx_dict[edge_type][1].append(from_bus_edge_idx)
+            # Add Edge Attributes to corresponding Edge Types
+            edge_types_attr_dict[edge_type].append([R_i, X_i])
 
     print("Adding Self Loops and Converting Edges to Undirected..")
 
     for key in edge_types_idx_dict:
         # Convert edge connections to undirected
-        n = len(edge_types_idx_dict[key][0])
-        edge_index, edge_attr = to_undirected(edge_index=torch.tensor(edge_types_idx_dict[key], dtype=torch.int),
-                                              edge_attr=torch.tensor(edge_types_attr_dict[key], dtype=torch.float32),
-                                              num_nodes=n)
+        # n = len(edge_types_idx_dict[key][0])
+        # edge_index, edge_attr = to_undirected(edge_index=torch.tensor(edge_types_idx_dict[key], dtype=torch.int),
+        #                                       edge_attr=torch.tensor(edge_types_attr_dict[key], dtype=torch.float32),
+        #                                       num_nodes=n)
 
         # Add self loops to edge connections
-        edge_index, edge_attr = add_self_loops(edge_index=edge_index, edge_attr=edge_attr, fill_val=1.)
+        #edge_index, edge_attr = add_self_loops(edge_index=edge_index, edge_attr=edge_attr, fill_val=1.)
 
-        edge_types_idx_dict[key] = edge_index
-        edge_types_attr_dict[key] = edge_attr
+        unique_edge_pairs = set()
+        edge_index = edge_types_idx_dict[key]
+        edge_attr = edge_types_attr_dict[key]
+        i = 0
+        while i < len(edge_index[0]):
+            from_edge = edge_index[0][i]
+            to_edge = edge_index[1][i]
+
+            if (from_edge, to_edge) in unique_edge_pairs:
+                del edge_index[0][i]
+                del edge_index[1][i]
+                del edge_attr[i]
+                continue
+
+            unique_edge_pairs.add((from_edge, to_edge))
+            i+=1
+
+        edge_types_idx_dict[key] = torch.tensor(edge_index, dtype=torch.int64)#edge_index
+        edge_types_attr_dict[key] = torch.tensor(edge_attr, dtype=torch.float32)
+
 
     print("Hetero Data Created.")
+    for key in edge_types_idx_dict:
+        print(f"{key}: {edge_types_idx_dict[key]}" )
 
     return edge_types_idx_dict, edge_types_attr_dict
 
@@ -1162,6 +1217,13 @@ def read_unsupervised_dataset(grid_name: str) -> Tuple[list, list, list]:
 
     idx_mapper, node_types_idx_dict = extract_node_types_as_dict(net)
 
+    node_type_idx_mapper = dict()
+    for node_type in node_types_idx_dict:
+        length = len(node_types_idx_dict[node_type])
+        for bus_idx, map_idx in zip(node_types_idx_dict[node_type], range(length)):
+            real_idx = idx_mapper[bus_idx]
+            node_type_idx_mapper[real_idx] = map_idx
+
     print(f"Extracting Edge Index and Edge Attributes for each Node Type for the grid {grid_name}")
 
     edge_types_idx_dict, edge_types_attr_dict = extract_edge_features_as_dict(net)
@@ -1209,13 +1271,16 @@ def read_unsupervised_dataset(grid_name: str) -> Tuple[list, list, list]:
             lst_rows, lst_cols = np.shape(lst)
             lst_np = np.array(lst).reshape(lst_rows, lst_cols)
             hetero_data[bus_type].x = torch.tensor(data=lst_np, dtype=torch.float32)
+            if len(hetero_data[bus_type]) == 0:
+                hetero_data[bus_type].num_nodes = 0
 
         # Store the Edge Attributes and Index for each edge type
         for edge_type in edge_types_idx_dict:
             str_lst = edge_type.split('-')
-            new_edge_type = str_lst[0], "-", str_lst[1]
-            hetero_data[new_edge_type].edge_index = edge_types_idx_dict[edge_type]
-            hetero_data[new_edge_type].edge_attr = edge_types_attr_dict[edge_type]
+            #new_edge_type = str_lst[0], "connects", str_lst[1]
+            if edge_types_idx_dict[edge_type].numel() != 0:
+                hetero_data[str_lst[0], "isConnected", str_lst[1]].edge_index = edge_types_idx_dict[edge_type]
+                hetero_data[str_lst[0], "isConnected", str_lst[1]].edge_attr = edge_types_attr_dict[edge_type]
 
 
         train_data.append(hetero_data)
@@ -1244,13 +1309,16 @@ def read_unsupervised_dataset(grid_name: str) -> Tuple[list, list, list]:
             lst_rows, lst_cols = np.shape(lst)
             lst_np = np.array(lst).reshape(lst_rows, lst_cols)
             hetero_data[bus_type].x = torch.tensor(data=lst_np, dtype=torch.float32)
+            if len(hetero_data[bus_type]) == 0:
+                hetero_data[bus_type].num_nodes = 0
 
         # Store the Edge Attributes and Index for each edge type
         for edge_type in edge_types_idx_dict:
             str_lst = edge_type.split('-')
-            new_edge_type = str_lst[0], "-", str_lst[1]
-            hetero_data[new_edge_type].edge_index = edge_types_idx_dict[edge_type]
-            hetero_data[new_edge_type].edge_attr = edge_types_attr_dict[edge_type]
+            # new_edge_type = str_lst[0], "connects", str_lst[1]
+            if edge_types_idx_dict[edge_type].numel() != 0:
+                hetero_data[str_lst[0], "isConnected", str_lst[1]].edge_index = edge_types_idx_dict[edge_type]
+                hetero_data[str_lst[0], "isConnected", str_lst[1]].edge_attr = edge_types_attr_dict[edge_type]
 
         val_data.append(hetero_data)
 
@@ -1278,13 +1346,16 @@ def read_unsupervised_dataset(grid_name: str) -> Tuple[list, list, list]:
             lst_rows, lst_cols = np.shape(lst)
             lst_np = np.array(lst).reshape(lst_rows, lst_cols)
             hetero_data[bus_type].x = torch.tensor(data=lst_np, dtype=torch.float32)
+            if len(hetero_data[bus_type]) == 0:
+                hetero_data[bus_type].num_nodes = 0
 
         # Store the Edge Attributes and Index for each edge type
         for edge_type in edge_types_idx_dict:
             str_lst = edge_type.split('-')
-            new_edge_type = str_lst[0], "-", str_lst[1]
-            hetero_data[new_edge_type].edge_index = edge_types_idx_dict[edge_type]
-            hetero_data[new_edge_type].edge_attr = edge_types_attr_dict[edge_type]
+            # new_edge_type = str_lst[0], "connects", str_lst[1]
+            if edge_types_idx_dict[edge_type].numel() != 0:
+                hetero_data[str_lst[0],"isConnected",str_lst[1]].edge_index = edge_types_idx_dict[edge_type]
+                hetero_data[str_lst[0],"isConnected",str_lst[1]].edge_attr = edge_types_attr_dict[edge_type]
 
         test_data.append(hetero_data)
 
