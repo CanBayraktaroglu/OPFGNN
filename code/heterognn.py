@@ -33,13 +33,18 @@ class HeteroGNN(torch.nn.Module):
         """
         super().__init__()
 
+        self.in_channels = 4
         self.hidden_channels = hidden_channels
+        self.out_channels = out_channels
         self.num_layers = num_layers
         self.dropout = dropout
         self.act = activation_resolver(act_fn, **({}))
         self.act_first = False
         self.jk_mode = "last"
+        in_channels = hidden_channels
+        self.lin = Linear(in_channels, self.out_channels, bias=False)
         self.norm = norm if isinstance(norm, str) else None
+        self.bias = nn.Parameter(torch.tensor(self.out_channels, dtype=torch.float32))
 
         self.edge_types = [
             ('PV', "isConnected", 'SB'),
@@ -61,7 +66,6 @@ class HeteroGNN(torch.nn.Module):
             ('NB', "isConnected", 'NB'),
 
         ]
-
 
         self.convs = ModuleList()
 
@@ -88,12 +92,26 @@ class HeteroGNN(torch.nn.Module):
             }, aggr='sum')
             self.convs.append(conv)
 
-        self.lin = Linear(hidden_channels, out_channels)
 
     def forward(self, x_dict, edge_idx_dict, edge_attr_dict):
+
         # All calls of the forward function must support edge_attr & edge_idx for this model
+        xs:List[Tensor] = []
+
         for conv in self.convs.children():
             x_dict = conv(x_dict, edge_idx_dict, edge_attr_dict)
 
+            # Apply activation function for the output features of each type and update the dict
+            for node_type in x_dict:
+                x_dict[node_type] = self.act(x_dict[node_type])
+
+        # for node_type in x_dict:
+        #     x = x_dict[node_type].tolist()
+        #     for row in x:
+        #         xs.append(row)
+        #
+        # xs = torch.tensor(data=xs, dtype=torch.float32)
+        # xs = self.lin(xs) if hasattr(self, 'lin') else xs
+        # return xs
         return x_dict
 
