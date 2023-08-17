@@ -1458,42 +1458,146 @@ def to_json(grid_name: str):
     with open("data.json", "w") as outfile:
         outfile.write(json_object)
 
-def get_edge_idx_edge_attr(net):
+def extract_edge_features(net: pp.pandapowerNet) -> Tuple[dict, dict]:
+    """
+    Bus Types: SB, PV, PQ, NB ( 4 Classes in total)
+    Edge Types: undirected Edges (9 edge classes in total)
+        SB - PV, SB - PQ, SB - NB
+        PV - PQ, PV - NB, PV - PV
+        PQ - NB; PQ - PQ
+        NB - NB
+    Args:
+        net: pandapowerNet
 
-    # Map indices of busses to ascending correct order
-    idx_mapper = dict()
-    for idx_given, idx_real in zip(net.bus.index.values, range(len(net.bus.index))):
-        idx_mapper[idx_given] = idx_real
+    Returns:
+        HeteroData
 
-    edge_attr = []
-    edge_index = [[], []]
+    """
 
-    for from_bus, to_bus, r_ohm_per_km, x_ohm_per_km, length_km in zip(net.line.from_bus, net.line.to_bus,
-                                                                       net.line.r_ohm_per_km, net.line.x_ohm_per_km,
-                                                                       net.line.length_km):
-        # Add self loops
-        # edge_index[0].append(idx_mapper[from_bus])
-        # edge_index[1].append(idx_mapper[from_bus])
 
-        # Add interbus connections
-        edge_index[0].append(idx_mapper[from_bus])
-        edge_index[1].append(idx_mapper[to_bus])
+    # Replace all ext_grids but the first one with generators and set the generators to slack= false
+    ext_grids = [i for i in range(1, len(net.ext_grid.name.values))]
+    pp.replace_ext_grid_by_gen(net, ext_grids=ext_grids, slack=False)
+
+    # Get node types and idx mapper
+    print("Extracting Node Types and Index Mapper..")
+    idx_mapper, node_types_idx_dict = extract_node_types_as_dict(net)
+
+    # Extract edge types
+    edge_types_idx_dict = dict()
+
+    edge_types_idx_dict["SB-PV"] = [[], []]
+    edge_types_idx_dict["SB-PQ"] = [[], []]
+    edge_types_idx_dict["SB-NB"] = [[], []]
+    edge_types_idx_dict["PV-PQ"] = [[], []]
+    edge_types_idx_dict["PV-NB"] = [[], []]
+    edge_types_idx_dict["PQ-NB"] = [[], []]
+
+    edge_types_idx_dict["PV-SB"] = [[], []]
+    edge_types_idx_dict["PQ-SB"] = [[], []]
+    edge_types_idx_dict["NB-SB"] = [[], []]
+    edge_types_idx_dict["PQ-PV"] = [[], []]
+    edge_types_idx_dict["NB-PV"] = [[], []]
+    edge_types_idx_dict["NB-PQ"] = [[], []]
+
+    edge_types_idx_dict["PV-PV"] = [[], []]
+    edge_types_idx_dict["PQ-PQ"] = [[], []]
+    edge_types_idx_dict["NB-NB"] = [[], []]
+
+
+    # Store Edge Attributes
+    edge_types_attr_dict = dict()
+
+    edge_types_attr_dict["SB-PV"] = []
+    edge_types_attr_dict["SB-PQ"] = []
+    edge_types_attr_dict["SB-NB"] = []
+    edge_types_attr_dict["PV-PQ"] = []
+    edge_types_attr_dict["PV-NB"] = []
+    edge_types_attr_dict["PQ-NB"] = []
+
+    edge_types_attr_dict["PV-SB"] = []
+    edge_types_attr_dict["PQ-SB"] = []
+    edge_types_attr_dict["NB-SB"] = []
+    edge_types_attr_dict["PQ-PV"] = []
+    edge_types_attr_dict["NB-PV"] = []
+    edge_types_attr_dict["NB-PQ"] = []
+
+    edge_types_attr_dict["PV-PV"] = []
+    edge_types_attr_dict["PQ-PQ"] = []
+    edge_types_attr_dict["NB-NB"] = []
+
+    print("Extracting Edge Index and Edge Attributes..")
+
+    for from_bus, to_bus, r_ohm_per_km, x_ohm_per_km, length_km in zip(net.line.from_bus, net.line.to_bus, net.line.r_ohm_per_km, net.line.x_ohm_per_km, net.line.length_km):
 
         # Calculate R_i and X_i
         R_i = length_km * r_ohm_per_km
         X_i = length_km * x_ohm_per_km
 
-        edge_attr.append([R_i, X_i])
+        # Get the types of from and to busses, thus the edge type
+        from_bus_type = get_node_type(from_bus, node_types_idx_dict)
+        to_bus_type = get_node_type(to_bus, node_types_idx_dict)
+        edge_type = from_bus_type + '-' + to_bus_type
 
-    # edge_attr = torch.tensor(StandardScaler().fit_transform(edge_attr), dtype=torch.float32)
+        # if edge_type not in edge_types_attr_dict:
+        #     str_lst = edge_type.split('-')
+        #     edge_type = str_lst.pop() + "-" + str_lst.pop()
 
-    # Convert edge connections to undirected
-    edge_index, edge_attr = to_undirected(edge_index=torch.tensor(edge_index, dtype=torch.int),
-                                          edge_attr=torch.tensor(edge_attr, dtype=torch.float32),
-                                          num_nodes=len(net.bus.index))
+        # Add Edge indices to corresponding Edge Types
+        from_bus_edge_idx = idx_mapper[from_bus]
+        to_bus_edge_idx = idx_mapper[to_bus]
 
-    # Add self loops to edge connections
-    edge_index, edge_attr = torch_geometric.utils.add_self_loops(edge_index=edge_index, edge_attr=edge_attr,
-                                                                 num_nodes=len(net.bus.index))
+        #from_bus_edge_idx = idx_mapper[from_bus]
+        #to_bus_edge_idx = idx_mapper[to_bus]
 
-    return edge_index, edge_attr
+        edge_types_idx_dict[edge_type][0].append(from_bus_edge_idx)
+        edge_types_idx_dict[edge_type][1].append(to_bus_edge_idx)
+
+        # Add Edge Attributes to corresponding Edge Types
+        edge_types_attr_dict[edge_type].append([R_i, X_i])
+
+        if from_bus_type != to_bus_type:
+            edge_type = to_bus_type + '-' + from_bus_type
+            edge_types_idx_dict[edge_type][0].append(to_bus_edge_idx)
+            edge_types_idx_dict[edge_type][1].append(from_bus_edge_idx)
+            # Add Edge Attributes to corresponding Edge Types
+            edge_types_attr_dict[edge_type].append([R_i, X_i])
+
+    print("Adding Self Loops and Converting Edges to Undirected..")
+
+    for key in edge_types_idx_dict:
+        # Convert edge connections to undirected
+        # n = len(edge_types_idx_dict[key][0])
+        # edge_index, edge_attr = to_undirected(edge_index=torch.tensor(edge_types_idx_dict[key], dtype=torch.int),
+        #                                       edge_attr=torch.tensor(edge_types_attr_dict[key], dtype=torch.float32),
+        #                                       num_nodes=n)
+
+        # Add self loops to edge connections
+        #edge_index, edge_attr = add_self_loops(edge_index=edge_index, edge_attr=edge_attr, fill_val=1.)
+
+        unique_edge_pairs = set()
+        edge_index = edge_types_idx_dict[key]
+        edge_attr = edge_types_attr_dict[key]
+        i = 0
+        while i < len(edge_index[0]):
+            from_edge = edge_index[0][i]
+            to_edge = edge_index[1][i]
+
+            if (from_edge, to_edge) in unique_edge_pairs:
+                del edge_index[0][i]
+                del edge_index[1][i]
+                del edge_attr[i]
+                continue
+
+            unique_edge_pairs.add((from_edge, to_edge))
+            i+=1
+
+        edge_types_idx_dict[key] = torch.tensor(edge_index, dtype=torch.int64)#edge_index
+        edge_types_attr_dict[key] = torch.tensor(edge_attr, dtype=torch.float32)
+
+
+    print("Hetero Data Created.")
+    for key in edge_types_idx_dict:
+        print(f"{key}: {edge_types_idx_dict[key]}" )
+
+    return edge_types_idx_dict, edge_types_attr_dict

@@ -105,8 +105,8 @@ class HeteroGNN(torch.nn.Module):
             for node_type in x_dict:
                 x_dict[node_type] = self.act(x_dict[node_type])
 
-        # for node_type in x_dict:
-        #     x = x_dict[node_type].tolist()
+        for node_type in x_dict:
+             x_dict[node_type] = self.lin(x_dict[node_type])
         #     for row in x:
         #         xs.append(row)
         #
