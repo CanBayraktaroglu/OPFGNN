@@ -931,7 +931,7 @@ def extract_node_types_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
         bus_indices.remove(slack_bus_dict["bus"][0])
     """
     if net.ext_grid.iloc[0].bus is not None:
-        ext_grid_bus = pp.get_connected_buses(net, net.ext_grid.iloc[0].bus).pop()
+        ext_grid_bus =  net.ext_grid.iloc[0].bus  #pp.get_connected_buses(net, net.ext_grid.iloc[0].bus).pop()
         node_type_bus_idx_dict["SB"].append(ext_grid_bus)
         # Remove the slack bus node idx from the list
         bus_indices.remove(ext_grid_bus)
@@ -1149,15 +1149,24 @@ def extract_edge_features_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
                 continue
 
             unique_edge_pairs.add((from_edge, to_edge))
-            i+=1
+            i += 1
 
         edge_types_idx_dict[key] = torch.tensor(edge_index, dtype=torch.int64)#edge_index
         edge_types_attr_dict[key] = torch.tensor(edge_attr, dtype=torch.float32)
 
 
+    ext_grid = net.ext_grid.iloc[0].bus
+    ext_grid_connected_busses = pp.get_connected_buses(net, buses=ext_grid)
+
+    for bus_idx in ext_grid_connected_busses:
+        to_bus = get_node_type(bus_idx,node_types_idx_dict)
+        edge = ("SB", "isConnected", to_bus)
+
+        edge_types_idx_dict[edge][0].append(ext_grid)
+        edge_types_idx_dict[edge][1].append(bus_idx)
+
+
     print("Hetero Data Created.")
-    for key in edge_types_idx_dict:
-        print(f"{key}: {edge_types_idx_dict[key]}" )
 
     return edge_types_idx_dict, edge_types_attr_dict
 

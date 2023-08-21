@@ -1,12 +1,9 @@
 import torch_geometric.nn.norm.layer_norm
-
 from gnn import *
 import warnings
 from collections import defaultdict
 from typing import Dict, Optional
-
 from torch import Tensor
-
 from torch_geometric.nn.conv.hgt_conv import group
 from torch_geometric.nn.module_dict import ModuleDict
 from torch_geometric.typing import Adj, EdgeType, NodeType
@@ -15,7 +12,6 @@ from torch_geometric.utils.hetero import check_add_self_loops
 # Define the GNN layer
 import torch_geometric.transforms as T
 from torch_geometric.nn import HeteroConv
-
 
 class HeteroGNN(torch.nn.Module):
     def __init__(self, hidden_channels: int, out_channels: int, num_layers: int, dropout: float, act_fn: str
@@ -93,10 +89,9 @@ class HeteroGNN(torch.nn.Module):
             self.convs.append(conv)
 
 
-    def forward(self, x_dict, edge_idx_dict, edge_attr_dict):
+    def forward(self, x_dict, edge_idx_dict, edge_attr_dict, bus_idx_neighbors_dict):
 
         # All calls of the forward function must support edge_attr & edge_idx for this model
-        xs:List[Tensor] = []
 
         for conv in self.convs.children():
             x_dict = conv(x_dict, edge_idx_dict, edge_attr_dict)
@@ -107,11 +102,39 @@ class HeteroGNN(torch.nn.Module):
 
         for node_type in x_dict:
              x_dict[node_type] = self.lin(x_dict[node_type])
-        #     for row in x:
-        #         xs.append(row)
-        #
-        # xs = torch.tensor(data=xs, dtype=torch.float32)
-        # xs = self.lin(xs) if hasattr(self, 'lin') else xs
-        # return xs
-        return x_dict
 
+        # ACOPF Forward Pass for P and Q
+        for from_bus in bus_idx_neighbors_dict:
+            for bus_idx in bus_idx_neighbors_dict[from_bus]:
+                V_i = abs(x_dict[from_bus][bus_idx][0])
+                volt_angle_i = x_dict[from_bus][bus_idx][1]
+                P_i = torch.tensor(0.0, dtype=torch.float32)
+                Q_i = torch.tensor(0.0, dtype=torch.float32)
+
+                for pair in bus_idx_neighbors_dict[from_bus][bus_idx]:
+                    # For each neighbor of the iterated bus
+                    to_bus, to_bus_idx, edge_attr = pair
+
+                    V_j = abs(x_dict[to_bus][to_bus_idx][0])
+
+                    volt_angle_j = x_dict[to_bus][to_bus_idx][1]
+                    delta_ij = volt_angle_j - volt_angle_i
+
+                    G_ij = edge_attr[0] / (edge_attr[0] ** 2 + edge_attr[1] ** 2)
+                    B_ij = -edge_attr[1] / (edge_attr[0] ** 2 + edge_attr[1] ** 2)
+
+                    # ACOPF Equation for P_i
+                    P_ij = V_i * V_j * (G_ij * torch.cos(delta_ij) + B_ij * torch.sin(delta_ij))
+
+                    P_i += P_ij
+
+                    # ACOPF Equation for Q_i
+                    Q_ij = V_i * V_j * (G_ij * torch.sin(delta_ij) - B_ij * torch.cos(delta_ij))
+
+                    Q_i += Q_ij
+
+                x_dict[from_bus][bus_idx][2] = P_i
+                x_dict[from_bus][bus_idx][3] = Q_i
+
+
+        return x_dict
