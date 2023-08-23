@@ -998,9 +998,9 @@ def extract_node_types_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
                 node_type_bus_idx_dict["PV"].append(idx_given)
         """
 
-        if gen_count:
+        if gen_count or sum(net.load.loc[net.load.bus == idx_given].p_mw.values) < sum(net.sgen.loc[net.sgen.bus == idx_given].p_mw.values):
             node_type_bus_idx_dict["PV"].append(idx_given)
-        elif load_count:
+        elif load_count and sum(net.load.loc[net.load.bus == idx_given].p_mw.values) != 0:
             node_type_bus_idx_dict["PQ"].append(idx_given)
         else:
             node_type_bus_idx_dict["NB"].append(idx_given)
@@ -1151,21 +1151,40 @@ def extract_edge_features_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
             unique_edge_pairs.add((from_edge, to_edge))
             i += 1
 
-        edge_types_idx_dict[key] = torch.tensor(edge_index, dtype=torch.int64)#edge_index
-        edge_types_attr_dict[key] = torch.tensor(edge_attr, dtype=torch.float32)
+        edge_types_idx_dict[key] = edge_index
+        edge_types_attr_dict[key] = edge_attr
 
-
+    # Add the external grid connections
     ext_grid = net.ext_grid.iloc[0].bus
     ext_grid_connected_busses = pp.get_connected_buses(net, buses=ext_grid)
 
     for bus_idx in ext_grid_connected_busses:
         to_bus = get_node_type(bus_idx,node_types_idx_dict)
-        edge = ("SB", "isConnected", to_bus)
-
-        edge_types_idx_dict[edge][0].append(ext_grid)
-        edge_types_idx_dict[edge][1].append(bus_idx)
+        edge = "SB-"+to_bus
+        reverse_edge = to_bus+"-SB"
 
 
+        ext_grid_trafos = net.trafo.loc[(net.trafo.hv_bus == ext_grid) & (net.trafo.lv_bus == bus_idx)]
+
+        for vk, vkr, s, vn in zip(ext_grid_trafos.vk_percent.values, ext_grid_trafos.vkr_percent.values, ext_grid_trafos.sn_mva.values,
+                                  ext_grid_trafos.vn_lv_kv.values):
+            zk = vk * net.sn_mva / (100 * s)
+            r = torch.tensor(vkr * net.sn_mva / (100 * s))
+            zn = vn ** 2 / net.sn_mva
+            z_ref_trafo = vn ** 2 * 10 ** 6 * net.sn_mva / s
+            z = zk * z_ref_trafo / zn
+            x = torch.sqrt(z ** 2 - r ** 2)
+            edge_types_idx_dict[edge][0].append(0)
+            edge_types_idx_dict[edge][1].append(node_type_idx_mapper[idx_mapper[bus_idx]])
+            edge_types_attr_dict[edge].append([r,x])
+
+            edge_types_idx_dict[reverse_edge][0].append(node_type_idx_mapper[idx_mapper[bus_idx]])
+            edge_types_idx_dict[reverse_edge][1].append(0)
+            edge_types_attr_dict[reverse_edge].append([r, x])
+
+    for key in edge_types_idx_dict:
+        edge_types_idx_dict[key] = torch.tensor(edge_index, dtype=torch.int64)  # edge_index
+        edge_types_attr_dict[key] = torch.tensor(edge_attr, dtype=torch.float32)
     print("Hetero Data Created.")
 
     return edge_types_idx_dict, edge_types_attr_dict
