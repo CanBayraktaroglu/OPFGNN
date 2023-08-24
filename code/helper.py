@@ -1108,6 +1108,8 @@ def extract_edge_features_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
 
         #from_bus_edge_idx = idx_mapper[from_bus]
         #to_bus_edge_idx = idx_mapper[to_bus]
+        if from_bus_edge_idx == 41:
+            print(f"edge:{edge_type} from_bus {from_bus}, to_bus:{to_bus} to_bus_edge_idx: {to_bus_edge_idx}")
 
         edge_types_idx_dict[edge_type][0].append(from_bus_edge_idx)
         edge_types_idx_dict[edge_type][1].append(to_bus_edge_idx)
@@ -1122,7 +1124,7 @@ def extract_edge_features_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
             # Add Edge Attributes to corresponding Edge Types
             edge_types_attr_dict[edge_type].append([R_i, X_i])
 
-    print("Adding Self Loops and Converting Edges to Undirected..")
+    #print("Adding Self Loops and Converting Edges to Undirected..")
 
     for key in edge_types_idx_dict:
         # Convert edge connections to undirected
@@ -1159,32 +1161,37 @@ def extract_edge_features_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
     ext_grid_connected_busses = pp.get_connected_buses(net, buses=ext_grid)
 
     for bus_idx in ext_grid_connected_busses:
-        to_bus = get_node_type(bus_idx,node_types_idx_dict)
+        to_bus = get_node_type(bus_idx, node_types_idx_dict)
         edge = "SB-"+to_bus
         reverse_edge = to_bus+"-SB"
 
-
         ext_grid_trafos = net.trafo.loc[(net.trafo.hv_bus == ext_grid) & (net.trafo.lv_bus == bus_idx)]
 
-        for vk, vkr, s, vn in zip(ext_grid_trafos.vk_percent.values, ext_grid_trafos.vkr_percent.values, ext_grid_trafos.sn_mva.values,
-                                  ext_grid_trafos.vn_lv_kv.values):
-            zk = vk * net.sn_mva / (100 * s)
-            r = torch.tensor(vkr * net.sn_mva / (100 * s))
-            zn = vn ** 2 / net.sn_mva
-            z_ref_trafo = vn ** 2 * 10 ** 6 * net.sn_mva / s
-            z = zk * z_ref_trafo / zn
-            x = torch.sqrt(z ** 2 - r ** 2)
-            edge_types_idx_dict[edge][0].append(0)
-            edge_types_idx_dict[edge][1].append(node_type_idx_mapper[idx_mapper[bus_idx]])
-            edge_types_attr_dict[edge].append([r,x])
+        vk = ext_grid_trafos.vk_percent.values[0]
+        vkr = ext_grid_trafos.vkr_percent.values[0]
+        s = ext_grid_trafos.sn_mva.values[0]
+        vn = ext_grid_trafos.vn_lv_kv.values[0]
+        zk = vk * net.sn_mva / (100 * s)
+        r = torch.tensor(vkr * net.sn_mva / (100 * s))
+        zn = vn ** 2 / net.sn_mva
+        z_ref_trafo = vn ** 2 * 10 ** 6 * net.sn_mva / s
+        z = zk * z_ref_trafo / zn
+        x = torch.sqrt(z ** 2 - r ** 2)
 
-            edge_types_idx_dict[reverse_edge][0].append(node_type_idx_mapper[idx_mapper[bus_idx]])
-            edge_types_idx_dict[reverse_edge][1].append(0)
-            edge_types_attr_dict[reverse_edge].append([r, x])
+        edge_types_idx_dict[edge][0].append(0)
+        edge_types_idx_dict[edge][1].append(node_type_idx_mapper[idx_mapper[bus_idx]])
+        edge_types_attr_dict[edge].append([r,x])
+
+        edge_types_idx_dict[reverse_edge][0].append(node_type_idx_mapper[idx_mapper[bus_idx]])
+        edge_types_idx_dict[reverse_edge][1].append(0)
+        edge_types_attr_dict[reverse_edge].append([r, x])
 
     for key in edge_types_idx_dict:
-        edge_types_idx_dict[key] = torch.tensor(edge_index, dtype=torch.int64)  # edge_index
-        edge_types_attr_dict[key] = torch.tensor(edge_attr, dtype=torch.float32)
+        edge_types_idx_dict[key] = torch.tensor(edge_types_idx_dict[key], dtype=torch.int64)
+        edge_types_attr_dict[key] = torch.tensor(edge_types_attr_dict[key] , dtype=torch.float32)
+        #if key[0] == key[-1]:
+            #edge_types_idx_dict[key] = to_undirected(edge_types_idx_dict[key])
+
     print("Hetero Data Created.")
 
     return edge_types_idx_dict, edge_types_attr_dict
