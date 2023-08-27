@@ -1108,8 +1108,6 @@ def extract_edge_features_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
 
         #from_bus_edge_idx = idx_mapper[from_bus]
         #to_bus_edge_idx = idx_mapper[to_bus]
-        if from_bus_edge_idx == 41:
-            print(f"edge:{edge_type} from_bus {from_bus}, to_bus:{to_bus} to_bus_edge_idx: {to_bus_edge_idx}")
 
         edge_types_idx_dict[edge_type][0].append(from_bus_edge_idx)
         edge_types_idx_dict[edge_type][1].append(to_bus_edge_idx)
@@ -1186,6 +1184,37 @@ def extract_edge_features_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
         edge_types_idx_dict[reverse_edge][1].append(0)
         edge_types_attr_dict[reverse_edge].append([r, x])
 
+
+    # Add generator bus features
+    gen_busses_idx = list(net.gen.bus.values)
+    gen_connected_busses = list(pp.get_connected_buses(net, gen_busses_idx))
+    for i in range(len(gen_busses_idx)):
+        bus_idx = gen_busses_idx[i]
+        to_bus = get_node_type(bus_idx, node_types_idx_dict)
+        edge = "PV-" + to_bus
+        reverse_edge = to_bus + "-PV"
+
+        gen_trafos = net.trafo.loc[(net.trafo.hv_bus == bus_idx) & (net.trafo.lv_bus == gen_connected_busses[i])]
+
+        vk = gen_trafos.vk_percent.values[0]
+        vkr = gen_trafos.vkr_percent.values[0]
+        s = gen_trafos.sn_mva.values[0]
+        vn = gen_trafos.vn_lv_kv.values[0]
+        zk = vk * net.sn_mva / (100 * s)
+        r = torch.tensor(vkr * net.sn_mva / (100 * s))
+        zn = vn ** 2 / net.sn_mva
+        z_ref_trafo = vn ** 2 * 10 ** 6 * net.sn_mva / s
+        z = zk * z_ref_trafo / zn
+        x = torch.sqrt(z ** 2 - r ** 2)
+
+        edge_types_idx_dict[edge][0].append(node_type_idx_mapper[idx_mapper[bus_idx]])
+        edge_types_idx_dict[edge][1].append(node_type_idx_mapper[idx_mapper[gen_connected_busses[i]]])
+        edge_types_attr_dict[edge].append([r, x])
+
+        edge_types_idx_dict[reverse_edge][0].append(node_type_idx_mapper[idx_mapper[gen_connected_busses[i]]])
+        edge_types_idx_dict[reverse_edge][1].append(node_type_idx_mapper[idx_mapper[bus_idx]])
+        edge_types_attr_dict[reverse_edge].append([r, x])
+
     for key in edge_types_idx_dict:
         edge_types_idx_dict[key] = torch.tensor(edge_types_idx_dict[key], dtype=torch.int64)
         edge_types_attr_dict[key] = torch.tensor(edge_types_attr_dict[key] , dtype=torch.float32)
@@ -1235,167 +1264,71 @@ def add_self_loops(edge_index: torch.Tensor, edge_attr: torch.Tensor, fill_val =
 
     return torch.tensor(idx_lst, dtype=torch.int), torch.tensor(attr_lst, dtype=torch.float32)
 
-def read_unsupervised_dataset(grid_name: str) -> Tuple[list, list, list]:
-    """
-    Reads unsupervised datasets and returns HeteroData
-    Args:
-        grid_name: string
+def process_network(grid_name: str):
+    print(f"Loading Network {grid_name}..")
+    net = sb.get_simbench_net(grid_name)  # '1-HV-mixed--0-no_sw'
+    # OPERATIONAL CONSTRAINTS
 
-    Returns:
-        HeteroData
+    # Set upper and lower limits of active-reactive powers of loads
+    min_p_mw_val, max_p_mw_val, min_q_mvar_val, max_q_mvar_val = [], [], [], []
+    p_mw = list(net.load.p_mw.values)
+    q_mvar = list(net.load.q_mvar.values)
 
-    """
-    # Define the graph using Pandapower
-    net = sb.get_simbench_net(grid_name)
+    for i in range(len(p_mw)):
+        min_p_mw_val.append(p_mw[i])
+        max_p_mw_val.append(p_mw[i])
+        min_q_mvar_val.append(q_mvar[i])
+        max_q_mvar_val.append(q_mvar[i])
 
-    print(f"Extracting Node Types for the grid {grid_name}..")
+    net.load.min_p_mw = min_p_mw_val
+    net.load.max_p_mw = max_p_mw_val
+    net.load.min_q_mvar = min_q_mvar_val
+    net.load.max_q_mvar = max_q_mvar_val
 
-    idx_mapper, node_types_idx_dict = extract_node_types_as_dict(net)
-
-    node_type_idx_mapper = dict()
-    for node_type in node_types_idx_dict:
-        length = len(node_types_idx_dict[node_type])
-        for bus_idx, map_idx in zip(node_types_idx_dict[node_type], range(length)):
-            real_idx = idx_mapper[bus_idx]
-            node_type_idx_mapper[real_idx] = map_idx
-
-    print(f"Extracting Edge Index and Edge Attributes for each Node Type for the grid {grid_name}")
-
-    edge_types_idx_dict, edge_types_attr_dict = extract_edge_features_as_dict(net)
-
-    print("Reading all of the .csv files from the directory of " + grid_name + " ...")
-
-    # Store path to the supervised datasets directory of the specified grid
-    train_data, val_data, test_data = [], [], []
-    path_to_dir = os.path.dirname(os.path.abspath("gnn.ipynb")) + "\\data\\Unsupervised\\Training\\" + grid_name
-    datasets = []
-
-    # Read all the csv files in the directory of the grid_name
-    for dataset_name in os.listdir(path_to_dir):
-        path2dataset = path_to_dir + "\\" + dataset_name
-        datasets.append(pd.read_csv(path2dataset))
-
-    # Process all the data according to  85 - 10 - 5
-    random.shuffle(datasets)
-    training = datasets[:85]
-    validation = datasets[85:95]
-    test = datasets[95:]
-
-    print("Processing Training Data for " + grid_name + " ...")
-    num_busses = int(len(training[0]))
-
-    for data in training:
-        hetero_data = HeteroData()
-        x = data.drop(columns=["Unnamed: 0"])
-        x_rows, x_cols = np.shape(x)
-        x = np.array(x).reshape(x_rows, x_cols)
-
-        # Store the Feature Matrices for each bus type
-        for bus_type in node_types_idx_dict:
-            lst = []
-            # Get the bus indices of the corresponding bus type
-            type_idx_lst = node_types_idx_dict[bus_type]
-
-            # For each index given, map it to the true index and append the corresponding feature vector
-            for idx_given in type_idx_lst:
-                lst.append(x[idx_mapper[idx_given], :])
-
-            if len(lst) == 0:
-                continue
-
-            lst_rows, lst_cols = np.shape(lst)
-            lst_np = np.array(lst).reshape(lst_rows, lst_cols)
-            hetero_data[bus_type].x = torch.tensor(data=lst_np, dtype=torch.float32)
-            if len(hetero_data[bus_type]) == 0:
-                hetero_data[bus_type].num_nodes = 0
-
-        # Store the Edge Attributes and Index for each edge type
-        for edge_type in edge_types_idx_dict:
-            str_lst = edge_type.split('-')
-            #new_edge_type = str_lst[0], "connects", str_lst[1]
-            if edge_types_idx_dict[edge_type].numel() != 0:
-                hetero_data[str_lst[0], "isConnected", str_lst[1]].edge_index = edge_types_idx_dict[edge_type]
-                hetero_data[str_lst[0], "isConnected", str_lst[1]].edge_attr = edge_types_attr_dict[edge_type]
+    # Replace all ext_grids but the first one with generators and set the generators to slack= false
+    ext_grids = [i for i in range(1, len(net.ext_grid.name.values))]
+    pp.replace_ext_grid_by_gen(net, ext_grids=ext_grids, slack=False)
 
 
-        train_data.append(hetero_data)
+    # NETWORK CONSTRAINTS
 
-    print("Processing Validation Data for " + grid_name + " ...")
+    # Maximize the branch limits
 
-    for data in validation:
-        hetero_data = HeteroData()
-        x = data.drop(columns=["Unnamed: 0"])
-        x_rows, x_cols = np.shape(x)
-        x = np.array(x).reshape(x_rows, x_cols)
+    # max_i_ka = list(net.line.max_i_ka.values)
 
-        # Store the Feature Matrices for each bus type
-        for bus_type in node_types_idx_dict:
-            lst = []
-            # Get the bus indices of the corresponding bus type
-            type_idx_lst = node_types_idx_dict[bus_type]
+    # for i in range(len(max_i_ka)):
+    # max_i_ka[i] = max(max_i_ka)
 
-            # For each index given, map it to the true index and append the corresponding feature vector
-            for idx_given in type_idx_lst:
-                lst.append(x[idx_mapper[idx_given], :])
+    print(f"Processing Network named {grid_name}..")
 
-            if len(lst) == 0:
-                continue
+    # Calculate reactive power from nominal and acive power for sgens
+    s_sgen = np.array(net.sgen.sn_mva.values ** 2)
+    p_sgen = np.array(net.sgen.p_mw.values ** 2)
+    q_sgen = np.sqrt(s_sgen - p_sgen)
+    net.sgen.q_mvar = list(q_sgen)
 
-            lst_rows, lst_cols = np.shape(lst)
-            lst_np = np.array(lst).reshape(lst_rows, lst_cols)
-            hetero_data[bus_type].x = torch.tensor(data=lst_np, dtype=torch.float32)
-            if len(hetero_data[bus_type]) == 0:
-                hetero_data[bus_type].num_nodes = 0
+    # Maximize line loading percents
+    max_loading_percent = list(net.line.max_loading_percent.values)
+    for i in range(len(max_loading_percent)):
+        max_loading_percent[i] = 100.0
+    net.line.max_loading_percent = max_loading_percent
 
-        # Store the Edge Attributes and Index for each edge type
-        for edge_type in edge_types_idx_dict:
-            str_lst = edge_type.split('-')
-            # new_edge_type = str_lst[0], "connects", str_lst[1]
-            if edge_types_idx_dict[edge_type].numel() != 0:
-                hetero_data[str_lst[0], "isConnected", str_lst[1]].edge_index = edge_types_idx_dict[edge_type]
-                hetero_data[str_lst[0], "isConnected", str_lst[1]].edge_attr = edge_types_attr_dict[edge_type]
+    # Maximize trafo loading percent
+    max_loading_percent = list(net.trafo.max_loading_percent.values)
+    for i in range(len(max_loading_percent)):
+        max_loading_percent[i] = 100.0
+    net.trafo.max_loading_percent = max_loading_percent
 
-        val_data.append(hetero_data)
+    # Maximize trafo3w loading percent
+    max_loading_percent = list(net.trafo3w.max_loading_percent.values)
+    for i in range(len(max_loading_percent)):
+        max_loading_percent[i] = 100.0
+    net.trafo3w.max_loading_percent = max_loading_percent
 
-    print("Processing Test Data for " + grid_name + " ...")
+    pp.drop_out_of_service_elements(net)
 
-    for data in test:
-        hetero_data = HeteroData()
-        x = data.drop(columns=["Unnamed: 0"])
-        x_rows, x_cols = np.shape(x)
-        x = np.array(x).reshape(x_rows, x_cols)
-
-        # Store the Feature Matrices for each bus type
-        for bus_type in node_types_idx_dict:
-            lst = []
-            # Get the bus indices of the corresponding bus type
-            type_idx_lst = node_types_idx_dict[bus_type]
-
-            # For each index given, map it to the true index and append the corresponding feature vector
-            for idx_given in type_idx_lst:
-                lst.append(x[idx_mapper[idx_given], :])
-
-            if len(lst) == 0:
-                continue
-
-            lst_rows, lst_cols = np.shape(lst)
-            lst_np = np.array(lst).reshape(lst_rows, lst_cols)
-            hetero_data[bus_type].x = torch.tensor(data=lst_np, dtype=torch.float32)
-            if len(hetero_data[bus_type]) == 0:
-                hetero_data[bus_type].num_nodes = 0
-
-        # Store the Edge Attributes and Index for each edge type
-        for edge_type in edge_types_idx_dict:
-            str_lst = edge_type.split('-')
-            # new_edge_type = str_lst[0], "connects", str_lst[1]
-            if edge_types_idx_dict[edge_type].numel() != 0:
-                hetero_data[str_lst[0],"isConnected",str_lst[1]].edge_index = edge_types_idx_dict[edge_type]
-                hetero_data[str_lst[0],"isConnected",str_lst[1]].edge_attr = edge_types_attr_dict[edge_type]
-
-        test_data.append(hetero_data)
-
-    print("Processing complete.")
-    return train_data, val_data, test_data
+    print("Network Processing Finished.")
+    return net
 
 def to_json(grid_name: str):
     """
@@ -1636,3 +1569,287 @@ def extract_edge_features(net: pp.pandapowerNet) -> Tuple[dict, dict]:
         print(f"{key}: {edge_types_idx_dict[key]}" )
 
     return edge_types_idx_dict, edge_types_attr_dict
+
+def read_unsupervised_dataset(grid_name: str) -> Tuple[list, list, list]:
+    """
+    Reads unsupervised datasets and returns HeteroData
+    Args:
+        grid_name: string
+
+    Returns:
+        HeteroData
+
+    """
+    # Define the graph using Pandapower
+    net = process_network(grid_name)
+
+    print(f"Extracting Node Types for the grid {grid_name}..")
+
+    idx_mapper, node_types_idx_dict = extract_node_types_as_dict(net)
+
+    node_type_idx_mapper = dict()
+    for node_type in node_types_idx_dict:
+        length = len(node_types_idx_dict[node_type])
+        for bus_idx, map_idx in zip(node_types_idx_dict[node_type], range(length)):
+            real_idx = idx_mapper[bus_idx]
+            node_type_idx_mapper[real_idx] = map_idx
+
+    print(f"Extracting Edge Index and Edge Attributes for each Node Type for the grid {grid_name}")
+
+    edge_types_idx_dict, edge_types_attr_dict = extract_edge_features_as_dict(net)
+
+    print("Reading all of the .csv files from the directory of " + grid_name + " ...")
+
+    # Store path to the supervised datasets directory of the specified grid
+    train_data, val_data, test_data = [], [], []
+    path_to_dir = os.path.dirname(os.path.abspath("gnn.ipynb")) + "\\data\\Unsupervised\\Training\\" + grid_name
+    datasets = []
+
+    # Read all the csv files in the directory of the grid_name
+    for dataset_name in os.listdir(path_to_dir):
+        path2dataset = path_to_dir + "\\" + dataset_name
+        datasets.append(pd.read_csv(path2dataset))
+
+    # Process all the data according to  85 - 10 - 5
+    random.shuffle(datasets)
+    training = datasets[:85]
+    validation = datasets[85:95]
+    test = datasets[95:]
+
+    print("Processing Training Data for " + grid_name + " ...")
+    num_busses = int(len(training[0]))
+
+    for data in training:
+        hetero_data = HeteroData()
+        x = data.drop(columns=["Unnamed: 0"])
+        x_rows, x_cols = np.shape(x)
+        x = np.array(x).reshape(x_rows, x_cols)
+
+        # Store the Feature Matrices for each bus type
+        for bus_type in node_types_idx_dict:
+            lst = []
+            # Get the bus indices of the corresponding bus type
+            type_idx_lst = node_types_idx_dict[bus_type]
+
+            # For each index given, map it to the true index and append the corresponding feature vector
+            for idx_given in type_idx_lst:
+                lst.append(x[idx_mapper[idx_given], :])
+
+            if len(lst) == 0:
+                continue
+
+            lst_rows, lst_cols = np.shape(lst)
+            lst_np = np.array(lst).reshape(lst_rows, lst_cols)
+            hetero_data[bus_type].x = torch.tensor(data=lst_np, dtype=torch.float32)
+            if len(hetero_data[bus_type]) == 0:
+                hetero_data[bus_type].num_nodes = 0
+
+        # Store the Edge Attributes and Index for each edge type
+        for edge_type in edge_types_idx_dict:
+            str_lst = edge_type.split('-')
+            #new_edge_type = str_lst[0], "connects", str_lst[1]
+            if edge_types_idx_dict[edge_type].numel() != 0:
+                hetero_data[str_lst[0], "isConnected", str_lst[1]].edge_index = edge_types_idx_dict[edge_type]
+                hetero_data[str_lst[0], "isConnected", str_lst[1]].edge_attr = edge_types_attr_dict[edge_type]
+
+
+        train_data.append(hetero_data)
+
+    print("Processing Validation Data for " + grid_name + " ...")
+
+    for data in validation:
+        hetero_data = HeteroData()
+        x = data.drop(columns=["Unnamed: 0"])
+        x_rows, x_cols = np.shape(x)
+        x = np.array(x).reshape(x_rows, x_cols)
+
+        # Store the Feature Matrices for each bus type
+        for bus_type in node_types_idx_dict:
+            lst = []
+            # Get the bus indices of the corresponding bus type
+            type_idx_lst = node_types_idx_dict[bus_type]
+
+            # For each index given, map it to the true index and append the corresponding feature vector
+            for idx_given in type_idx_lst:
+                lst.append(x[idx_mapper[idx_given], :])
+
+            if len(lst) == 0:
+                continue
+
+            lst_rows, lst_cols = np.shape(lst)
+            lst_np = np.array(lst).reshape(lst_rows, lst_cols)
+            hetero_data[bus_type].x = torch.tensor(data=lst_np, dtype=torch.float32)
+            if len(hetero_data[bus_type]) == 0:
+                hetero_data[bus_type].num_nodes = 0
+
+        # Store the Edge Attributes and Index for each edge type
+        for edge_type in edge_types_idx_dict:
+            str_lst = edge_type.split('-')
+            # new_edge_type = str_lst[0], "connects", str_lst[1]
+            if edge_types_idx_dict[edge_type].numel() != 0:
+                hetero_data[str_lst[0], "isConnected", str_lst[1]].edge_index = edge_types_idx_dict[edge_type]
+                hetero_data[str_lst[0], "isConnected", str_lst[1]].edge_attr = edge_types_attr_dict[edge_type]
+
+        val_data.append(hetero_data)
+
+    print("Processing Test Data for " + grid_name + " ...")
+
+    for data in test:
+        hetero_data = HeteroData()
+        x = data.drop(columns=["Unnamed: 0"])
+        x_rows, x_cols = np.shape(x)
+        x = np.array(x).reshape(x_rows, x_cols)
+
+        # Store the Feature Matrices for each bus type
+        for bus_type in node_types_idx_dict:
+            lst = []
+            # Get the bus indices of the corresponding bus type
+            type_idx_lst = node_types_idx_dict[bus_type]
+
+            # For each index given, map it to the true index and append the corresponding feature vector
+            for idx_given in type_idx_lst:
+                lst.append(x[idx_mapper[idx_given], :])
+
+            if len(lst) == 0:
+                continue
+
+            lst_rows, lst_cols = np.shape(lst)
+            lst_np = np.array(lst).reshape(lst_rows, lst_cols)
+            hetero_data[bus_type].x = torch.tensor(data=lst_np, dtype=torch.float32)
+            if len(hetero_data[bus_type]) == 0:
+                hetero_data[bus_type].num_nodes = 0
+
+        # Store the Edge Attributes and Index for each edge type
+        for edge_type in edge_types_idx_dict:
+            str_lst = edge_type.split('-')
+            # new_edge_type = str_lst[0], "connects", str_lst[1]
+            if edge_types_idx_dict[edge_type].numel() != 0:
+                hetero_data[str_lst[0],"isConnected",str_lst[1]].edge_index = edge_types_idx_dict[edge_type]
+                hetero_data[str_lst[0],"isConnected",str_lst[1]].edge_attr = edge_types_attr_dict[edge_type]
+
+        test_data.append(hetero_data)
+
+    print("Processing complete.")
+    return train_data, val_data, test_data
+
+def generate_unsupervised_input(grid_name:str) ->Tuple[list, list, list]:
+    """
+        Processes the PandaPower Network and generates inputs,returns HeteroData
+        Args:
+            grid_name: string
+
+        Returns:
+            each node feature is a 1 x 11 vector with parameters being in order:
+            V_i, delta_iSB, P_i, Q_i,
+            min_V_i, max_V_i, sn_mva, min_P_i,
+            max_P_i, min_Q_i, max_Q_i
+            HeteroData
+
+        """
+    # Process the network via Grid Name
+    net = process_network(grid_name)
+
+    print(f"Extracting Node Types for the grid {grid_name}..")
+
+    idx_mapper, node_types_idx_dict = extract_node_types_as_dict(net)
+
+    node_type_idx_mapper = dict()
+    for node_type in node_types_idx_dict:
+        length = len(node_types_idx_dict[node_type])
+        for bus_idx, map_idx in zip(node_types_idx_dict[node_type], range(length)):
+            real_idx = idx_mapper[bus_idx]
+            node_type_idx_mapper[real_idx] = map_idx
+
+    print(f"Extracting Edge Index and Edge Attributes for each Node Type for the grid {grid_name}")
+
+    edge_types_idx_dict, edge_types_attr_dict = extract_edge_features_as_dict(net)
+
+    # Initialize a Hetero Data Instance
+    data = HeteroData()
+    ext_grid_bus_idx = net.ext_grid.iloc[0].bus
+    gen_busses_idx = list(net.gen.bus.values)
+
+    for node_type in node_types_idx_dict:
+        X_node_type = []  # number of busses of the corresponding node type x 11 vector
+        node_indices = node_types_idx_dict[node_type]
+
+        for bus_idx in node_indices:
+            node_features = [] # 1 x 11 vector
+            node_idx = node_type_idx_mapper[idx_mapper[bus_idx]]
+
+            # Core Features
+            V_i = net.bus.loc[net.bus.index == bus_idx].vn_kv[bus_idx]
+            delta_iSB = 0.0 if node_type == "SB" else 1.0
+            P_i = 0.0 if node_type == "NB" else 1.0
+            Q_i = 0.0 if node_type == "NB" else 1.0
+
+            # Add Core Features to the node features vector
+            node_features.append(V_i), node_features.append(delta_iSB)
+            node_features.append(P_i), node_features.append(Q_i)
+
+            # Constraint Features
+            # Voltage Magnitudes V_i
+            min_V_i = 0.9 * V_i
+            max_V_i = 1.1 * V_i
+
+            # Nominal Apparent Power sn_mva
+            sgen_max_sn= sum(net.sgen.loc[net.sgen.bus == bus_idx].sn_mva.values)
+            load_max_sn = sum(net.load.loc[net.load.bus == bus_idx].sn_mva.values)
+
+            sn_mva = abs(sgen_max_sn - load_max_sn)
+
+            # Min Active Power min_p_i
+            sgen_min_p = sum(net.sgen.loc[net.sgen.bus == bus_idx].p_mw.values) if node_type != "NB" else 0.0
+            load_min_p = sum(net.load.loc[net.load.bus == bus_idx].p_mw.values) if node_type != "NB" else 0.0
+            min_p_i = load_min_p - sgen_min_p
+
+            # Max Active Power max_p_i
+            #sgen_max_p = sum(net.sgen.loc[net.sgen.bus == bus_idx].p_mw.values) if node_type != "NB" else 0.0
+            #load_max_p = sum(net.load.loc[net.load.bus == bus_idx].p_mw.values) if node_type != "NB" else 0.0
+            max_p_i = load_min_p if node_type != "NB" else 0.0 # enforcing self-sustenance
+
+            # Min Reactive Power min_q_i
+            sgen_min_q = sum(net.sgen.loc[net.sgen.bus == bus_idx].q_mvar.values) if node_type != "NB" else 0.0
+            load_min_q = sum(net.load.loc[net.load.bus == bus_idx].q_mvar.values) if node_type != "NB" else 0.0
+            min_q_i = load_min_q - sgen_min_q
+
+            # Max Reactive Power max_q_i
+            # sgen_max_p = sum(net.sgen.loc[net.sgen.bus == bus_idx].p_mw.values) if node_type != "NB" else 0.0
+            # load_max_p = sum(net.load.loc[net.load.bus == bus_idx].p_mw.values) if node_type != "NB" else 0.0
+            max_q_i = load_min_q if node_type != "NB" else 0.0 # enforcing self-sustenance
+
+            if bus_idx == ext_grid_bus_idx:
+                ext_grid_sn_mva = net.trafo.loc[net.trafo.hv_bus == ext_grid_bus_idx].sn_mva.values[0]
+                sn_mva = ext_grid_sn_mva
+                min_p_i = -sn_mva
+                max_p_i = sn_mva
+                min_q_i = -sn_mva
+                max_q_i = sn_mva
+            elif bus_idx in gen_busses_idx:
+                sn_mva = net.trafo.loc[net.trafo.hv_bus == bus_idx].sn_mva.values[0]
+                min_p_i = -sn_mva
+                max_p_i = sn_mva
+                min_q_i = -sn_mva
+                max_q_i = sn_mva
+
+            # Add the constraint features to the node feature vector
+            node_features.append(min_V_i), node_features.append(max_V_i), node_features.append(sn_mva)
+            node_features.append(min_p_i), node_features.append(max_p_i), node_features.append(min_q_i),
+            node_features.append(max_q_i)
+
+            # Add the node feature vector to the collection of feature vectors of the corresponding node type
+            X_node_type.append(node_features)
+
+        # Add the collection of node features to the corresponding node of Hetero Data
+        data[node_type].x = torch.tensor(X_node_type, dtype=torch.float32)
+
+    # Add the edge indices and edge attributes to the Hetero Data
+    for edge_type in edge_types_idx_dict:
+        data[edge_type].edge_index = edge_types_idx_dict[edge_type]
+        data[edge_type].edge_attr = edge_types_attr_dict[edge_type]
+
+    print("Hetero Data Input has been generated.")
+    return data
+
+
+
