@@ -13,6 +13,7 @@ from torch_geometric.utils.hetero import check_add_self_loops
 import torch_geometric.transforms as T
 from torch_geometric.nn import HeteroConv
 
+
 class HeteroGNN(torch.nn.Module):
     def __init__(self, hidden_channels: int, out_channels: int, num_layers: int, dropout: float, act_fn: str
                  , norm: Union[str, Callable, None] = None):
@@ -29,7 +30,7 @@ class HeteroGNN(torch.nn.Module):
         """
         super().__init__()
 
-        self.in_channels = 4
+        self.in_channels = 11
         self.hidden_channels = hidden_channels
         self.out_channels = out_channels
         self.num_layers = num_layers
@@ -66,7 +67,6 @@ class HeteroGNN(torch.nn.Module):
         self.convs = ModuleList()
 
         for _ in range(self.num_layers):
-
             conv = HeteroConv({
                 ('SB', "isConnected", 'PV'): TransformerConv(-1, hidden_channels, edge_dim=2),
                 ('SB', "isConnected", 'PQ'): TransformerConv(-1, hidden_channels, edge_dim=2),
@@ -88,11 +88,9 @@ class HeteroGNN(torch.nn.Module):
             }, aggr='sum')
             self.convs.append(conv)
 
-
     def forward(self, x_dict, edge_idx_dict, edge_attr_dict, bus_idx_neighbors_dict):
 
         # All calls of the forward function must support edge_attr & edge_idx for this model
-
         for conv in self.convs.children():
             x_dict = conv(x_dict, edge_idx_dict, edge_attr_dict)
 
@@ -101,7 +99,7 @@ class HeteroGNN(torch.nn.Module):
                 x_dict[node_type] = self.act(x_dict[node_type])
 
         for node_type in x_dict:
-             x_dict[node_type] = self.lin(x_dict[node_type])
+            x_dict[node_type] = self.lin(x_dict[node_type])
 
         # ACOPF Forward Pass for P and Q
         for from_bus in bus_idx_neighbors_dict:
@@ -135,6 +133,5 @@ class HeteroGNN(torch.nn.Module):
 
                 x_dict[from_bus][bus_idx][2] = P_i
                 x_dict[from_bus][bus_idx][3] = Q_i
-
 
         return x_dict

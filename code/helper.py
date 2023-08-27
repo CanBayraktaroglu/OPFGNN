@@ -1845,8 +1845,11 @@ def generate_unsupervised_input(grid_name:str) ->Tuple[list, list, list]:
 
     # Add the edge indices and edge attributes to the Hetero Data
     for edge_type in edge_types_idx_dict:
-        data[edge_type].edge_index = edge_types_idx_dict[edge_type]
-        data[edge_type].edge_attr = edge_types_attr_dict[edge_type]
+        bus_names = edge_type.split("-")
+        from_bus, to_bus = bus_names
+        edge = (from_bus, "isConnected", to_bus)
+        data[edge].edge_index = edge_types_idx_dict[edge_type]
+        data[edge].edge_attr = edge_types_attr_dict[edge_type]
 
     print("Hetero Data Input has been generated.")
     return data
