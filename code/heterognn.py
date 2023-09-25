@@ -1,3 +1,4 @@
+import torch
 import torch_geometric.nn.norm.layer_norm
 from cvxpylayers.torch import CvxpyLayer
 import cvxpy as cp
@@ -26,7 +27,7 @@ def custom_sigmoid(x, lower_bound, upper_bound, slope=0.1):
     return scaled_sigmoid
 
 
-class HeteroGNN(torch.nn.Module):
+class ACOPFGNN(torch.nn.Module):
     def __init__(self, hidden_channels: int, out_channels: int, num_layers: int, dropout: float, act_fn: str
                  , norm: Union[str, Callable, None] = None):
         """
@@ -99,20 +100,29 @@ class HeteroGNN(torch.nn.Module):
                 ('NB', "isConnected", 'NB'): TransformerConv(-1, hidden_channels, edge_dim=2),
             }, aggr='sum')
             self.convs.append(conv)
+        """
+        # Initialize weights
+        for m in self.modules():
+            if isinstance(m, TransformerConv):
+                nn.init.xavier_uniform_(m.weight) # Initialize the weights with xavier uniformly
+                if m.bias is not None:
+                    m.bias.data.fill_(0.01)
+        """
 
     def forward(self, x_dict, constraint_dict, edge_idx_dict, edge_attr_dict, bus_idx_neighbors_dict):
         out_dict = x_dict.copy()
         # All calls of the forward function must support edge_attr & edge_idx for this model
         for conv in self.convs.children():
             out_dict = conv(out_dict, edge_idx_dict, edge_attr_dict)
+            #print(f"Nan Value present in out_dict?: {torch.isnan(out_dict).any()}")
 
             # Apply activation function for the output features of each type and update the dict
             for node_type in out_dict:
                 out_dict[node_type] = self.act(out_dict[node_type])
-
+                #print(f"Nan Value present in out_dict after activation fn applied?: {torch.isnan(out_dict).any()}")
         for node_type in out_dict:
             out_dict[node_type] = self.lin(out_dict[node_type])
-
+            #print(f"Nan Value present in out_dict after linear operations?: {torch.isnan(out_dict).any()}")
         # ACOPF Forward Pass for P and Q
         for from_bus in bus_idx_neighbors_dict:
             for bus_idx in bus_idx_neighbors_dict[from_bus]:
@@ -130,34 +140,68 @@ class HeteroGNN(torch.nn.Module):
                 P_i = torch.tensor(0.0, dtype=torch.float32)
                 Q_i = torch.tensor(0.0, dtype=torch.float32)
 
-                for pair in bus_idx_neighbors_dict[from_bus][bus_idx]:
-                    # For each neighbor of the iterated bus
-                    to_bus, to_bus_idx, edge_attr = pair
+                if from_bus != "NB":
 
-                    V_j = abs(out_dict[to_bus][to_bus_idx][0])
+                    for pair in bus_idx_neighbors_dict[from_bus][bus_idx]:
+                        # For each neighbor of the iterated bus
+                        to_bus, to_bus_idx, edge_attr = pair
 
-                    volt_angle_j = out_dict[to_bus][to_bus_idx][1]
-                    delta_ij = volt_angle_j - volt_angle_i
+                        V_j = abs(out_dict[to_bus][to_bus_idx][0])
 
-                    G_ij = edge_attr[0] / (edge_attr[0] ** 2 + edge_attr[1] ** 2)
-                    B_ij = -edge_attr[1] / (edge_attr[0] ** 2 + edge_attr[1] ** 2)
+                        volt_angle_j = out_dict[to_bus][to_bus_idx][1]
+                        delta_ij = volt_angle_j - volt_angle_i
 
-                    # ACOPF Equation for P_i
-                    P_ij = V_i * V_j * (G_ij * torch.cos(delta_ij) + B_ij * torch.sin(delta_ij))
+                        G_ij = edge_attr[0] / (edge_attr[0] ** 2 + edge_attr[1] ** 2)
+                        if torch.isnan(G_ij).any():
+                            print("Nan Value present in G_ij")
+                        B_ij = -edge_attr[1] / (edge_attr[0] ** 2 + edge_attr[1] ** 2)
+                        if torch.isnan(B_ij).any():
+                            print(f"Nan Value present in B_ij")
+                        # ACOPF Equation for P_i
+                        P_ij = V_i * V_j * (G_ij * torch.cos(delta_ij) + B_ij * torch.sin(delta_ij))
+                        if torch.isnan(P_ij).any():
+                            print(f"Nan Value present in P_ij?")
+                        P_i += P_ij
 
-                    P_i += P_ij
+                        # ACOPF Equation for Q_i
+                        Q_ij = V_i * V_j * (G_ij * torch.sin(delta_ij) - B_ij * torch.cos(delta_ij))
+                        if torch.isnan(Q_ij).any():
+                            print(f"Nan Value present in Q_ij")
+                        Q_i += Q_ij
 
-                    # ACOPF Equation for Q_i
-                    Q_ij = V_i * V_j * (G_ij * torch.sin(delta_ij) - B_ij * torch.cos(delta_ij))
-
-                    Q_i += Q_ij
+                    # Enforce the constraints
+                    # Active Power boundary constraint
+                    P_i = custom_sigmoid(P_i, active_pow_lower_bound, active_pow_upper_bound)
+                    if torch.isnan(P_i).any():
+                        print(f"Nan Value present in P_i after sigmoid")
+                    # Reactive Power boundary constraint
+                    Q_i = custom_sigmoid(Q_i, reactive_pow_lower_bound, reactive_pow_upper_bound)
+                    if torch.isnan(Q_i).any():
+                        print(f"Nan Value present in Q_i after sigmoid")
+                    # Maximum Apparent Power S constraint
+                    constrained_P_i_upper_bound = torch.sqrt(torch.square(max_apparent_pow) - torch.square(Q_i))
+                    learnable_P_i_constraint = torch.tensor(0.1, dtype=torch.float32, requires_grad=True)
+                    P_i = custom_sigmoid(P_i, min(active_pow_lower_bound, constrained_P_i_upper_bound), max(active_pow_lower_bound, constrained_P_i_upper_bound),slope=learnable_P_i_constraint)
+                    if torch.isnan(P_i).any():
+                        print(f"Nan Value present in P_i after S enforcement")
+                    constrained_Q_i_upper_bound = torch.sqrt(torch.square(max_apparent_pow) - torch.square(P_i))
+                    learnable_Q_i_constraint = torch.tensor(0.1, dtype=torch.float32, requires_grad=True)
+                    Q_i = custom_sigmoid(Q_i, min(reactive_pow_lower_bound, constrained_Q_i_upper_bound), max(reactive_pow_lower_bound, constrained_Q_i_upper_bound),slope=learnable_Q_i_constraint)
+                    if torch.isnan(Q_i).any():
+                        print(f"Nan Value present in Q_i after S enforcement")
 
                 # Enforce the constraints
-                out_dict[from_bus][bus_idx][0] = custom_sigmoid(V_i, volt_mag_lower_bound, volt_mag_upper_bound)/x_dict[from_bus][bus_idx][0]
-                out_dict[from_bus][bus_idx][2] = custom_sigmoid(P_i, active_pow_lower_bound, active_pow_upper_bound)
-                out_dict[from_bus][bus_idx][3] = custom_sigmoid(Q_i, reactive_pow_lower_bound, reactive_pow_upper_bound)
+                # Voltage Magnitude boundary constraint
+                learnable_V_i_constraint = torch.tensor(0.1, dtype=torch.float32, requires_grad=True)
+                out_dict[from_bus][bus_idx][0] = custom_sigmoid(V_i, volt_mag_lower_bound, volt_mag_upper_bound,slope=learnable_V_i_constraint)#/x_dict[from_bus][bus_idx][0]
+                # Voltage Angle constraint
+                out_dict[from_bus][bus_idx][1] = torch.relu(volt_angle_i) if from_bus != "SB" else torch.relu(volt_angle_i) - out_dict["SB"][0][1] # voltage angle >= 0
+
+                out_dict[from_bus][bus_idx][2] = P_i
+                out_dict[from_bus][bus_idx][3] = Q_i
 
         return out_dict
+
 
 
 """
@@ -167,80 +211,20 @@ class ACOPFModel(nn.Module):
                  , norm: Union[str, Callable, None] = None):
         super(ACOPFModel, self).__init__()
         self.gnn = HeteroGNN(self, hidden_channels, out_channels, num_layers, dropout, act_fn, norm)
+        
         self.cvxpy_layer = CvxpyLayer(
             self.build_acopf_problem,  # Pass the problem builder function
             input_vars=[x],  # Input variables
             output_vars=[objective, *constraints]  # Output variables
         )
 
-    def forward(self, x):
+    def forward(self, x_dict, constraint_dict, edge_idx_dict, edge_attr_dict, bus_idx_neighbors_dict):
         # Perform GNN propagation on input data 'x' to compute node_features
-        node_features = self.gnn(x)
+        out_dict = self.gnn(x_dict, constraint_dict, edge_idx_dict, edge_attr_dict, bus_idx_neighbors_dict)
 
-        # Call the CvxpyLayer to solve the ACOPF problem
-        objective, constraints = self.cvxpy_layer(node_features)
+        return out_dict
 
-        return objective, constraints
+    def build_acopf_problem(self, out_dict):
+        return NotImplementedError"""
 
-    def build_acopf_problem(self, x_dict: dict):
-        num_nodes = 0
-        min_voltage_magnitudes = []
-        max_voltage_magnitudes = []
-        max_apparent_power = []
-        min_active_powers = []
-        max_active_powers = []
-        min_reactive_powers = []
-        max_reactive_powers = []
-
-        for key in x_dict:
-            x = x_dict[key]
-            num_nodes += x.shape[0]
-
-            min_voltage_magnitudes_node = list(x[:, 4])
-            max_voltage_magnitudes_node = list(x[:, 5])
-            max_apparent_power_node = list(x[:, 6])
-            min_active_powers_node = list(x[:, 7])
-            max_active_powers_node = list(x[:, 8])
-            min_reactive_powers_node = list(x[:, 9])
-            max_reactive_powers_node = list(x[:, 10])
-
-            min_voltage_magnitudes.extend(min_voltage_magnitudes_node)
-            max_voltage_magnitudes.extend(max_voltage_magnitudes_node)
-            max_apparent_power.extend(max_apparent_power_node)
-            min_active_powers.extend(min_active_powers_node)
-            max_active_powers.extend(max_active_powers_node)
-            min_reactive_powers.extend(min_reactive_powers_node)
-            max_reactive_powers.extend(max_reactive_powers_node)
-
-
-        # Define optimization variables
-        voltage_magnitudes = cp.Variable(num_nodes)
-        active_powers = cp.Variable(num_nodes)
-        reactive_powers = cp.Variable(num_nodes)
-
-        # Define objective function (example, you can modify this)
-        objective = cp.Minimize(cp.sum_squares(active_powers) + cp.sum_squares(reactive_powers))
-
-        # Define constraint expressions
-        constraints = [
-            voltage_magnitudes >= min_voltage_magnitudes,
-            voltage_magnitudes <= max_voltage_magnitudes,
-            # Add other constraints here...
-            active_powers >= min_active_powers,
-            active_powers <= max_active_powers,
-            reactive_powers >= min_reactive_powers,
-            reactive_powers <= max_reactive_powers,
-            # Add other constraints here...
-        ]
-        return objective, constraints
-
-    def custom_sigmoid(x, lower_bound, upper_bound, slope=0.1):
-        # Scale and shift the sigmoid function
-        scaled_sigmoid = 1 / (1 + torch.exp(-slope * (x - (lower_bound + upper_bound) / 2)))
-
-        # Scale and shift the result to fit within the specified lower_bound and upper_bound
-        scaled_sigmoid = (scaled_sigmoid - 0.5) * (upper_bound - lower_bound) + (lower_bound + upper_bound) / 2
-
-        return scaled_sigmoid
         
-"""

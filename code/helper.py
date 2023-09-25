@@ -1,27 +1,21 @@
-import pandapower.topology as pptop
-import simbench
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch_geometric
-import torchvision
 from torch_geometric.data import Data, HeteroData
-import sklearn.metrics as metrics
 from torch_geometric.utils import to_undirected
-from torch_geometric.loader import DataLoader
 import pandas as pd
 import numpy as np
 import pandapower as pp
-import networkx as nx
 import wandb
-from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler, PowerTransformer, MaxAbsScaler, QuantileTransformer
+from sklearn.preprocessing import StandardScaler
 import simbench as sb
 import os
 import random
 from graphdata import GraphData
-from typing import Tuple
-import torch_geometric.transforms as T
+from typing import Tuple, List, Any
 import json
+from ACOPFData import ACOPFData
+import pickle
 
 def sample_uniform_from_df(load):
     # Create Datasets from sampling reference active power and reactive power demands of loads uniformly
@@ -1007,9 +1001,7 @@ def extract_node_types_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
 
     return idx_mapper, node_type_bus_idx_dict
 
-
-
-def extract_edge_features_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
+def extract_edge_features_as_dict(net: pp.pandapowerNet, suppress_info:bool = True) -> Tuple[dict, dict]:
     """
     Bus Types: SB, PV, PQ, NB ( 4 Classes in total)
     Edge Types: undirected Edges (9 edge classes in total)
@@ -1031,7 +1023,8 @@ def extract_edge_features_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
     pp.replace_ext_grid_by_gen(net, ext_grids=ext_grids, slack=False)
 
     # Get node types and idx mapper
-    print("Extracting Node Types and Index Mapper..")
+    if not suppress_info:
+        print("Extracting Node Types and Index Mapper..")
     idx_mapper, node_types_idx_dict = extract_node_types_as_dict(net)
 
     node_type_idx_mapper = dict()
@@ -1085,7 +1078,8 @@ def extract_edge_features_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
     edge_types_attr_dict["PQ-PQ"] = []
     edge_types_attr_dict["NB-NB"] = []
 
-    print("Extracting Edge Index and Edge Attributes..")
+    if not suppress_info:
+        print("Extracting Edge Index and Edge Attributes..")
 
     for from_bus, to_bus, r_ohm_per_km, x_ohm_per_km, length_km in zip(net.line.from_bus, net.line.to_bus, net.line.r_ohm_per_km, net.line.x_ohm_per_km, net.line.length_km):
 
@@ -1221,13 +1215,12 @@ def extract_edge_features_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
         #if key[0] == key[-1]:
             #edge_types_idx_dict[key] = to_undirected(edge_types_idx_dict[key])
 
-    print("Hetero Data Created.")
+    if not suppress_info:
+        print("Hetero Data Created.")
 
     return edge_types_idx_dict, edge_types_attr_dict
 
-
-
-def get_node_type(bus_idx: int, node_types_idx_dict: dict) -> str:
+def get_node_type(bus_idx: int, node_types_idx_dict: dict) -> Any:
     for key in node_types_idx_dict:
         for idx in node_types_idx_dict[key]:
             if bus_idx == idx:
@@ -1264,9 +1257,14 @@ def add_self_loops(edge_index: torch.Tensor, edge_attr: torch.Tensor, fill_val =
 
     return torch.tensor(idx_lst, dtype=torch.int), torch.tensor(attr_lst, dtype=torch.float32)
 
-def process_network(grid_name: str):
-    print(f"Loading Network {grid_name}..")
+def process_network(grid_name: str, suppress_info:bool = True):
+    if not suppress_info:
+        print(f"Loading Network {grid_name}..")
     net = sb.get_simbench_net(grid_name)  # '1-HV-mixed--0-no_sw'
+
+    # Sample loads uniformly
+    net.load = sample_uniform_from_df(net.load)
+
     # OPERATIONAL CONSTRAINTS
 
     # Set upper and lower limits of active-reactive powers of loads
@@ -1299,7 +1297,8 @@ def process_network(grid_name: str):
     # for i in range(len(max_i_ka)):
     # max_i_ka[i] = max(max_i_ka)
 
-    print(f"Processing Network named {grid_name}..")
+    if not suppress_info:
+        print(f"Processing Network named {grid_name}..")
 
     # Calculate reactive power from nominal and acive power for sgens
     s_sgen = np.array(net.sgen.sn_mva.values ** 2)
@@ -1326,8 +1325,8 @@ def process_network(grid_name: str):
     net.trafo3w.max_loading_percent = max_loading_percent
 
     pp.drop_out_of_service_elements(net)
-
-    print("Network Processing Finished.")
+    if not suppress_info:
+        print("Network Processing Finished.")
     return net
 
 def to_json(grid_name: str):
@@ -1426,7 +1425,7 @@ def to_json(grid_name: str):
     with open("data.json", "w") as outfile:
         outfile.write(json_object)
 
-def extract_edge_features(net: pp.pandapowerNet) -> Tuple[dict, dict]:
+def extract_edge_features(net: pp.pandapowerNet, suppress_info:bool = True) -> Tuple[dict, dict]:
     """
     Bus Types: SB, PV, PQ, NB ( 4 Classes in total)
     Edge Types: undirected Edges (9 edge classes in total)
@@ -1448,7 +1447,8 @@ def extract_edge_features(net: pp.pandapowerNet) -> Tuple[dict, dict]:
     pp.replace_ext_grid_by_gen(net, ext_grids=ext_grids, slack=False)
 
     # Get node types and idx mapper
-    print("Extracting Node Types and Index Mapper..")
+    if not suppress_info:
+        print("Extracting Node Types and Index Mapper..")
     idx_mapper, node_types_idx_dict = extract_node_types_as_dict(net)
 
     # Extract edge types
@@ -1494,7 +1494,8 @@ def extract_edge_features(net: pp.pandapowerNet) -> Tuple[dict, dict]:
     edge_types_attr_dict["PQ-PQ"] = []
     edge_types_attr_dict["NB-NB"] = []
 
-    print("Extracting Edge Index and Edge Attributes..")
+    if not suppress_info:
+        print("Extracting Edge Index and Edge Attributes..")
 
     for from_bus, to_bus, r_ohm_per_km, x_ohm_per_km, length_km in zip(net.line.from_bus, net.line.to_bus, net.line.r_ohm_per_km, net.line.x_ohm_per_km, net.line.length_km):
 
@@ -1531,7 +1532,8 @@ def extract_edge_features(net: pp.pandapowerNet) -> Tuple[dict, dict]:
             # Add Edge Attributes to corresponding Edge Types
             edge_types_attr_dict[edge_type].append([R_i, X_i])
 
-    print("Adding Self Loops and Converting Edges to Undirected..")
+    if not suppress_info:
+        print("Adding Self Loops and Converting Edges to Undirected..")
 
     for key in edge_types_idx_dict:
         # Convert edge connections to undirected
@@ -1563,10 +1565,10 @@ def extract_edge_features(net: pp.pandapowerNet) -> Tuple[dict, dict]:
         edge_types_idx_dict[key] = torch.tensor(edge_index, dtype=torch.int64)#edge_index
         edge_types_attr_dict[key] = torch.tensor(edge_attr, dtype=torch.float32)
 
-
-    print("Hetero Data Created.")
-    for key in edge_types_idx_dict:
-        print(f"{key}: {edge_types_idx_dict[key]}" )
+    if not suppress_info:
+        print("Hetero Data Created.")
+        for key in edge_types_idx_dict:
+            print(f"{key}: {edge_types_idx_dict[key]}" )
 
     return edge_types_idx_dict, edge_types_attr_dict
 
@@ -1732,7 +1734,7 @@ def read_unsupervised_dataset(grid_name: str) -> Tuple[list, list, list]:
     print("Processing complete.")
     return train_data, val_data, test_data
 
-def generate_unsupervised_input(grid_name:str) ->Tuple[list, list, list]:
+def generate_unsupervised_input(grid_name:str, suppress_info:bool = True) ->Tuple[list, list, list]:
     """
         Processes the PandaPower Network and generates inputs,returns HeteroData
         Args:
@@ -1749,7 +1751,8 @@ def generate_unsupervised_input(grid_name:str) ->Tuple[list, list, list]:
     # Process the network via Grid Name
     net = process_network(grid_name)
 
-    print(f"Extracting Node Types for the grid {grid_name}..")
+    if not suppress_info:
+        print(f"Extracting Node Types for the grid {grid_name}..")
 
     idx_mapper, node_types_idx_dict = extract_node_types_as_dict(net)
 
@@ -1760,7 +1763,8 @@ def generate_unsupervised_input(grid_name:str) ->Tuple[list, list, list]:
             real_idx = idx_mapper[bus_idx]
             node_type_idx_mapper[real_idx] = map_idx
 
-    print(f"Extracting Edge Index and Edge Attributes for each Node Type for the grid {grid_name}")
+    if not suppress_info:
+        print(f"Extracting Edge Index and Edge Attributes for each Node Type for the grid {grid_name}")
 
     edge_types_idx_dict, edge_types_attr_dict = extract_edge_features_as_dict(net)
 
@@ -1777,15 +1781,13 @@ def generate_unsupervised_input(grid_name:str) ->Tuple[list, list, list]:
             node_features = [] # 1 x 11 vector
             node_idx = node_type_idx_mapper[idx_mapper[bus_idx]]
 
+
             # Core Features
             V_i = net.bus.loc[net.bus.index == bus_idx].vn_kv[bus_idx]
             delta_iSB = 0.0 if node_type == "SB" else 1.0
-            P_i = 0.0 if node_type == "NB" else 1.0
-            Q_i = 0.0 if node_type == "NB" else 1.0
 
             # Add Core Features to the node features vector
             node_features.append(V_i), node_features.append(delta_iSB)
-            node_features.append(P_i), node_features.append(Q_i)
 
             # Constraint Features
             # Voltage Magnitudes V_i
@@ -1807,6 +1809,8 @@ def generate_unsupervised_input(grid_name:str) ->Tuple[list, list, list]:
             #sgen_max_p = sum(net.sgen.loc[net.sgen.bus == bus_idx].p_mw.values) if node_type != "NB" else 0.0
             #load_max_p = sum(net.load.loc[net.load.bus == bus_idx].p_mw.values) if node_type != "NB" else 0.0
             max_p_i = load_min_p if node_type != "NB" else 0.0 # enforcing self-sustenance
+
+
 
             # Min Reactive Power min_q_i
             sgen_min_q = sum(net.sgen.loc[net.sgen.bus == bus_idx].q_mvar.values) if node_type != "NB" else 0.0
@@ -1832,6 +1836,17 @@ def generate_unsupervised_input(grid_name:str) ->Tuple[list, list, list]:
                 min_q_i = -sn_mva
                 max_q_i = sn_mva
 
+
+            # Flat initialization of P_i based on constraints
+            P_i = (max_p_i + min_p_i) * 0.5 if node_type != "NB" else 0.0
+
+            # Flat initialization of Q_i based on constraints
+            Q_i = (max_q_i + min_q_i) * 0.5 if node_type != "NB" else 0.0
+
+            # Add the remaining core features to the node feature vector
+            node_features.append(P_i)
+            node_features.append(Q_i)
+
             # Add the constraint features to the node feature vector
             node_features.append(min_V_i), node_features.append(max_V_i), node_features.append(sn_mva)
             node_features.append(min_p_i), node_features.append(max_p_i), node_features.append(min_q_i),
@@ -1851,8 +1866,204 @@ def generate_unsupervised_input(grid_name:str) ->Tuple[list, list, list]:
         data[edge].edge_index = edge_types_idx_dict[edge_type]
         data[edge].edge_attr = edge_types_attr_dict[edge_type]
 
-    print("Hetero Data Input has been generated.")
-    return data
+    if not suppress_info:
+        print("Hetero Data Input has been generated.")
+    return sum(net.load.p_mw**2), sum(net.load.q_mvar**2), data
 
+def extract_unsupervised_inputs(data: HeteroData):
+    x_dict = dict()
+    constraint_dict = dict()
+    edge_idx_dict = dict()
+    edge_attr_dict = dict()
+    bus_idx_neighbors_dict = dict()
+    scalers_dict = dict()
 
+    # x_dict and constraint_dict
+    for node_type in data.node_types:
+        x: torch.Tensor
+        c: torch.Tensor
+        scaler = StandardScaler()
+        if len(data[node_type]) != 0:
+            x = scaler.fit_transform(data[node_type].x[:, :4])
+            x = torch.tensor(x, dtype=torch.float32, requires_grad=True)
+            c = custom_transform(scaler, data[node_type].x[:, 4:].detach().numpy())
+            c = torch.tensor(c, dtype=torch.float32, requires_grad=False)
+            x_dict[node_type] = x
+            constraint_dict[node_type] = c
 
+        scalers_dict[node_type] = scaler
+
+    # edge_idx_dict and edge_attr_dict
+    for edge_type in data.edge_types:
+        if data[edge_type].edge_attr.numel() != 0:
+            edge_idx_dict[edge_type] = data[edge_type].edge_index
+            edge_attr_dict[edge_type] = data[edge_type].edge_attr
+
+    # bus index to neighbor(s) mapper
+    # Add each node type as a dict
+    for node_type in x_dict:
+        bus_idx_neighbors_dict[node_type] = dict()
+
+    for edge_type, edge_idx in edge_idx_dict.items():
+        from_bus, _, to_bus = edge_type
+        for i, from_edge, to_edge in zip(range(len(edge_idx[0])), edge_idx[0], edge_idx[1]):
+            pair = (to_bus, to_edge.item(), edge_attr_dict[edge_type][i])
+            if from_edge.item() in bus_idx_neighbors_dict[from_bus]:
+                bus_idx_neighbors_dict[from_bus][from_edge.item()].append(pair)
+            else:
+                bus_idx_neighbors_dict[from_bus][from_edge.item()] = [pair]
+
+    return x_dict, constraint_dict, edge_idx_dict, edge_attr_dict, bus_idx_neighbors_dict, scalers_dict
+
+def save_unsupervised_inputs(grid_name: str, num_samples: int):
+    path = "../code/data/Heterogeneous/" + grid_name
+    inputs = [] # List of ACOPFData instances
+    for i in range(num_samples):
+        print(f"Epoch: {i}")
+        network_load_P, network_load_Q, data = generate_unsupervised_input(grid_name)
+        _input_ = ACOPFData(data, network_load_P, network_load_Q)
+        inputs.append(_input_)
+
+    print("Data Prep finished.")
+    os.makedirs(path, exist_ok=True)
+
+    with open(os.path.join(path, 'inputs.pkl'), 'wb') as f:
+        pickle.dump(inputs, f)
+
+    print("Data Saved.")
+
+def load_unsupervised_inputs(grid_name: str):
+    path = "../code/data/Heterogeneous/" + grid_name
+    with open(os.path.join(path, 'inputs.pkl'), 'rb') as f:
+        inputs = pickle.load(f)
+
+    return inputs
+
+def hetero_obj_fn(out_dict, targets):
+
+    # Objective Function on basis of ACOPF Equations for P and Q
+
+    P_supplied = 0.0
+    Q_supplied = 0.0
+
+    for from_bus in out_dict:
+        for i in range(len(out_dict[from_bus])):
+            P_i = out_dict[from_bus][i][2]
+            Q_i = out_dict[from_bus][i][3]
+            P_supplied += P_i.item()
+            Q_supplied += Q_i.item()
+
+    outputs = torch.tensor([P_supplied, Q_supplied], dtype=torch.float32, requires_grad=True)
+    #print(P_supplied, P_demanded, Q_supplied, Q_demanded)
+    #P_loss = torch.square(torch.tensor(P_demanded) - P_supplied)
+    #Q_loss = torch.square(torch.tensor(Q_demanded) - Q_supplied)
+
+    #mse_loss = torch.nn.functional.mse_loss(outputs, targets)
+
+    #Loss = torch.log(torch.tensor(1) + mse_loss)
+    Loss = torch.nn.MSELoss()
+    Loss = Loss(outputs, targets)
+    return Loss
+
+def train_ACOPF(model, optimizer, inputs: List[ACOPFData], num_epochs:int):
+    train_loss = 0.0
+    torch.autograd.set_detect_anomaly(True)
+
+    for i in range(num_epochs):
+        print(f"Epoch: {i}")
+        random.shuffle(inputs)
+        for j, ACOPFdata in enumerate(inputs):
+
+            #scaler = StandardScaler()
+
+            x_dict = ACOPFdata.x_dict
+            constraint_dict = ACOPFdata.constraint_dict
+            edge_idx_dict = ACOPFdata.edge_idx_dict
+            edge_attr_dict = ACOPFdata.edge_attr_dict
+            bus_idx_neighbors_dict = ACOPFdata.bus_idx_neighbors_dict
+            network_loads = ACOPFdata.network_loads
+            scalers_dict = ACOPFdata.scalers_dict
+
+            # Define Scaler and standardize inputs and targets
+            #x_dict = torch.tensor(scaler.fit_transform(x_dict), dtype=torch.float32)
+
+            # Zero your gradients for every batch!
+            optimizer.zero_grad()
+
+            # Make predictions for this batch
+            out_dict = model(x_dict, constraint_dict, edge_idx_dict, edge_attr_dict, bus_idx_neighbors_dict)
+
+            #scaler.inverse_transform(out_dict)
+
+            # Compute the loss and its gradients for RMSE loss
+            targets = torch.tensor(scalers_dict["SB"].transform(targets), dtype=torch.float32, requires_grad=False)
+            loss = hetero_obj_fn(out_dict, targets)
+            loss.backward()
+
+            # Adjust learning weights
+            optimizer.step()
+
+            # Gather data and report
+            train_loss += loss.item()
+
+            print(f"Step: {j} Loss: {loss.item()}")
+
+        print(f"Mean Epoch Loss: {train_loss/len(inputs)}")
+        train_loss = 0.0
+    """
+    num_samples = len(inputs)
+    wandb.log({
+        'epoch': epoch,
+        'train_loss': train_loss / num_samples
+
+    })
+    """
+def custom_transform(scaler: StandardScaler, constraint_features):
+    # Core feature columns: V_i, delta_iSB, P_i, Q_i
+    means = scaler.mean_ # mean
+    standard_deviations = scaler.scale_ # standard deviation
+
+    # Transforming min and max voltage magnitude constraints
+    # according to the fitted values on the core feature: V_i
+    constraint_features[:, :2] = (constraint_features[:, :2] - means[0])/standard_deviations[0]
+
+    # Transforming max apparent Power S constraints
+    # according to the fitted values on the average of core feature: P_i and Q_i
+    mean = (means[2] + means[3])/2
+    standard_deviation = (standard_deviations[2] + standard_deviations[3])/2
+    constraint_features[:, 2] = (constraint_features[:, 2] - mean) / standard_deviation
+
+    # Transforming min and max active power constraints
+    # according to the fitted values on the core feature: P_i
+    constraint_features[:, 3:5] = (constraint_features[:, 3:5] - means[2]) / standard_deviations[2]
+
+    # Transforming min and max active power constraints
+    # according to the fitted values on the core feature: P_i
+    constraint_features[:, 5:] = (constraint_features[:, 5:] - means[3]) / standard_deviations[3]
+
+    return constraint_features
+
+def custom_inverse_transform(scaler: StandardScaler, constraint_features):
+    # Core feature columns: V_i, delta_iSB, P_i, Q_i
+    means = scaler.mean_  # mean
+    standard_deviations = scaler.scale_  # standard deviation
+
+    # Inverse Transforming min and max voltage magnitude constraints
+    # according to the fitted values on the core feature: V_i
+    constraint_features[:, :2] = constraint_features[:, :2] *  standard_deviations[0] + means[0]
+
+    # Inverse Transforming max apparent Power S constraints
+    # according to the fitted values on the average of core feature: P_i and Q_i
+    mean = (means[2] + means[3]) / 2
+    standard_deviation = (standard_deviations[2] + standard_deviations[3]) / 2
+    constraint_features[:, 2] = constraint_features[:, 2] * standard_deviation + mean
+
+    # Inverse Transforming min and max active power constraints
+    # according to the fitted values on the core feature: P_i
+    constraint_features[:, 3:5] = constraint_features[:, 3:5] * standard_deviations[2] + means[2]
+
+    # Inverse Transforming min and max active power constraints
+    # according to the fitted values on the core feature: P_i
+    constraint_features[:, 5:] = constraint_features[:, 5:] * standard_deviations[3] + means[3]
+
+    return constraint_features
