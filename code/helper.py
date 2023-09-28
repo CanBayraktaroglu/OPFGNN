@@ -7,15 +7,16 @@ import pandas as pd
 import numpy as np
 import pandapower as pp
 import wandb
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 import simbench as sb
 import os
 import random
 from graphdata import GraphData
 from typing import Tuple, List, Any
 import json
-from ACOPFData import ACOPFData
+from ACOPFData import ACOPFInput, ACOPFOutput
 import pickle
+
 
 def sample_uniform_from_df(load):
     # Create Datasets from sampling reference active power and reactive power demands of loads uniformly
@@ -105,14 +106,14 @@ def create_dataset_from_dcopf_and_acopf(net):
                         points=[[[0, 20, 2], [20, 30, 5]] for _ in range(len(net.ext_grid.name.values))])
 
     try:
-        pp.runpm_dc_opf(net) # Run DCOPP-Julia
+        pp.runpm_dc_opf(net)  # Run DCOPP-Julia
     except pp.OPFNotConverged:
-        #print("DC OPTIMAL POWERFLOW COMPUTATION DID NOT CONVERGE. SKIPPING THIS DATASET.")
+        # print("DC OPTIMAL POWERFLOW COMPUTATION DID NOT CONVERGE. SKIPPING THIS DATASET.")
         return None
 
     df = pd.DataFrame(net.res_bus)  # Store the resulting busses in a dataframe
 
-    df = df.drop(labels=['lam_p', 'lam_q'], axis=1) # Drop columns
+    df = df.drop(labels=['lam_p', 'lam_q'], axis=1)  # Drop columns
 
     for i in range(len(df)):
         df.iloc[i][0] = 1.0  # net.bus.iloc[i][1]  # Set the initial bus voltages
@@ -133,9 +134,9 @@ def create_dataset_from_dcopf_and_acopf(net):
         try:
             pp.runopp(net, init=init)  # Calculate ACOPF with IPFOPT
         except pp.OPFNotConverged:
-            #print("OPTIMAL POWERFLOW COMPUTATION DID NOT CONVERGE FOR START VECTOR CONFIG " + init)
+            # print("OPTIMAL POWERFLOW COMPUTATION DID NOT CONVERGE FOR START VECTOR CONFIG " + init)
             if init == "results":
-                #print("SKIPPING THIS DATASET.")
+                # print("SKIPPING THIS DATASET.")
                 return None
             continue
         break
@@ -146,6 +147,7 @@ def create_dataset_from_dcopf_and_acopf(net):
     df = pd.concat([df, net.res_bus], axis=0)
 
     return df  # Resulting Dataset is 2N x 4 with 0-N x 4 being X and N+1-2N x 4 being Y
+
 
 def create_dataset_from_dcopf(net):
     # Creates Dataset from the combination of initial bus voltages and loads
@@ -243,7 +245,6 @@ def create_dataset_from_dcopf(net):
 
 
 def read_supervised_training_data(grid_name):
-
     # Define the graph using Pandapower
     net = sb.get_simbench_net(grid_name)
 
@@ -348,7 +349,6 @@ def read_supervised_training_data(grid_name):
 
 
 def read_supervised_training_data_edge_attr(grid_name):
-
     # Define the graph using Pandapower
     net = sb.get_simbench_net(grid_name)
 
@@ -379,16 +379,16 @@ def read_supervised_training_data_edge_attr(grid_name):
 
         edge_attr.append([R_i, X_i])
 
-    #edge_attr = torch.tensor(StandardScaler().fit_transform(edge_attr), dtype=torch.float32)
+    # edge_attr = torch.tensor(StandardScaler().fit_transform(edge_attr), dtype=torch.float32)
 
     # Convert edge connections to undirected
     edge_index, edge_attr = to_undirected(edge_index=torch.tensor(edge_index, dtype=torch.int),
-                                             edge_attr=torch.tensor(edge_attr, dtype=torch.float32),
-                                             num_nodes=len(net.bus.index))
+                                          edge_attr=torch.tensor(edge_attr, dtype=torch.float32),
+                                          num_nodes=len(net.bus.index))
 
     # Add self loops to edge connections
     edge_index, edge_attr = torch_geometric.utils.add_self_loops(edge_index=edge_index, edge_attr=edge_attr,
-                                              num_nodes=len(net.bus.index))
+                                                                 num_nodes=len(net.bus.index))
 
     print("Reading all of the .csv files from the directory of " + grid_name + " ...")
 
@@ -460,8 +460,9 @@ def read_multiple_supervised_datasets(grid_names):
     for _ in grid_names:
         train_data, val_data, test_data, edge_index, edge_attr = read_supervised_training_data_edge_attr(_)
         # edge_attr = torch.tensor(StandardScaler().fit_transform(edge_attr), dtype=torch.float32)
-        graphdata_lst.append(GraphData(_,train_data, val_data, test_data, edge_index, edge_attr))
+        graphdata_lst.append(GraphData(_, train_data, val_data, test_data, edge_index, edge_attr))
     return graphdata_lst
+
 
 def normalize(lst):
     _sum_ = sum(lst)
@@ -469,7 +470,6 @@ def normalize(lst):
 
 
 def train_one_epoch(epoch, grid_name, optimizer, training_loader, model, loss_fn, scaler):
-
     train_rmse_loss = 0.0
     train_mae_loss = 0.0
     train_mre_loss = 0.0
@@ -478,7 +478,7 @@ def train_one_epoch(epoch, grid_name, optimizer, training_loader, model, loss_fn
     mae_loss_fn = nn.L1Loss()
 
     # create a criterion to measure the mean relative error (MRE), inputs_targets: List
-    mre_loss_fn = lambda outputs, targets : get_mre_loss(outputs, targets)
+    mre_loss_fn = lambda outputs, targets: get_mre_loss(outputs, targets)
 
     last_idx = 0
 
@@ -509,7 +509,7 @@ def train_one_epoch(epoch, grid_name, optimizer, training_loader, model, loss_fn
 
         # Compute MAE loss
         mae_loss = mae_loss_fn(outputs, targets)
-        #mae_loss.backward()
+        # mae_loss.backward()
 
         # Compute MRE loss
         mre_loss = mre_loss_fn(outputs, targets)
@@ -534,9 +534,9 @@ def train_one_epoch(epoch, grid_name, optimizer, training_loader, model, loss_fn
         """
 
     wandb.log({
-        'grid name' : grid_name,
+        'grid name': grid_name,
         'epoch': epoch,
-        'train_rmse_loss': train_rmse_loss/ last_idx,
+        'train_rmse_loss': train_rmse_loss / last_idx,
         'train_mae_loss': train_mae_loss / last_idx,
         'train_mre_loss': train_mre_loss / last_idx
 
@@ -544,7 +544,6 @@ def train_one_epoch(epoch, grid_name, optimizer, training_loader, model, loss_fn
 
 
 def validate_one_epoch(epoch, grid_name, validation_loader, model, loss_fn, scaler):
-
     val_rmse_loss = 0.0
     val_mae_loss = 0.0
     val_mre_loss = 0.0
@@ -601,19 +600,17 @@ def validate_one_epoch(epoch, grid_name, validation_loader, model, loss_fn, scal
 
 
 def train_validate_one_epoch(epoch, grid_name, optimizer, training_loader, validation_loader, model, loss_fn, scaler):
-
     print("Training the model for epoch " + str(epoch))
     # Train for an epoch
-    #model.train()
+    # model.train()
     train_one_epoch(epoch, grid_name, optimizer, training_loader, model, loss_fn, scaler)
     print("Validating the model on unseen Datasets for epoch " + str(epoch))
     # Validate for an epoch
-    #model.eval()
+    # model.eval()
     validate_one_epoch(epoch, grid_name, validation_loader, model, loss_fn, scaler)
 
 
 def test_one_epoch(test_loader, grid_name, model, loss_fn, scaler):
-
     test_rmse_loss = 0.0
     test_mae_loss = 0.0
     test_mre_loss = 0.0
@@ -675,8 +672,7 @@ def test_one_epoch(test_loader, grid_name, model, loss_fn, scaler):
         'test_mre_loss': mre
     })
 
-    return output,target, rmse, mae, mre
-
+    return output, target, rmse, mae, mre
 
 
 def get_mre_loss(outputs: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
@@ -713,7 +709,6 @@ def divide_chunks(l, n):
 
 
 def train_all_one_epoch(epoch, optimizer, training_loader_lst, model, loss_fn):
-
     train_rmse_loss = 0.0
     train_mae_loss = 0.0
     train_mre_loss = 0.0
@@ -722,10 +717,9 @@ def train_all_one_epoch(epoch, optimizer, training_loader_lst, model, loss_fn):
     mae_loss_fn = nn.L1Loss()
 
     # create a criterion to measure the mean relative error (MRE), inputs_targets: List
-    mre_loss_fn = lambda outputs, targets : get_mre_loss(outputs, targets)
+    mre_loss_fn = lambda outputs, targets: get_mre_loss(outputs, targets)
 
     for i, training_loader in enumerate(training_loader_lst):
-
 
         # Here, we use enumerate(training_loader) instead of
         # iter(training_loader) so that we can track the batch
@@ -756,7 +750,7 @@ def train_all_one_epoch(epoch, optimizer, training_loader_lst, model, loss_fn):
 
             # Compute MAE loss
             mae_loss = mae_loss_fn(outputs, targets)
-            #mae_loss.backward()
+            # mae_loss.backward()
 
             # Compute MRE loss
             mre_loss = mre_loss_fn(outputs, targets)
@@ -772,7 +766,7 @@ def train_all_one_epoch(epoch, optimizer, training_loader_lst, model, loss_fn):
     num_samples = len(training_loader_lst) * len(training_loader_lst[0].dataset)
     wandb.log({
         'epoch': epoch,
-        'train_rmse_loss': train_rmse_loss/ num_samples,
+        'train_rmse_loss': train_rmse_loss / num_samples,
         'train_mae_loss': train_mae_loss / num_samples,
         'train_mre_loss': train_mre_loss / num_samples
 
@@ -780,7 +774,6 @@ def train_all_one_epoch(epoch, optimizer, training_loader_lst, model, loss_fn):
 
 
 def validate_all_one_epoch(epoch, validation_loader_lst, model, loss_fn):
-
     val_rmse_loss = 0.0
     val_mae_loss = 0.0
     val_mre_loss = 0.0
@@ -797,7 +790,6 @@ def validate_all_one_epoch(epoch, validation_loader_lst, model, loss_fn):
         # iter(validation_loader) so that we can track the batch
         # index and do some intra-epoch reporting
         for j, data in enumerate(validation_loader):
-
             scaler = StandardScaler()
             inputs, targets = data.x, data.y
 
@@ -835,8 +827,8 @@ def validate_all_one_epoch(epoch, validation_loader_lst, model, loss_fn):
 
     })
 
-def test_all_one_epoch(test_loader_lst, model, loss_fn):
 
+def test_all_one_epoch(test_loader_lst, model, loss_fn):
     test_rmse_loss = 0.0
     test_mae_loss = 0.0
     test_mre_loss = 0.0
@@ -882,7 +874,6 @@ def test_all_one_epoch(test_loader_lst, model, loss_fn):
             test_mae_loss += mae_loss.item()
             test_mre_loss += mre_loss.item()
 
-
             if j + 1 == len(test_loader.dataset):
                 output = scaler.inverse_transform(outputs.detach().numpy())
                 target = scaler.inverse_transform(targets.detach().numpy())
@@ -925,7 +916,7 @@ def extract_node_types_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
         bus_indices.remove(slack_bus_dict["bus"][0])
     """
     if net.ext_grid.iloc[0].bus is not None:
-        ext_grid_bus =  net.ext_grid.iloc[0].bus  #pp.get_connected_buses(net, net.ext_grid.iloc[0].bus).pop()
+        ext_grid_bus = net.ext_grid.iloc[0].bus  # pp.get_connected_buses(net, net.ext_grid.iloc[0].bus).pop()
         node_type_bus_idx_dict["SB"].append(ext_grid_bus)
         # Remove the slack bus node idx from the list
         bus_indices.remove(ext_grid_bus)
@@ -992,7 +983,8 @@ def extract_node_types_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
                 node_type_bus_idx_dict["PV"].append(idx_given)
         """
 
-        if gen_count or sum(net.load.loc[net.load.bus == idx_given].p_mw.values) < sum(net.sgen.loc[net.sgen.bus == idx_given].p_mw.values):
+        if gen_count or sum(net.load.loc[net.load.bus == idx_given].p_mw.values) < sum(
+                net.sgen.loc[net.sgen.bus == idx_given].p_mw.values):
             node_type_bus_idx_dict["PV"].append(idx_given)
         elif load_count and sum(net.load.loc[net.load.bus == idx_given].p_mw.values) != 0:
             node_type_bus_idx_dict["PQ"].append(idx_given)
@@ -1001,7 +993,8 @@ def extract_node_types_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
 
     return idx_mapper, node_type_bus_idx_dict
 
-def extract_edge_features_as_dict(net: pp.pandapowerNet, suppress_info:bool = True) -> Tuple[dict, dict]:
+
+def extract_edge_features_as_dict(net: pp.pandapowerNet, suppress_info: bool = True) -> Tuple[dict, dict]:
     """
     Bus Types: SB, PV, PQ, NB ( 4 Classes in total)
     Edge Types: undirected Edges (9 edge classes in total)
@@ -1016,7 +1009,6 @@ def extract_edge_features_as_dict(net: pp.pandapowerNet, suppress_info:bool = Tr
         HeteroData
 
     """
-
 
     # Replace all ext_grids but the first one with generators and set the generators to slack= false
     ext_grids = [i for i in range(1, len(net.ext_grid.name.values))]
@@ -1033,7 +1025,6 @@ def extract_edge_features_as_dict(net: pp.pandapowerNet, suppress_info:bool = Tr
         for bus_idx, map_idx in zip(node_types_idx_dict[node_type], range(length)):
             real_idx = idx_mapper[bus_idx]
             node_type_idx_mapper[real_idx] = map_idx
-
 
     # Extract edge types
     edge_types_idx_dict = dict()
@@ -1055,7 +1046,6 @@ def extract_edge_features_as_dict(net: pp.pandapowerNet, suppress_info:bool = Tr
     edge_types_idx_dict["PV-PV"] = [[], []]
     edge_types_idx_dict["PQ-PQ"] = [[], []]
     edge_types_idx_dict["NB-NB"] = [[], []]
-
 
     # Store Edge Attributes
     edge_types_attr_dict = dict()
@@ -1081,7 +1071,9 @@ def extract_edge_features_as_dict(net: pp.pandapowerNet, suppress_info:bool = Tr
     if not suppress_info:
         print("Extracting Edge Index and Edge Attributes..")
 
-    for from_bus, to_bus, r_ohm_per_km, x_ohm_per_km, length_km in zip(net.line.from_bus, net.line.to_bus, net.line.r_ohm_per_km, net.line.x_ohm_per_km, net.line.length_km):
+    for from_bus, to_bus, r_ohm_per_km, x_ohm_per_km, length_km in zip(net.line.from_bus, net.line.to_bus,
+                                                                       net.line.r_ohm_per_km, net.line.x_ohm_per_km,
+                                                                       net.line.length_km):
 
         # Calculate R_i and X_i
         R_i = length_km * r_ohm_per_km
@@ -1100,8 +1092,8 @@ def extract_edge_features_as_dict(net: pp.pandapowerNet, suppress_info:bool = Tr
         from_bus_edge_idx = node_type_idx_mapper[idx_mapper[from_bus]]
         to_bus_edge_idx = node_type_idx_mapper[idx_mapper[to_bus]]
 
-        #from_bus_edge_idx = idx_mapper[from_bus]
-        #to_bus_edge_idx = idx_mapper[to_bus]
+        # from_bus_edge_idx = idx_mapper[from_bus]
+        # to_bus_edge_idx = idx_mapper[to_bus]
 
         edge_types_idx_dict[edge_type][0].append(from_bus_edge_idx)
         edge_types_idx_dict[edge_type][1].append(to_bus_edge_idx)
@@ -1116,7 +1108,7 @@ def extract_edge_features_as_dict(net: pp.pandapowerNet, suppress_info:bool = Tr
             # Add Edge Attributes to corresponding Edge Types
             edge_types_attr_dict[edge_type].append([R_i, X_i])
 
-    #print("Adding Self Loops and Converting Edges to Undirected..")
+    # print("Adding Self Loops and Converting Edges to Undirected..")
 
     for key in edge_types_idx_dict:
         # Convert edge connections to undirected
@@ -1126,7 +1118,7 @@ def extract_edge_features_as_dict(net: pp.pandapowerNet, suppress_info:bool = Tr
         #                                       num_nodes=n)
 
         # Add self loops to edge connections
-        #edge_index, edge_attr = add_self_loops(edge_index=edge_index, edge_attr=edge_attr, fill_val=1.)
+        # edge_index, edge_attr = add_self_loops(edge_index=edge_index, edge_attr=edge_attr, fill_val=1.)
 
         unique_edge_pairs = set()
         edge_index = edge_types_idx_dict[key]
@@ -1154,8 +1146,8 @@ def extract_edge_features_as_dict(net: pp.pandapowerNet, suppress_info:bool = Tr
 
     for bus_idx in ext_grid_connected_busses:
         to_bus = get_node_type(bus_idx, node_types_idx_dict)
-        edge = "SB-"+to_bus
-        reverse_edge = to_bus+"-SB"
+        edge = "SB-" + to_bus
+        reverse_edge = to_bus + "-SB"
 
         ext_grid_trafos = net.trafo.loc[(net.trafo.hv_bus == ext_grid) & (net.trafo.lv_bus == bus_idx)]
 
@@ -1172,12 +1164,11 @@ def extract_edge_features_as_dict(net: pp.pandapowerNet, suppress_info:bool = Tr
 
         edge_types_idx_dict[edge][0].append(0)
         edge_types_idx_dict[edge][1].append(node_type_idx_mapper[idx_mapper[bus_idx]])
-        edge_types_attr_dict[edge].append([r,x])
+        edge_types_attr_dict[edge].append([r, x])
 
         edge_types_idx_dict[reverse_edge][0].append(node_type_idx_mapper[idx_mapper[bus_idx]])
         edge_types_idx_dict[reverse_edge][1].append(0)
         edge_types_attr_dict[reverse_edge].append([r, x])
-
 
     # Add generator bus features
     gen_busses_idx = list(net.gen.bus.values)
@@ -1211,14 +1202,15 @@ def extract_edge_features_as_dict(net: pp.pandapowerNet, suppress_info:bool = Tr
 
     for key in edge_types_idx_dict:
         edge_types_idx_dict[key] = torch.tensor(edge_types_idx_dict[key], dtype=torch.int64)
-        edge_types_attr_dict[key] = torch.tensor(edge_types_attr_dict[key] , dtype=torch.float32)
-        #if key[0] == key[-1]:
-            #edge_types_idx_dict[key] = to_undirected(edge_types_idx_dict[key])
+        edge_types_attr_dict[key] = torch.tensor(edge_types_attr_dict[key], dtype=torch.float32)
+        # if key[0] == key[-1]:
+        # edge_types_idx_dict[key] = to_undirected(edge_types_idx_dict[key])
 
     if not suppress_info:
         print("Hetero Data Created.")
 
     return edge_types_idx_dict, edge_types_attr_dict
+
 
 def get_node_type(bus_idx: int, node_types_idx_dict: dict) -> Any:
     for key in node_types_idx_dict:
@@ -1228,7 +1220,8 @@ def get_node_type(bus_idx: int, node_types_idx_dict: dict) -> Any:
 
     return None
 
-def add_self_loops(edge_index: torch.Tensor, edge_attr: torch.Tensor, fill_val = 1.) -> Tuple[torch.Tensor, torch.Tensor]:
+
+def add_self_loops(edge_index: torch.Tensor, edge_attr: torch.Tensor, fill_val=1.) -> Tuple[torch.Tensor, torch.Tensor]:
     """
     Must be applied after converting the edges to "undirected"
     Args:
@@ -1243,10 +1236,9 @@ def add_self_loops(edge_index: torch.Tensor, edge_attr: torch.Tensor, fill_val =
     idx_lst = edge_index.tolist()
     attr_lst = edge_attr.tolist()
 
-    n = int(len(idx_lst[0])/2)
+    n = int(len(idx_lst[0]) / 2)
     s = set(idx_lst[0][:n])
     for i in s:
-
         # Add Self-Loops to Edge Index
         idx_lst[0].append(i)
         idx_lst[1].append(i)
@@ -1254,10 +1246,10 @@ def add_self_loops(edge_index: torch.Tensor, edge_attr: torch.Tensor, fill_val =
         # Add the additional edge attributes
         attr_lst.append([fill_val, fill_val])
 
-
     return torch.tensor(idx_lst, dtype=torch.int), torch.tensor(attr_lst, dtype=torch.float32)
 
-def process_network(grid_name: str, suppress_info:bool = True):
+
+def process_network(grid_name: str, suppress_info: bool = True):
     if not suppress_info:
         print(f"Loading Network {grid_name}..")
     net = sb.get_simbench_net(grid_name)  # '1-HV-mixed--0-no_sw'
@@ -1286,7 +1278,6 @@ def process_network(grid_name: str, suppress_info:bool = True):
     # Replace all ext_grids but the first one with generators and set the generators to slack= false
     ext_grids = [i for i in range(1, len(net.ext_grid.name.values))]
     pp.replace_ext_grid_by_gen(net, ext_grids=ext_grids, slack=False)
-
 
     # NETWORK CONSTRAINTS
 
@@ -1328,6 +1319,7 @@ def process_network(grid_name: str, suppress_info:bool = True):
     if not suppress_info:
         print("Network Processing Finished.")
     return net
+
 
 def to_json(grid_name: str):
     """
@@ -1418,14 +1410,15 @@ def to_json(grid_name: str):
     x = np.array(x).reshape(x_rows, x_cols)
 
     for i in range(num_busses):
-        #x_dict["busses"][str(i)] = dict()
+        # x_dict["busses"][str(i)] = dict()
         x_dict["busses"][str(i)]["Node Features"] = list(x[i])
 
     json_object = json.dumps(x_dict, indent=1)
     with open("data.json", "w") as outfile:
         outfile.write(json_object)
 
-def extract_edge_features(net: pp.pandapowerNet, suppress_info:bool = True) -> Tuple[dict, dict]:
+
+def extract_edge_features(net: pp.pandapowerNet, suppress_info: bool = True) -> Tuple[dict, dict]:
     """
     Bus Types: SB, PV, PQ, NB ( 4 Classes in total)
     Edge Types: undirected Edges (9 edge classes in total)
@@ -1440,7 +1433,6 @@ def extract_edge_features(net: pp.pandapowerNet, suppress_info:bool = True) -> T
         HeteroData
 
     """
-
 
     # Replace all ext_grids but the first one with generators and set the generators to slack= false
     ext_grids = [i for i in range(1, len(net.ext_grid.name.values))]
@@ -1472,7 +1464,6 @@ def extract_edge_features(net: pp.pandapowerNet, suppress_info:bool = True) -> T
     edge_types_idx_dict["PQ-PQ"] = [[], []]
     edge_types_idx_dict["NB-NB"] = [[], []]
 
-
     # Store Edge Attributes
     edge_types_attr_dict = dict()
 
@@ -1497,7 +1488,9 @@ def extract_edge_features(net: pp.pandapowerNet, suppress_info:bool = True) -> T
     if not suppress_info:
         print("Extracting Edge Index and Edge Attributes..")
 
-    for from_bus, to_bus, r_ohm_per_km, x_ohm_per_km, length_km in zip(net.line.from_bus, net.line.to_bus, net.line.r_ohm_per_km, net.line.x_ohm_per_km, net.line.length_km):
+    for from_bus, to_bus, r_ohm_per_km, x_ohm_per_km, length_km in zip(net.line.from_bus, net.line.to_bus,
+                                                                       net.line.r_ohm_per_km, net.line.x_ohm_per_km,
+                                                                       net.line.length_km):
 
         # Calculate R_i and X_i
         R_i = length_km * r_ohm_per_km
@@ -1516,8 +1509,8 @@ def extract_edge_features(net: pp.pandapowerNet, suppress_info:bool = True) -> T
         from_bus_edge_idx = idx_mapper[from_bus]
         to_bus_edge_idx = idx_mapper[to_bus]
 
-        #from_bus_edge_idx = idx_mapper[from_bus]
-        #to_bus_edge_idx = idx_mapper[to_bus]
+        # from_bus_edge_idx = idx_mapper[from_bus]
+        # to_bus_edge_idx = idx_mapper[to_bus]
 
         edge_types_idx_dict[edge_type][0].append(from_bus_edge_idx)
         edge_types_idx_dict[edge_type][1].append(to_bus_edge_idx)
@@ -1543,7 +1536,7 @@ def extract_edge_features(net: pp.pandapowerNet, suppress_info:bool = True) -> T
         #                                       num_nodes=n)
 
         # Add self loops to edge connections
-        #edge_index, edge_attr = add_self_loops(edge_index=edge_index, edge_attr=edge_attr, fill_val=1.)
+        # edge_index, edge_attr = add_self_loops(edge_index=edge_index, edge_attr=edge_attr, fill_val=1.)
 
         unique_edge_pairs = set()
         edge_index = edge_types_idx_dict[key]
@@ -1560,17 +1553,18 @@ def extract_edge_features(net: pp.pandapowerNet, suppress_info:bool = True) -> T
                 continue
 
             unique_edge_pairs.add((from_edge, to_edge))
-            i+=1
+            i += 1
 
-        edge_types_idx_dict[key] = torch.tensor(edge_index, dtype=torch.int64)#edge_index
+        edge_types_idx_dict[key] = torch.tensor(edge_index, dtype=torch.int64)  # edge_index
         edge_types_attr_dict[key] = torch.tensor(edge_attr, dtype=torch.float32)
 
     if not suppress_info:
         print("Hetero Data Created.")
         for key in edge_types_idx_dict:
-            print(f"{key}: {edge_types_idx_dict[key]}" )
+            print(f"{key}: {edge_types_idx_dict[key]}")
 
     return edge_types_idx_dict, edge_types_attr_dict
+
 
 def read_unsupervised_dataset(grid_name: str) -> Tuple[list, list, list]:
     """
@@ -1649,11 +1643,10 @@ def read_unsupervised_dataset(grid_name: str) -> Tuple[list, list, list]:
         # Store the Edge Attributes and Index for each edge type
         for edge_type in edge_types_idx_dict:
             str_lst = edge_type.split('-')
-            #new_edge_type = str_lst[0], "connects", str_lst[1]
+            # new_edge_type = str_lst[0], "connects", str_lst[1]
             if edge_types_idx_dict[edge_type].numel() != 0:
                 hetero_data[str_lst[0], "isConnected", str_lst[1]].edge_index = edge_types_idx_dict[edge_type]
                 hetero_data[str_lst[0], "isConnected", str_lst[1]].edge_attr = edge_types_attr_dict[edge_type]
-
 
         train_data.append(hetero_data)
 
@@ -1726,15 +1719,16 @@ def read_unsupervised_dataset(grid_name: str) -> Tuple[list, list, list]:
             str_lst = edge_type.split('-')
             # new_edge_type = str_lst[0], "connects", str_lst[1]
             if edge_types_idx_dict[edge_type].numel() != 0:
-                hetero_data[str_lst[0],"isConnected",str_lst[1]].edge_index = edge_types_idx_dict[edge_type]
-                hetero_data[str_lst[0],"isConnected",str_lst[1]].edge_attr = edge_types_attr_dict[edge_type]
+                hetero_data[str_lst[0], "isConnected", str_lst[1]].edge_index = edge_types_idx_dict[edge_type]
+                hetero_data[str_lst[0], "isConnected", str_lst[1]].edge_attr = edge_types_attr_dict[edge_type]
 
         test_data.append(hetero_data)
 
     print("Processing complete.")
     return train_data, val_data, test_data
 
-def generate_unsupervised_input(grid_name:str, suppress_info:bool = True) ->Tuple[list, list, list]:
+
+def generate_unsupervised_input(grid_name: str, suppress_info: bool = True) -> Any:
     """
         Processes the PandaPower Network and generates inputs,returns HeteroData
         Args:
@@ -1748,6 +1742,7 @@ def generate_unsupervised_input(grid_name:str, suppress_info:bool = True) ->Tupl
             HeteroData
 
         """
+
     # Process the network via Grid Name
     net = process_network(grid_name)
 
@@ -1755,6 +1750,7 @@ def generate_unsupervised_input(grid_name:str, suppress_info:bool = True) ->Tupl
         print(f"Extracting Node Types for the grid {grid_name}..")
 
     idx_mapper, node_types_idx_dict = extract_node_types_as_dict(net)
+    index_mappers = (idx_mapper, node_types_idx_dict)
 
     node_type_idx_mapper = dict()
     for node_type in node_types_idx_dict:
@@ -1778,9 +1774,8 @@ def generate_unsupervised_input(grid_name:str, suppress_info:bool = True) ->Tupl
         node_indices = node_types_idx_dict[node_type]
 
         for bus_idx in node_indices:
-            node_features = [] # 1 x 11 vector
+            node_features = []  # 1 x 11 vector
             node_idx = node_type_idx_mapper[idx_mapper[bus_idx]]
-
 
             # Core Features
             V_i = net.bus.loc[net.bus.index == bus_idx].vn_kv[bus_idx]
@@ -1795,22 +1790,20 @@ def generate_unsupervised_input(grid_name:str, suppress_info:bool = True) ->Tupl
             max_V_i = 1.1 * V_i
 
             # Nominal Apparent Power sn_mva
-            sgen_max_sn= sum(net.sgen.loc[net.sgen.bus == bus_idx].sn_mva.values)
+            sgen_max_sn = sum(net.sgen.loc[net.sgen.bus == bus_idx].sn_mva.values)
             load_max_sn = sum(net.load.loc[net.load.bus == bus_idx].sn_mva.values)
 
             sn_mva = abs(sgen_max_sn - load_max_sn)
 
             # Min Active Power min_p_i
-            sgen_min_p = sum(net.sgen.loc[net.sgen.bus == bus_idx].p_mw.values) if node_type != "NB" else 0.0
-            load_min_p = sum(net.load.loc[net.load.bus == bus_idx].p_mw.values) if node_type != "NB" else 0.0
-            min_p_i = load_min_p - sgen_min_p
+            sgen_min_p = sum(net.sgen.loc[net.sgen.bus == bus_idx].p_mw.values)
+            load_min_p = sum(net.load.loc[net.load.bus == bus_idx].p_mw.values)
+            min_p_i = load_min_p - sgen_min_p if node_type != "NB" else 0.0
 
             # Max Active Power max_p_i
-            #sgen_max_p = sum(net.sgen.loc[net.sgen.bus == bus_idx].p_mw.values) if node_type != "NB" else 0.0
-            #load_max_p = sum(net.load.loc[net.load.bus == bus_idx].p_mw.values) if node_type != "NB" else 0.0
-            max_p_i = load_min_p if node_type != "NB" else 0.0 # enforcing self-sustenance
-
-
+            # sgen_max_p = sum(net.sgen.loc[net.sgen.bus == bus_idx].p_mw.values) if node_type != "NB" else 0.0
+            # load_max_p = sum(net.load.loc[net.load.bus == bus_idx].p_mw.values) if node_type != "NB" else 0.0
+            max_p_i = load_min_p if node_type != "NB" else 0.0  # enforcing self-sustenance
 
             # Min Reactive Power min_q_i
             sgen_min_q = sum(net.sgen.loc[net.sgen.bus == bus_idx].q_mvar.values) if node_type != "NB" else 0.0
@@ -1820,7 +1813,7 @@ def generate_unsupervised_input(grid_name:str, suppress_info:bool = True) ->Tupl
             # Max Reactive Power max_q_i
             # sgen_max_p = sum(net.sgen.loc[net.sgen.bus == bus_idx].p_mw.values) if node_type != "NB" else 0.0
             # load_max_p = sum(net.load.loc[net.load.bus == bus_idx].p_mw.values) if node_type != "NB" else 0.0
-            max_q_i = load_min_q if node_type != "NB" else 0.0 # enforcing self-sustenance
+            max_q_i = load_min_q if node_type != "NB" else 0.0  # enforcing self-sustenance
 
             if bus_idx == ext_grid_bus_idx:
                 ext_grid_sn_mva = net.trafo.loc[net.trafo.hv_bus == ext_grid_bus_idx].sn_mva.values[0]
@@ -1835,7 +1828,6 @@ def generate_unsupervised_input(grid_name:str, suppress_info:bool = True) ->Tupl
                 max_p_i = sn_mva
                 min_q_i = -sn_mva
                 max_q_i = sn_mva
-
 
             # Flat initialization of P_i based on constraints
             P_i = (max_p_i + min_p_i) * 0.5 if node_type != "NB" else 0.0
@@ -1868,7 +1860,8 @@ def generate_unsupervised_input(grid_name:str, suppress_info:bool = True) ->Tupl
 
     if not suppress_info:
         print("Hetero Data Input has been generated.")
-    return sum(net.load.p_mw**2), sum(net.load.q_mvar**2), data
+    return index_mappers, net, data
+
 
 def extract_unsupervised_inputs(data: HeteroData):
     x_dict = dict()
@@ -1882,12 +1875,12 @@ def extract_unsupervised_inputs(data: HeteroData):
     for node_type in data.node_types:
         x: torch.Tensor
         c: torch.Tensor
-        scaler = StandardScaler()
+        scaler = MinMaxScaler()
         if len(data[node_type]) != 0:
-            x = scaler.fit_transform(data[node_type].x[:, :4])
-            x = torch.tensor(x, dtype=torch.float32, requires_grad=True)
-            c = custom_transform(scaler, data[node_type].x[:, 4:].detach().numpy())
+            c = scaler.fit_transform(data[node_type].x[:, 4:].detach().numpy())
             c = torch.tensor(c, dtype=torch.float32, requires_grad=False)
+            x = custom_minmax_transform(scaler, data[node_type].x[:, :4].detach().numpy())
+            x = torch.tensor(x, dtype=torch.float32, requires_grad=True)
             x_dict[node_type] = x
             constraint_dict[node_type] = c
 
@@ -1915,13 +1908,14 @@ def extract_unsupervised_inputs(data: HeteroData):
 
     return x_dict, constraint_dict, edge_idx_dict, edge_attr_dict, bus_idx_neighbors_dict, scalers_dict
 
+
 def save_unsupervised_inputs(grid_name: str, num_samples: int):
     path = "../code/data/Heterogeneous/" + grid_name
-    inputs = [] # List of ACOPFData instances
+    inputs = []  # List of ACOPFData instances
     for i in range(num_samples):
         print(f"Epoch: {i}")
-        network_load_P, network_load_Q, data = generate_unsupervised_input(grid_name)
-        _input_ = ACOPFData(data, network_load_P, network_load_Q)
+        index_mappers, network, data = generate_unsupervised_input(grid_name)
+        _input_ = ACOPFInput(data, network, index_mappers)
         inputs.append(_input_)
 
     print("Data Prep finished.")
@@ -1930,7 +1924,8 @@ def save_unsupervised_inputs(grid_name: str, num_samples: int):
     with open(os.path.join(path, 'inputs.pkl'), 'wb') as f:
         pickle.dump(inputs, f)
 
-    print("Data Saved.")
+    print("Inputs Saved.")
+
 
 def load_unsupervised_inputs(grid_name: str):
     path = "../code/data/Heterogeneous/" + grid_name
@@ -1939,12 +1934,33 @@ def load_unsupervised_inputs(grid_name: str):
 
     return inputs
 
-def hetero_obj_fn(out_dict, targets):
 
+def save_unsupervised_output(acopfoutput: ACOPFOutput, grid_name: str):
+    path = "../code/data/Heterogeneous/" + grid_name
+    with open(os.path.join(path, 'output.pkl'), 'wb') as f:
+        pickle.dump(acopfoutput, f)
+
+    print("Output Saved.")
+
+
+def load_unsupervised_output(grid_name: str):
+    path = "../code/data/Heterogeneous/" + grid_name
+    with open(os.path.join(path, 'output.pkl'), 'rb') as f:
+        output = pickle.load(f)
+
+    return output
+
+
+def self_supervised_hetero_obj_fn(out_dict):
     # Objective Function on basis of ACOPF Equations for P and Q
 
     P_supplied = 0.0
     Q_supplied = 0.0
+
+    # P_supplied = [P_0, P_1...P_N-1]
+    # Q_supplied = [Q_0, Q_1...Q_N-1]
+
+    # P_demanded = [P_d_0,P_d_1..P_d_N-1]
 
     for from_bus in out_dict:
         for i in range(len(out_dict[from_bus])):
@@ -1954,38 +1970,37 @@ def hetero_obj_fn(out_dict, targets):
             Q_supplied += Q_i.item()
 
     outputs = torch.tensor([P_supplied, Q_supplied], dtype=torch.float32, requires_grad=True)
-    #print(P_supplied, P_demanded, Q_supplied, Q_demanded)
-    #P_loss = torch.square(torch.tensor(P_demanded) - P_supplied)
-    #Q_loss = torch.square(torch.tensor(Q_demanded) - Q_supplied)
 
-    #mse_loss = torch.nn.functional.mse_loss(outputs, targets)
-
-    #Loss = torch.log(torch.tensor(1) + mse_loss)
     Loss = torch.nn.MSELoss()
+    targets = torch.zeros_like(outputs, dtype=torch.float32)
     Loss = Loss(outputs, targets)
+
     return Loss
 
-def train_ACOPF(model, optimizer, inputs: List[ACOPFData], num_epochs:int):
+
+def train_ACOPF(model, optimizer, inputs: List[ACOPFInput], num_epochs: int, return_outputs: bool = True):
     train_loss = 0.0
     torch.autograd.set_detect_anomaly(True)
+    output = None
 
     for i in range(num_epochs):
         print(f"Epoch: {i}")
         random.shuffle(inputs)
+
         for j, ACOPFdata in enumerate(inputs):
 
-            #scaler = StandardScaler()
+            # scaler = StandardScaler()
 
             x_dict = ACOPFdata.x_dict
             constraint_dict = ACOPFdata.constraint_dict
             edge_idx_dict = ACOPFdata.edge_idx_dict
             edge_attr_dict = ACOPFdata.edge_attr_dict
             bus_idx_neighbors_dict = ACOPFdata.bus_idx_neighbors_dict
-            network_loads = ACOPFdata.network_loads
-            scalers_dict = ACOPFdata.scalers_dict
+            net = ACOPFdata.net
+            scaler_dict = ACOPFdata.scaler_dict
 
             # Define Scaler and standardize inputs and targets
-            #x_dict = torch.tensor(scaler.fit_transform(x_dict), dtype=torch.float32)
+            # x_dict = torch.tensor(scaler.fit_transform(x_dict), dtype=torch.float32)
 
             # Zero your gradients for every batch!
             optimizer.zero_grad()
@@ -1993,23 +2008,25 @@ def train_ACOPF(model, optimizer, inputs: List[ACOPFData], num_epochs:int):
             # Make predictions for this batch
             out_dict = model(x_dict, constraint_dict, edge_idx_dict, edge_attr_dict, bus_idx_neighbors_dict)
 
-            #scaler.inverse_transform(out_dict)
-
             # Compute the loss and its gradients for RMSE loss
-            targets = torch.tensor(scalers_dict["SB"].transform(targets), dtype=torch.float32, requires_grad=False)
-            loss = hetero_obj_fn(out_dict, targets)
+            loss = self_supervised_hetero_obj_fn(out_dict)
             loss.backward()
 
             # Adjust learning weights
             optimizer.step()
+
+            # Store the outputs at the last iteration and last input
+            if i == num_epochs - 1 and j == len(inputs) - 1:
+                output = ACOPFOutput(out_dict, scaler_dict, net)
 
             # Gather data and report
             train_loss += loss.item()
 
             print(f"Step: {j} Loss: {loss.item()}")
 
-        print(f"Mean Epoch Loss: {train_loss/len(inputs)}")
+        print(f"Mean Epoch Loss: {train_loss / len(inputs)}")
         train_loss = 0.0
+
     """
     num_samples = len(inputs)
     wandb.log({
@@ -2018,19 +2035,22 @@ def train_ACOPF(model, optimizer, inputs: List[ACOPFData], num_epochs:int):
 
     })
     """
-def custom_transform(scaler: StandardScaler, constraint_features):
+    return output
+
+
+def custom_standard_transform(scaler, constraint_features):
     # Core feature columns: V_i, delta_iSB, P_i, Q_i
-    means = scaler.mean_ # mean
-    standard_deviations = scaler.scale_ # standard deviation
+    means = scaler.mean_  # mean
+    standard_deviations = scaler.scale_  # standard deviation
 
     # Transforming min and max voltage magnitude constraints
     # according to the fitted values on the core feature: V_i
-    constraint_features[:, :2] = (constraint_features[:, :2] - means[0])/standard_deviations[0]
+    constraint_features[:, :2] = (constraint_features[:, :2] - means[0]) / standard_deviations[0]
 
     # Transforming max apparent Power S constraints
     # according to the fitted values on the average of core feature: P_i and Q_i
-    mean = (means[2] + means[3])/2
-    standard_deviation = (standard_deviations[2] + standard_deviations[3])/2
+    mean = (means[2] + means[3]) / 2
+    standard_deviation = (standard_deviations[2] + standard_deviations[3]) / 2
     constraint_features[:, 2] = (constraint_features[:, 2] - mean) / standard_deviation
 
     # Transforming min and max active power constraints
@@ -2043,14 +2063,15 @@ def custom_transform(scaler: StandardScaler, constraint_features):
 
     return constraint_features
 
-def custom_inverse_transform(scaler: StandardScaler, constraint_features):
+
+def custom_standard_inverse_transform(scaler: StandardScaler, constraint_features):
     # Core feature columns: V_i, delta_iSB, P_i, Q_i
     means = scaler.mean_  # mean
     standard_deviations = scaler.scale_  # standard deviation
 
     # Inverse Transforming min and max voltage magnitude constraints
     # according to the fitted values on the core feature: V_i
-    constraint_features[:, :2] = constraint_features[:, :2] *  standard_deviations[0] + means[0]
+    constraint_features[:, :2] = constraint_features[:, :2] * standard_deviations[0] + means[0]
 
     # Inverse Transforming max apparent Power S constraints
     # according to the fitted values on the average of core feature: P_i and Q_i
@@ -2067,3 +2088,61 @@ def custom_inverse_transform(scaler: StandardScaler, constraint_features):
     constraint_features[:, 5:] = constraint_features[:, 5:] * standard_deviations[3] + means[3]
 
     return constraint_features
+
+
+def custom_minmax_transform(scaler: MinMaxScaler, core_features):
+    # Constraint feature columns: min_V_i, max_V_i, max_S, min_P_i, max_P_i, min_Q_i, max_Q_i
+    max_values = scaler.data_max_
+    min_values = scaler.data_min_
+
+    # Transform the Voltage Magnitude Column V_i of the Core Features based on min_V_i, max_V_i
+    _min_ = min(min_values[0], min_values[1])
+    _max_ = max(max_values[0], max_values[1])
+    core_features[:, 0] = (core_features[:, 0] - _min_) / (_max_ - _min_)
+
+    # Transform the Active Power Column P_i of the Core Features based on min_P_i, max_P_i
+    _min_ = min(min_values[3], min_values[4])
+    _max_ = max(max_values[3], max_values[4])
+    core_features[:, 2] = (core_features[:, 2] - _min_) / (_max_ - _min_)
+
+    if np.isnan(core_features[:, 2]).any():
+        core_features[:, 2] = np.zeros_like(core_features[:, 2])
+
+    # Transform the Reactive Power Column Q_i of the Core Features based on min_Q_i, max_Q_i
+    _min_ = min(min_values[5], min_values[6])
+    _max_ = max(max_values[5], max_values[6])
+    core_features[:, 3] = (core_features[:, 3] - _min_) / (_max_ - _min_)
+
+    if np.isnan(core_features[:, 3]).any():
+        core_features[:, 3] = np.zeros_like(core_features[:, 3])
+
+    return core_features
+
+
+def custom_minmax_inverse_transform(scaler: MinMaxScaler, core_features):
+    # Constraint feature columns: min_V_i, max_V_i, max_S, min_P_i, max_P_i, min_Q_i, max_Q_i
+    max_values = scaler.data_max_
+    min_values = scaler.data_min_
+
+    # Inverse Transform the Voltage Magnitude Column V_i of the Core Features based on min_V_i, max_V_i
+    _min_ = min(min_values[0], min_values[1])
+    _max_ = max(max_values[0], max_values[1])
+    core_features[:, 0] = core_features[:, 0] * (_max_ - _min_) + _min_
+
+    # Inverse Transform the Active Power Column P_i of the Core Features based on min_P_i, max_P_i
+    _min_ = min(min_values[3], min_values[4])
+    _max_ = max(max_values[3], max_values[4])
+    core_features[:, 2] = core_features[:, 2] * (_max_ - _min_) + _min_
+
+    if np.isnan(core_features[:, 2]).any():
+        core_features[:, 2] = np.zeros_like(core_features[:, 2])
+
+    # Inverse Transform the Reactive Power Column Q_i of the Core Features based on min_Q_i, max_Q_i
+    _min_ = min(min_values[5], min_values[6])
+    _max_ = max(max_values[5], max_values[6])
+    core_features[:, 3] = core_features[:, 3] * (_max_ - _min_) + _min_
+
+    if np.isnan(core_features[:, 3]).any():
+        core_features[:, 3] = np.zeros_like(core_features[:, 3])
+
+    return core_features

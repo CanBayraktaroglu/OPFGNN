@@ -109,7 +109,7 @@ class ACOPFGNN(torch.nn.Module):
                     m.bias.data.fill_(0.01)
         """
 
-    def forward(self, x_dict, constraint_dict, edge_idx_dict, edge_attr_dict, bus_idx_neighbors_dict):
+    def forward(self, x_dict, constraint_dict, edge_idx_dict, edge_attr_dict, bus_idx_neighbors_dict, check_nans:bool = False):
         out_dict = x_dict.copy()
         # All calls of the forward function must support edge_attr & edge_idx for this model
         for conv in self.convs.children():
@@ -123,6 +123,7 @@ class ACOPFGNN(torch.nn.Module):
         for node_type in out_dict:
             out_dict[node_type] = self.lin(out_dict[node_type])
             #print(f"Nan Value present in out_dict after linear operations?: {torch.isnan(out_dict).any()}")
+
         # ACOPF Forward Pass for P and Q
         for from_bus in bus_idx_neighbors_dict:
             for bus_idx in bus_idx_neighbors_dict[from_bus]:
@@ -152,48 +153,55 @@ class ACOPFGNN(torch.nn.Module):
                         delta_ij = volt_angle_j - volt_angle_i
 
                         G_ij = edge_attr[0] / (edge_attr[0] ** 2 + edge_attr[1] ** 2)
-                        if torch.isnan(G_ij).any():
+                        if check_nans and torch.isnan(G_ij).any():
                             print("Nan Value present in G_ij")
+
                         B_ij = -edge_attr[1] / (edge_attr[0] ** 2 + edge_attr[1] ** 2)
-                        if torch.isnan(B_ij).any():
+                        if check_nans and torch.isnan(B_ij).any():
                             print(f"Nan Value present in B_ij")
+
                         # ACOPF Equation for P_i
                         P_ij = V_i * V_j * (G_ij * torch.cos(delta_ij) + B_ij * torch.sin(delta_ij))
-                        if torch.isnan(P_ij).any():
+                        if check_nans and torch.isnan(P_ij).any():
                             print(f"Nan Value present in P_ij?")
                         P_i += P_ij
 
                         # ACOPF Equation for Q_i
                         Q_ij = V_i * V_j * (G_ij * torch.sin(delta_ij) - B_ij * torch.cos(delta_ij))
-                        if torch.isnan(Q_ij).any():
+                        if check_nans and torch.isnan(Q_ij).any():
                             print(f"Nan Value present in Q_ij")
                         Q_i += Q_ij
 
                     # Enforce the constraints
                     # Active Power boundary constraint
                     P_i = custom_sigmoid(P_i, active_pow_lower_bound, active_pow_upper_bound)
-                    if torch.isnan(P_i).any():
+                    if check_nans and torch.isnan(P_i).any():
                         print(f"Nan Value present in P_i after sigmoid")
                     # Reactive Power boundary constraint
                     Q_i = custom_sigmoid(Q_i, reactive_pow_lower_bound, reactive_pow_upper_bound)
-                    if torch.isnan(Q_i).any():
+
+                    if check_nans and torch.isnan(Q_i).any():
                         print(f"Nan Value present in Q_i after sigmoid")
+
                     # Maximum Apparent Power S constraint
                     constrained_P_i_upper_bound = torch.sqrt(torch.square(max_apparent_pow) - torch.square(Q_i))
                     learnable_P_i_constraint = torch.tensor(0.1, dtype=torch.float32, requires_grad=True)
                     P_i = custom_sigmoid(P_i, min(active_pow_lower_bound, constrained_P_i_upper_bound), max(active_pow_lower_bound, constrained_P_i_upper_bound),slope=learnable_P_i_constraint)
-                    if torch.isnan(P_i).any():
+
+                    if check_nans and torch.isnan(P_i).any():
                         print(f"Nan Value present in P_i after S enforcement")
+
                     constrained_Q_i_upper_bound = torch.sqrt(torch.square(max_apparent_pow) - torch.square(P_i))
                     learnable_Q_i_constraint = torch.tensor(0.1, dtype=torch.float32, requires_grad=True)
                     Q_i = custom_sigmoid(Q_i, min(reactive_pow_lower_bound, constrained_Q_i_upper_bound), max(reactive_pow_lower_bound, constrained_Q_i_upper_bound),slope=learnable_Q_i_constraint)
-                    if torch.isnan(Q_i).any():
+                    if check_nans and torch.isnan(Q_i).any():
                         print(f"Nan Value present in Q_i after S enforcement")
 
                 # Enforce the constraints
                 # Voltage Magnitude boundary constraint
                 learnable_V_i_constraint = torch.tensor(0.1, dtype=torch.float32, requires_grad=True)
                 out_dict[from_bus][bus_idx][0] = custom_sigmoid(V_i, volt_mag_lower_bound, volt_mag_upper_bound,slope=learnable_V_i_constraint)#/x_dict[from_bus][bus_idx][0]
+
                 # Voltage Angle constraint
                 out_dict[from_bus][bus_idx][1] = torch.relu(volt_angle_i) if from_bus != "SB" else torch.relu(volt_angle_i) - out_dict["SB"][0][1] # voltage angle >= 0
 
