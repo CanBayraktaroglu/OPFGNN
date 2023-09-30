@@ -16,6 +16,8 @@ from typing import Tuple, List, Any
 import json
 from ACOPFData import ACOPFInput, ACOPFOutput
 import pickle
+from gnn import GNN
+from heterognn import ACOPFGNN
 
 
 def sample_uniform_from_df(load):
@@ -1957,11 +1959,6 @@ def self_supervised_hetero_obj_fn(out_dict):
     P_supplied = 0.0
     Q_supplied = 0.0
 
-    # P_supplied = [P_0, P_1...P_N-1]
-    # Q_supplied = [Q_0, Q_1...Q_N-1]
-
-    # P_demanded = [P_d_0,P_d_1..P_d_N-1]
-
     for from_bus in out_dict:
         for i in range(len(out_dict[from_bus])):
             P_i = out_dict[from_bus][i][2]
@@ -1978,29 +1975,57 @@ def self_supervised_hetero_obj_fn(out_dict):
     return Loss
 
 
-def train_ACOPF(model, optimizer, inputs: List[ACOPFInput], num_epochs: int, return_outputs: bool = True):
+def load_homogeneous_supervised_model(in_channels=4, hidden_channels=256, out_channels=4, activation="elu",
+                                      num_layers=5, dropout=0.0, jk="last", layer_type="TransConv"):
+    # Create the GNN Model
+    model = GNN(in_channels, hidden_channels, num_layers, out_channels, dropout=dropout,
+                norm=torch_geometric.nn.norm.batch_norm.BatchNorm(hidden_channels),
+                jk=jk, layer_type=layer_type, activation=activation)
+
+    # Load the saved model parameter
+    ordered_dict = torch.load(r"C:\Users\canba\OneDrive\Masaüstü\OPFGNN\code\Models\Supervised\supervisedmodel.pt")
+    model.load_state_dict(ordered_dict)
+
+    return model
+
+
+def create_ACOPFGNN_model(hidden_channels=256, out_channels=4, num_layers=1, dropout=0.0, act_fn="elu"):
+    hetero_model = ACOPFGNN(hidden_channels, out_channels, num_layers, dropout, act_fn)
+    return hetero_model
+
+
+def train_validate_ACOPF(model: ACOPFGNN, optimizer: torch.optim.Adam, train_inputs: List[ACOPFInput],
+                         val_inputs: List[ACOPFInput], start_epoch=0, num_epochs: int = 1000,
+                         return_outputs: bool = True) -> Tuple[Any, Any]:
     train_loss = 0.0
+    val_loss = 0.0
+
     torch.autograd.set_detect_anomaly(True)
-    output = None
+    train_output = None
+    val_output = None
 
-    for i in range(num_epochs):
+    for i in range(start_epoch - 1, num_epochs):
         print(f"Epoch: {i}")
-        random.shuffle(inputs)
+        print("###########################################")
+        print("   TRAINING")
 
-        for j, ACOPFdata in enumerate(inputs):
+        # Shuffle the inputs for both Training and Validation
+        random.shuffle(train_inputs)
+        random.shuffle(val_inputs)
 
-            # scaler = StandardScaler()
+        # TRAINING
 
-            x_dict = ACOPFdata.x_dict
-            constraint_dict = ACOPFdata.constraint_dict
-            edge_idx_dict = ACOPFdata.edge_idx_dict
-            edge_attr_dict = ACOPFdata.edge_attr_dict
-            bus_idx_neighbors_dict = ACOPFdata.bus_idx_neighbors_dict
-            net = ACOPFdata.net
-            scaler_dict = ACOPFdata.scaler_dict
+        for j, ACOPFinput in enumerate(train_inputs):
 
-            # Define Scaler and standardize inputs and targets
-            # x_dict = torch.tensor(scaler.fit_transform(x_dict), dtype=torch.float32)
+            # Store the attributes in variables to be used later on
+            x_dict = ACOPFinput.x_dict
+            constraint_dict = ACOPFinput.constraint_dict
+            edge_idx_dict = ACOPFinput.edge_idx_dict
+            edge_attr_dict = ACOPFinput.edge_attr_dict
+            bus_idx_neighbors_dict = ACOPFinput.bus_idx_neighbors_dict
+            net = ACOPFinput.net
+            scaler_dict = ACOPFinput.scaler_dict
+            index_mappers = ACOPFinput.index_mappers
 
             # Zero your gradients for every batch!
             optimizer.zero_grad()
@@ -2016,26 +2041,57 @@ def train_ACOPF(model, optimizer, inputs: List[ACOPFInput], num_epochs: int, ret
             optimizer.step()
 
             # Store the outputs at the last iteration and last input
-            if i == num_epochs - 1 and j == len(inputs) - 1:
-                output = ACOPFOutput(out_dict, scaler_dict, net)
+            if return_outputs and i == num_epochs - 1 and j == len(train_inputs) - 1:
+                train_output = ACOPFOutput(out_dict, scaler_dict, net, index_mappers)
 
             # Gather data and report
             train_loss += loss.item()
 
-            print(f"Step: {j} Loss: {loss.item()}")
+            print(f"     Training Step: {j} Training Loss: {train_loss/(j + 1)} ")
 
-        print(f"Mean Epoch Loss: {train_loss / len(inputs)}")
+        # Validation
+        print("###########################################")
+        print("   VALIDATION")
+
+        for j, ACOPFinput in enumerate(val_inputs):
+
+            # Store the attributes in variables to be used later on
+            x_dict = ACOPFinput.x_dict
+            constraint_dict = ACOPFinput.constraint_dict
+            edge_idx_dict = ACOPFinput.edge_idx_dict
+            edge_attr_dict = ACOPFinput.edge_attr_dict
+            bus_idx_neighbors_dict = ACOPFinput.bus_idx_neighbors_dict
+            net = ACOPFinput.net
+            scaler_dict = ACOPFinput.scaler_dict
+            index_mappers = ACOPFinput.index_mappers
+
+            # Make predictions for this batch
+            out_dict = model(x_dict, constraint_dict, edge_idx_dict, edge_attr_dict, bus_idx_neighbors_dict)
+
+            # Compute the loss and its gradients for RMSE loss
+            loss = self_supervised_hetero_obj_fn(out_dict)
+
+            # Store the outputs at the last iteration and last input
+            if return_outputs and i == num_epochs - 1 and j == len(val_inputs) - 1:
+                val_output = ACOPFOutput(out_dict, scaler_dict, net, index_mappers)
+
+            # Gather data and report
+            val_loss += loss.item()
+
+            print(f"     Validation Step: {j} Validation Loss: {val_loss / (j + 1)} ")
+
+        total_train_loss = train_loss / len(train_inputs)
+        total_val_loss = val_loss / len(val_inputs)
+
+        wandb.log({
+            'epoch': i,
+            'train_loss': total_train_loss,
+            'val_loss': total_val_loss
+        })
         train_loss = 0.0
+        val_loss = 0.0
 
-    """
-    num_samples = len(inputs)
-    wandb.log({
-        'epoch': epoch,
-        'train_loss': train_loss / num_samples
-
-    })
-    """
-    return output
+    return train_output, val_output
 
 
 def custom_standard_transform(scaler, constraint_features):
@@ -2098,12 +2154,12 @@ def custom_minmax_transform(scaler: MinMaxScaler, core_features):
     # Transform the Voltage Magnitude Column V_i of the Core Features based on min_V_i, max_V_i
     _min_ = min(min_values[0], min_values[1])
     _max_ = max(max_values[0], max_values[1])
-    core_features[:, 0] = (core_features[:, 0] - _min_) / (_max_ - _min_)
+    core_features[:, 0] = 2 * ((core_features[:, 0] - _min_) / (_max_ - _min_)) - 1
 
     # Transform the Active Power Column P_i of the Core Features based on min_P_i, max_P_i
     _min_ = min(min_values[3], min_values[4])
     _max_ = max(max_values[3], max_values[4])
-    core_features[:, 2] = (core_features[:, 2] - _min_) / (_max_ - _min_)
+    core_features[:, 2] = 2 * ((core_features[:, 2] - _min_) / (_max_ - _min_)) - 1
 
     if np.isnan(core_features[:, 2]).any():
         core_features[:, 2] = np.zeros_like(core_features[:, 2])
@@ -2111,7 +2167,7 @@ def custom_minmax_transform(scaler: MinMaxScaler, core_features):
     # Transform the Reactive Power Column Q_i of the Core Features based on min_Q_i, max_Q_i
     _min_ = min(min_values[5], min_values[6])
     _max_ = max(max_values[5], max_values[6])
-    core_features[:, 3] = (core_features[:, 3] - _min_) / (_max_ - _min_)
+    core_features[:, 3] = 2 * ((core_features[:, 3] - _min_) / (_max_ - _min_)) - 1
 
     if np.isnan(core_features[:, 3]).any():
         core_features[:, 3] = np.zeros_like(core_features[:, 3])
@@ -2127,12 +2183,12 @@ def custom_minmax_inverse_transform(scaler: MinMaxScaler, core_features):
     # Inverse Transform the Voltage Magnitude Column V_i of the Core Features based on min_V_i, max_V_i
     _min_ = min(min_values[0], min_values[1])
     _max_ = max(max_values[0], max_values[1])
-    core_features[:, 0] = core_features[:, 0] * (_max_ - _min_) + _min_
+    core_features[:, 0] = (core_features[:, 0] + 1) * 0.5 * (_max_ - _min_) + _min_
 
     # Inverse Transform the Active Power Column P_i of the Core Features based on min_P_i, max_P_i
     _min_ = min(min_values[3], min_values[4])
     _max_ = max(max_values[3], max_values[4])
-    core_features[:, 2] = core_features[:, 2] * (_max_ - _min_) + _min_
+    core_features[:, 2] = (core_features[:, 2] + 1) * 0.5 * (_max_ - _min_) + _min_
 
     if np.isnan(core_features[:, 2]).any():
         core_features[:, 2] = np.zeros_like(core_features[:, 2])
@@ -2140,7 +2196,7 @@ def custom_minmax_inverse_transform(scaler: MinMaxScaler, core_features):
     # Inverse Transform the Reactive Power Column Q_i of the Core Features based on min_Q_i, max_Q_i
     _min_ = min(min_values[5], min_values[6])
     _max_ = max(max_values[5], max_values[6])
-    core_features[:, 3] = core_features[:, 3] * (_max_ - _min_) + _min_
+    core_features[:, 3] = (core_features[:, 3] + 1) * 0.5 * (_max_ - _min_) + _min_
 
     if np.isnan(core_features[:, 3]).any():
         core_features[:, 3] = np.zeros_like(core_features[:, 3])

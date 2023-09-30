@@ -1,16 +1,6 @@
-import torch
-import torch_geometric.nn.norm.layer_norm
-from cvxpylayers.torch import CvxpyLayer
-import cvxpy as cp
+from torch_geometric.nn.norm import BatchNorm
 from gnn import *
-import warnings
-from collections import defaultdict
-from typing import Dict, Optional
-from torch import Tensor
-from torch_geometric.nn.conv.hgt_conv import group
-from torch_geometric.nn.module_dict import ModuleDict
-from torch_geometric.typing import Adj, EdgeType, NodeType
-from torch_geometric.utils.hetero import check_add_self_loops
+
 
 # Define the GNN layer
 import torch_geometric.transforms as T
@@ -48,13 +38,30 @@ class ACOPFGNN(torch.nn.Module):
         self.out_channels = out_channels
         self.num_layers = num_layers
         self.dropout = dropout
+        self.act_fn = act_fn
         self.act = activation_resolver(act_fn, **({}))
         self.act_first = False
         self.jk_mode = "last"
         in_channels = hidden_channels
         self.lin = Linear(in_channels, self.out_channels, bias=False)
-        self.norm = norm if isinstance(norm, str) else None
         self.bias = nn.Parameter(torch.tensor(self.out_channels, dtype=torch.float32))
+
+        self.norms = None
+        if norm is not None:
+            norm_layer = BatchNorm(in_channels=self.hidden_channels)
+
+            """normalization_resolver(
+                norm,
+                hidden_channels,
+                **({}),
+            )"""
+
+            self.norms = ModuleList()
+
+            for _ in range(num_layers):
+                for _ in ["SB", "PV", "PQ", "NB"]:
+                    self.norms.append(copy.deepcopy(norm_layer))
+
 
         self.edge_types = [
             ('PV', "isConnected", 'SB'),
@@ -100,26 +107,23 @@ class ACOPFGNN(torch.nn.Module):
                 ('NB', "isConnected", 'NB'): TransformerConv(-1, hidden_channels, edge_dim=2),
             }, aggr='sum')
             self.convs.append(conv)
-        """
-        # Initialize weights
-        for m in self.modules():
-            if isinstance(m, TransformerConv):
-                nn.init.xavier_uniform_(m.weight) # Initialize the weights with xavier uniformly
-                if m.bias is not None:
-                    m.bias.data.fill_(0.01)
-        """
+
 
     def forward(self, x_dict, constraint_dict, edge_idx_dict, edge_attr_dict, bus_idx_neighbors_dict, check_nans:bool = False):
         out_dict = x_dict.copy()
+
         # All calls of the forward function must support edge_attr & edge_idx for this model
         for conv in self.convs.children():
             out_dict = conv(out_dict, edge_idx_dict, edge_attr_dict)
             #print(f"Nan Value present in out_dict?: {torch.isnan(out_dict).any()}")
 
             # Apply activation function for the output features of each type and update the dict
-            for node_type in out_dict:
+            for i, node_type in enumerate(out_dict.keys()):
+                if self.norms is not None:
+                    out_dict[node_type] = self.norms[i](out_dict[node_type])
                 out_dict[node_type] = self.act(out_dict[node_type])
                 #print(f"Nan Value present in out_dict after activation fn applied?: {torch.isnan(out_dict).any()}")
+
         for node_type in out_dict:
             out_dict[node_type] = self.lin(out_dict[node_type])
             #print(f"Nan Value present in out_dict after linear operations?: {torch.isnan(out_dict).any()}")

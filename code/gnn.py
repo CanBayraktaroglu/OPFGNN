@@ -1,11 +1,10 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch import Tensor
 from torch_geometric.nn.conv import GraphConv, GCNConv, TransformerConv
 from torch_geometric.nn.conv import MessagePassing
 from torch_geometric.nn.models.basic_gnn import BasicGNN
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Callable, List
 from torch.nn import Linear, ModuleList
 from torch_geometric.nn.models.jumping_knowledge import JumpingKnowledge
 from torch_geometric.nn.resolver import (activation_resolver, normalization_resolver)
@@ -14,7 +13,6 @@ from torch_geometric.loader import NeighborLoader
 import copy
 from typing import Optional, Tuple, Union
 from torch_geometric.nn.dense.linear import Linear
-from torch_geometric.typing import Adj, OptTensor, PairTensor, SparseTensor
 
 
 class GNN(BasicGNN):
