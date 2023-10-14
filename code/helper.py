@@ -18,6 +18,8 @@ from ACOPFData import ACOPFInput, ACOPFOutput
 import pickle
 from gnn import GNN
 from heterognn import ACOPFGNN
+from torch.optim.lr_scheduler import ReduceLROnPlateau
+import asyncio
 
 
 def sample_uniform_from_df(load):
@@ -1318,6 +1320,16 @@ def process_network(grid_name: str, suppress_info: bool = True):
     net.trafo3w.max_loading_percent = max_loading_percent
 
     pp.drop_out_of_service_elements(net)
+
+    """
+    # Cost assignment
+    pp.create_pwl_costs(net, [i for i in range(len(net.gen.name.values))], et="gen",
+                        points=[[[0, 20, 1], [20, 30, 2]] for _ in range(len(net.gen.name.values))])
+    pp.create_pwl_costs(net, [i for i in range(len(net.sgen.name.values))], et="sgen",
+                        points=[[[0, 20, 0.25], [20, 30, 0.5]] for _ in range(len(net.sgen.name.values))])
+    pp.create_pwl_costs(net, [i for i in range(len(net.ext_grid.name.values))], et="ext_grid",
+                        points=[[[0, 20, 2], [20, 30, 5]] for _ in range(len(net.ext_grid.name.values))])
+    """
     if not suppress_info:
         print("Network Processing Finished.")
     return net
@@ -1777,65 +1789,100 @@ def generate_unsupervised_input(grid_name: str, suppress_info: bool = True) -> A
 
         for bus_idx in node_indices:
             node_features = []  # 1 x 11 vector
-            node_idx = node_type_idx_mapper[idx_mapper[bus_idx]]
 
             # Core Features
-            V_i = net.bus.loc[net.bus.index == bus_idx].vn_kv[bus_idx]
-            delta_iSB = 0.0 if node_type == "SB" else 1.0
+            V_i = torch.tensor(net.bus.loc[net.bus.index == bus_idx].vn_kv[bus_idx], requires_grad=True)
+            random.seed()
+            delta_iSB = torch.tensor(0.0, dtype=torch.float32,
+                                     requires_grad=True) if node_type == "SB" else torch.tensor(
+                1.0, dtype=torch.float32, requires_grad=True)
 
             # Add Core Features to the node features vector
             node_features.append(V_i), node_features.append(delta_iSB)
 
             # Constraint Features
             # Voltage Magnitudes V_i
-            min_V_i = 0.9 * V_i
-            max_V_i = 1.1 * V_i
+            min_V_i = torch.tensor(0.9 * V_i.item(), requires_grad=False)
+            max_V_i = torch.tensor(1.1 * V_i.item(), requires_grad=False)
 
-            # Nominal Apparent Power sn_mva
-            sgen_max_sn = sum(net.sgen.loc[net.sgen.bus == bus_idx].sn_mva.values)
-            load_max_sn = sum(net.load.loc[net.load.bus == bus_idx].sn_mva.values)
+            sgen_min_p = sum(net.sgen.loc[net.sgen.bus == bus_idx].p_mw.values) if node_type != "NB" else 0.0
+            load_min_p = sum(net.load.loc[net.load.bus == bus_idx].p_mw.values) if node_type != "NB" else 0.0
 
-            sn_mva = abs(sgen_max_sn - load_max_sn)
-
-            # Min Active Power min_p_i
-            sgen_min_p = sum(net.sgen.loc[net.sgen.bus == bus_idx].p_mw.values)
-            load_min_p = sum(net.load.loc[net.load.bus == bus_idx].p_mw.values)
-            min_p_i = load_min_p - sgen_min_p if node_type != "NB" else 0.0
-
-            # Max Active Power max_p_i
-            # sgen_max_p = sum(net.sgen.loc[net.sgen.bus == bus_idx].p_mw.values) if node_type != "NB" else 0.0
-            # load_max_p = sum(net.load.loc[net.load.bus == bus_idx].p_mw.values) if node_type != "NB" else 0.0
-            max_p_i = load_min_p if node_type != "NB" else 0.0  # enforcing self-sustenance
-
-            # Min Reactive Power min_q_i
             sgen_min_q = sum(net.sgen.loc[net.sgen.bus == bus_idx].q_mvar.values) if node_type != "NB" else 0.0
             load_min_q = sum(net.load.loc[net.load.bus == bus_idx].q_mvar.values) if node_type != "NB" else 0.0
-            min_q_i = load_min_q - sgen_min_q
 
-            # Max Reactive Power max_q_i
-            # sgen_max_p = sum(net.sgen.loc[net.sgen.bus == bus_idx].p_mw.values) if node_type != "NB" else 0.0
-            # load_max_p = sum(net.load.loc[net.load.bus == bus_idx].p_mw.values) if node_type != "NB" else 0.0
-            max_q_i = load_min_q if node_type != "NB" else 0.0  # enforcing self-sustenance
+            min_p_i = torch.tensor(0.0, requires_grad=False)
+            max_p_i = torch.tensor(0.0, requires_grad=False)
+            min_q_i = torch.tensor(0.0, requires_grad=False)
+            max_q_i = torch.tensor(0.0, requires_grad=False)
+
+            if node_type == "PV":
+
+                # Min Active Power min_p_i
+
+                min_p_i = torch.tensor(-sgen_min_p, requires_grad=False)
+
+                # Max Active Power max_p_i
+
+                max_p_i = torch.tensor(-load_min_p,
+                                       requires_grad=False)  # PV busses must ensure at least their own load demand is satisfied
+
+                # Min Reactive Power min_q_i
+
+                min_q_i = torch.tensor(-load_min_q, requires_grad=False)
+
+                # Max Reactive Power max_q_i
+
+                max_q_i = torch.tensor(-sgen_min_q, requires_grad=False)  # enforcing self-sustenance
+
+            elif node_type == "PQ":
+                # Min Active Power min_p_i
+
+                min_p_i = torch.tensor(load_min_p - sgen_min_p,
+                                       requires_grad=False)  # PQ busses shall at least consume the required remaining demand from their loads, subtracted what they generate
+
+                # Max Active Power max_p_i
+
+                max_p_i = torch.tensor(load_min_p, requires_grad=False)
+
+                # Min Reactive Power min_q_i
+
+                min_q_i = torch.tensor(load_min_q - sgen_min_q, requires_grad=False)
+
+                # Max Reactive Power max_q_i
+
+                max_q_i = torch.tensor(load_min_q, requires_grad=False)  # enforcing self-sustenance
+
+            # Nominal Apparent Power sn_mva
+
+            sn_mva = torch.sqrt(
+                torch.square(
+                    torch.tensor(max(abs(max_p_i.item()), abs(min_p_i.item())), requires_grad=False)) + torch.square(
+                    torch.tensor(max(abs(min_q_i.item()), abs(max_q_i.item())), requires_grad=False)))
+
+            # External Grid and Gen PVs
 
             if bus_idx == ext_grid_bus_idx:
                 ext_grid_sn_mva = net.trafo.loc[net.trafo.hv_bus == ext_grid_bus_idx].sn_mva.values[0]
-                sn_mva = ext_grid_sn_mva
-                min_p_i = -sn_mva
-                max_p_i = sn_mva
-                min_q_i = -sn_mva
-                max_q_i = sn_mva
+                sn_mva = torch.tensor(ext_grid_sn_mva, requires_grad=False)
+                min_p_i = torch.tensor(-sn_mva.item(), requires_grad=False)
+                max_p_i = torch.tensor(sn_mva.item(), requires_grad=False)
+                min_q_i = torch.tensor(-sn_mva.item(), requires_grad=False)
+                max_q_i = torch.tensor(sn_mva.item(), requires_grad=False)
             elif bus_idx in gen_busses_idx:
-                sn_mva = net.trafo.loc[net.trafo.hv_bus == bus_idx].sn_mva.values[0]
-                min_p_i = -sn_mva
-                max_p_i = sn_mva
-                min_q_i = -sn_mva
-                max_q_i = sn_mva
+                sn_mva = torch.tensor(net.trafo.loc[net.trafo.hv_bus == bus_idx].sn_mva.values[0], requires_grad=False)
+                min_p_i = torch.tensor(-sn_mva.item(), requires_grad=False)
+                max_p_i = torch.tensor(0.0, requires_grad=False)
+                min_q_i = torch.tensor(-sn_mva.item(), requires_grad=False)
+                max_q_i = torch.tensor(0.0, requires_grad=False)
 
             # Flat initialization of P_i based on constraints
-            P_i = (max_p_i + min_p_i) * 0.5 if node_type != "NB" else 0.0
+            P_i = torch.tensor(0.5 * (max_p_i.item() + min_p_i.item()),
+                               requires_grad=True) if node_type != "NB" else torch.tensor(0.0, requires_grad=False)
 
             # Flat initialization of Q_i based on constraints
-            Q_i = (max_q_i + min_q_i) * 0.5 if node_type != "NB" else 0.0
+            Q_i = torch.tensor(0.5 * (max_q_i.item() + min_q_i.item()),
+                               requires_grad=True) if node_type != "NB" else torch.tensor(0.0, requires_grad=False)
 
             # Add the remaining core features to the node feature vector
             node_features.append(P_i)
@@ -1847,10 +1894,11 @@ def generate_unsupervised_input(grid_name: str, suppress_info: bool = True) -> A
             node_features.append(max_q_i)
 
             # Add the node feature vector to the collection of feature vectors of the corresponding node type
-            X_node_type.append(node_features)
+            X_node_type.append(torch.stack(node_features))
 
+        X_node_type = torch.stack(X_node_type)
         # Add the collection of node features to the corresponding node of Hetero Data
-        data[node_type].x = torch.tensor(X_node_type, dtype=torch.float32)
+        data[node_type].x = X_node_type  # torch.tensor(X_node_type, dtype=torch.float32)
 
     # Add the edge indices and edge attributes to the Hetero Data
     for edge_type in edge_types_idx_dict:
@@ -1865,14 +1913,13 @@ def generate_unsupervised_input(grid_name: str, suppress_info: bool = True) -> A
     return index_mappers, net, data
 
 
-def extract_unsupervised_inputs(data: HeteroData):
+def extract_unsupervised_inputs(data: HeteroData, net, index_mappers):
     x_dict = dict()
     constraint_dict = dict()
     edge_idx_dict = dict()
     edge_attr_dict = dict()
     bus_idx_neighbors_dict = dict()
-    scalers_dict = dict()
-
+    """
     # x_dict and constraint_dict
     for node_type in data.node_types:
         x: torch.Tensor
@@ -1880,13 +1927,126 @@ def extract_unsupervised_inputs(data: HeteroData):
         scaler = MinMaxScaler()
         if len(data[node_type]) != 0:
             c = scaler.fit_transform(data[node_type].x[:, 4:].detach().numpy())
+            c = 2 * c - 1  # Scale between -1 and 1
+            if torch.isnan(torch.tensor(c)).any():
+                print(f"nan value found in node_type {node_type} in c")
             c = torch.tensor(c, dtype=torch.float32, requires_grad=False)
-            x = custom_minmax_transform(scaler, data[node_type].x[:, :4].detach().numpy())
+            x, min_angle, max_angle = custom_minmax_transform(scaler, data[node_type].x[:, :4].detach().numpy())
+
+            if node_type == "SB":
+                x[0, 1] = torch.tensor(0.0, dtype=torch.float32, requires_grad=True)
+
+            if torch.isnan(torch.tensor(x)).any():
+                print(f"nan value found in node_type {node_type} in x")
             x = torch.tensor(x, dtype=torch.float32, requires_grad=True)
             x_dict[node_type] = x
             constraint_dict[node_type] = c
 
-        scalers_dict[node_type] = scaler
+            scalers_dict[node_type] = scaler
+            angle_params_dict[node_type] = (min_angle, max_angle)
+    """
+    node_type_len_mapper = dict()
+    constraints = []
+    features = []
+    scaler = MinMaxScaler(feature_range=(-1, 1))
+
+    for node_type in data.node_types:
+        # x = data[node_type].x
+        x = data[node_type].x[:, :4].detach().numpy()
+        c = data[node_type].x[:, 4:].detach().numpy()
+        node_type_len_mapper[node_type] = (len(features), len(features) + len(x))
+        features.extend(x)
+        constraints.extend(c)
+
+    # features = [feature.detach().numpy() for feature in features]
+
+    try:
+        pp.runopp(net)
+        res_bus = net.res_bus
+    except:
+        res_bus = None
+
+    if res_bus is not None:
+        res_bus = res_bus
+        res_bus = res_bus.drop(labels=['lam_p', 'lam_q'], axis=1)
+        res_bus = np.array(res_bus)
+        res_bus[:, 0] *= net.bus.vn_kv.values
+
+        # Combine X and Y for fitting
+        combined_data = np.vstack((features, res_bus))
+
+        # Fit the scaler on the combined data
+        scaler.fit(combined_data)
+
+        # Transform X and Y
+        features = scaler.transform(features)
+        res_bus = scaler.transform(res_bus)
+        constraints = custom_minmax_constraints_transform(scaler, np.array(constraints))
+        # res_bus = 2 * scaler.fit_transform(res_bus) - 1
+
+        idx_mapper, node_types_idx_dict = index_mappers
+
+        node_type_idx_mapper = dict()
+        for node_type in node_types_idx_dict:
+            length = len(node_types_idx_dict[node_type])
+            for bus_idx, map_idx in zip(node_types_idx_dict[node_type], range(length)):
+                real_idx = idx_mapper[bus_idx]
+                node_type_idx_mapper[real_idx] = map_idx
+
+        res_bus_dict = dict()
+        for node_type in node_types_idx_dict:
+            node_indices = node_types_idx_dict[node_type]
+            idx = [idx_mapper[i] for i in node_indices]
+            res_bus_dict[node_type] = torch.tensor(res_bus[idx], dtype=torch.float32, requires_grad=False)
+    else:
+        try:
+            pp.runpm_ac_opf(net)
+            res_bus = net.res_bus
+        except:
+            res_bus = None
+
+        if res_bus is not None:
+            res_bus = res_bus.drop(labels=['lam_p', 'lam_q'], axis=1)
+            res_bus = np.array(res_bus)
+            res_bus[:, 0] *= net.bus.vn_kv.values
+            # Combine X and Y for fitting
+            combined_data = np.vstack((features, res_bus))
+
+            # Fit the scaler on the combined data
+            scaler.fit(combined_data)
+
+            # Transform X and Y
+            features = scaler.transform(features)
+            res_bus = scaler.transform(res_bus)
+            constraints = custom_minmax_constraints_transform(scaler, np.array(constraints))
+            # res_bus = 2 * scaler.fit_transform(res_bus) - 1
+
+            idx_mapper, node_types_idx_dict = index_mappers
+
+            node_type_idx_mapper = dict()
+            for node_type in node_types_idx_dict:
+                length = len(node_types_idx_dict[node_type])
+                for bus_idx, map_idx in zip(node_types_idx_dict[node_type], range(length)):
+                    real_idx = idx_mapper[bus_idx]
+                    node_type_idx_mapper[real_idx] = map_idx
+
+            res_bus_dict = dict()
+            for node_type in node_types_idx_dict:
+                node_indices = node_types_idx_dict[node_type]
+                idx = [idx_mapper[i] for i in node_indices]
+                res_bus_dict[node_type] = torch.tensor(res_bus[idx], dtype=torch.float32, requires_grad=False)
+
+    # constraints = scaler.fit_transform(np.array(constraints))
+    # constraints = 2 * constraints - 1
+    # features, min_angle, max_angle = custom_minmax_transform(scaler, np.array(features))
+    angle_params = (None, None)
+
+    for node_type in data.node_types:
+        start_idx, end_idx = node_type_len_mapper[node_type]
+        core_features = features[start_idx:end_idx, :]
+        constraint_features = constraints[start_idx:end_idx, :]
+        x_dict[node_type] = torch.tensor(core_features, dtype=torch.float32, requires_grad=True)
+        constraint_dict[node_type] = torch.tensor(constraint_features, dtype=torch.float32, requires_grad=False)
 
     # edge_idx_dict and edge_attr_dict
     for edge_type in data.edge_types:
@@ -1908,7 +2068,7 @@ def extract_unsupervised_inputs(data: HeteroData):
             else:
                 bus_idx_neighbors_dict[from_bus][from_edge.item()] = [pair]
 
-    return x_dict, constraint_dict, edge_idx_dict, edge_attr_dict, bus_idx_neighbors_dict, scalers_dict
+    return x_dict, constraint_dict, edge_idx_dict, edge_attr_dict, bus_idx_neighbors_dict, scaler, angle_params, res_bus_dict
 
 
 def save_unsupervised_inputs(grid_name: str, num_samples: int):
@@ -1927,6 +2087,42 @@ def save_unsupervised_inputs(grid_name: str, num_samples: int):
         pickle.dump(inputs, f)
 
     print("Inputs Saved.")
+
+
+def save_multiple_unsupervised_inputs(grid_names, num_samples):
+    path = "../code/data/Heterogeneous/"
+    inputs = []  # List of ACOPFData instances
+    for grid_name in grid_names:
+        print(f"Grid: {grid_name}")
+        i = 0
+        while i < num_samples:
+            print(f"Epoch: {i}")
+            i += 1
+            index_mappers, network, data = generate_unsupervised_input(grid_name)
+            _input_ = ACOPFInput(data, network, index_mappers)
+            if _input_.res_bus is None:
+                i -= 1
+                continue
+            else:
+                inputs.append(_input_)
+
+    print("Data Prep finished.")
+    os.makedirs(path, exist_ok=True)
+
+    random.shuffle(inputs)
+
+    with open(os.path.join(path, 'inputs.pkl'), 'wb') as f:
+        pickle.dump(inputs, f)
+
+    print("Inputs Saved.")
+
+
+def load_multiple_unsupervised_inputs():
+    path = "../code/data/Heterogeneous/"
+    with open(os.path.join(path, 'inputs.pkl'), 'rb') as f:
+        inputs = pickle.load(f)
+
+    return inputs
 
 
 def load_unsupervised_inputs(grid_name: str):
@@ -1953,26 +2149,192 @@ def load_unsupervised_output(grid_name: str):
     return output
 
 
-def self_supervised_hetero_obj_fn(out_dict):
+def self_supervised_hetero_obj_fn(out_dict, bus_idx_neighbors_dict, res_bus_dict, constraints_dict, alpha, beta, gamma):
     # Objective Function on basis of ACOPF Equations for P and Q
-
-    P_supplied = 0.0
-    Q_supplied = 0.0
+    mre_loss_fn = lambda outputs, targets: get_mre_loss(outputs, targets)
+    wired = []
+    output = []
+    P_supplied = []
+    Q_supplied = []
+    P_lower_penalties = []
+    P_upper_penalties = []
+    Q_lower_penalties = []
+    Q_upper_penalties = []
+    V_lower_penalties = []
+    V_upper_penalties = []
+    S_penalties = []
+    wired_mre_losses = torch.tensor(0.0, requires_grad=False)
+    loss = torch.nn.functional.mse_loss
 
     for from_bus in out_dict:
-        for i in range(len(out_dict[from_bus])):
-            P_i = out_dict[from_bus][i][2]
-            Q_i = out_dict[from_bus][i][3]
-            P_supplied += P_i.item()
-            Q_supplied += Q_i.item()
+        wired.extend(res_bus_dict[from_bus])
+        output.extend(out_dict[from_bus])
+        V_node = out_dict[from_bus][:, 0]
+        # delta_node = out_dict[from_bus][:, 1]
+        P_node = out_dict[from_bus][:, 2]
+        Q_node = out_dict[from_bus][:, 3]
+        P_supplied.extend(P_node)
+        Q_supplied.extend(Q_node)
 
-    outputs = torch.tensor([P_supplied, Q_supplied], dtype=torch.float32, requires_grad=True)
+        V_min = constraints_dict[from_bus][:, 0]
+        V_max = constraints_dict[from_bus][:, 1]
+        S = constraints_dict[from_bus][:, 2]
+        P_min = constraints_dict[from_bus][:, 3]
+        P_max = constraints_dict[from_bus][:, 4]
+        Q_min = constraints_dict[from_bus][:, 5]
+        Q_max = constraints_dict[from_bus][:, 6]
 
-    Loss = torch.nn.MSELoss()
-    targets = torch.zeros_like(outputs, dtype=torch.float32)
-    Loss = Loss(outputs, targets)
+        # Penalty for exceeding upper bounds
+        P_upper_violation = torch.nn.functional.relu(P_node - P_max) if from_bus != "NB" else P_node
+        Q_upper_violation = torch.nn.functional.relu(Q_node - Q_max) if from_bus != "NB" else Q_node
+        V_upper_violation = torch.nn.functional.relu(V_node - V_max)
 
-    return Loss
+        # Penalty for exceeding lower bounds
+        P_lower_violation = torch.nn.functional.relu(P_min - P_node) if from_bus != "NB" else P_node
+        Q_lower_violation = torch.nn.functional.relu(Q_min - Q_node) if from_bus != "NB" else Q_node
+        V_lower_violation = torch.nn.functional.relu(V_min - V_node)
+
+        # Max apparent power penalty
+        S_violation = torch.nn.functional.relu(torch.square(P_node) + torch.square(Q_node) - torch.square(S))
+        P_upper_penalties.extend(P_upper_violation)
+        Q_upper_penalties.extend(Q_upper_violation)
+        V_upper_penalties.extend(V_upper_violation)
+        P_lower_penalties.extend(P_lower_violation)
+        Q_lower_penalties.extend(Q_lower_violation)
+        V_lower_penalties.extend(V_lower_violation)
+        S_penalties.extend(S_violation)
+        # volt_angle_lower_penalties.extend(delta_lower_violation)
+        # volt_angle_higher_penalties.extend(delta_upper_violation)
+
+    P_pen_lower = torch.stack(P_lower_penalties)
+    Q_pen_lower = torch.stack(Q_lower_penalties)
+    V_pen_lower = torch.stack(V_lower_penalties)
+    P_pen_upper = torch.stack(P_upper_penalties)
+    Q_pen_upper = torch.stack(Q_upper_penalties)
+    V_pen_upper = torch.stack(V_upper_penalties)
+    S_pen_ = torch.stack(S_penalties)
+    # delta_lower = torch.stack(volt_angle_lower_penalties)
+    # delta_higher = torch.stack(volt_angle_higher_penalties)
+
+    P_pen = loss(P_pen_lower + P_pen_upper, torch.tensor([0.0] * len(P_lower_penalties), requires_grad=False))
+    Q_pen = loss(Q_pen_lower + Q_pen_upper, torch.tensor([0.0] * len(Q_lower_penalties), requires_grad=False))
+    V_pen = loss(V_pen_lower + V_pen_upper, torch.tensor([0.0] * len(V_lower_penalties), requires_grad=False))
+    S_pen = loss(S_pen_, torch.tensor([0.0] * len(S_penalties), requires_grad=False))
+    Penalties = torch.sum(torch.stack([P_pen, Q_pen, V_pen, S_pen]))
+
+    # wired_losses = loss(torch.stack(output), torch.stack(wired))
+    # wired_mre_losses = mre_loss_fn(torch.stack(output), torch.stack(wired))
+    physics_loss = calc_physics_loss(out_dict, bus_idx_neighbors_dict)
+
+    unsupervised_loss_P = loss(torch.sum(torch.stack(P_supplied)), torch.tensor(0.0, requires_grad=False))
+    unsupervised_loss_Q = loss(torch.sum(torch.stack(Q_supplied)), torch.tensor(0.0, requires_grad=False))
+    # Loss = wired_losses + alpha * physics_loss + beta * Penalties
+    unsupervised_loss = torch.log(torch.tensor(1.0, requires_grad=False) + unsupervised_loss_P + unsupervised_loss_Q)
+    Loss = alpha * unsupervised_loss + beta * physics_loss + gamma * Penalties
+
+    return physics_loss, wired_mre_losses, Loss, Penalties, unsupervised_loss
+
+
+def self_supervised_enforcer_obj_fn(out_dict, res_bus_dict, constraints_dict):
+    P_supplied = []
+    Q_supplied = []
+    P_lower_penalties = []
+    P_upper_penalties = []
+    Q_lower_penalties = []
+    Q_upper_penalties = []
+    V_lower_penalties = []
+    V_upper_penalties = []
+    S_penalties = []
+    alpha = 1.0
+    wired_losses = 0.0
+    mre_loss_fn = lambda outputs, targets: get_mre_loss(outputs, targets)
+    wired_mre_losses = 0.0
+    loss = torch.nn.functional.mse_loss
+
+    for from_bus in out_dict:
+        V_node = out_dict[from_bus][:, 0]
+        # delta_node = out_dict[from_bus][:, 1]
+        P_node = out_dict[from_bus][:, 2]
+        Q_node = out_dict[from_bus][:, 3]
+
+        if res_bus_dict is not None:
+            wired_losses += loss(out_dict[from_bus], res_bus_dict[from_bus])
+            wired_mre_losses += mre_loss_fn(out_dict[from_bus], res_bus_dict[from_bus])
+
+        V_min = constraints_dict[from_bus][:, 0]
+        V_max = constraints_dict[from_bus][:, 1]
+        S = constraints_dict[from_bus][:, 2]
+        P_min = constraints_dict[from_bus][:, 3]
+        P_max = constraints_dict[from_bus][:, 4]
+        Q_min = constraints_dict[from_bus][:, 5]
+        Q_max = constraints_dict[from_bus][:, 6]
+
+        # Penalty for exceeding upper bounds
+        P_upper_violation = torch.nn.functional.relu(P_node - P_max)
+        Q_upper_violation = torch.nn.functional.relu(Q_node - Q_max)
+        V_upper_violation = torch.nn.functional.relu(V_node - V_max)
+
+        # Penalty for exceeding lower bounds
+        P_lower_violation = torch.nn.functional.relu(P_min - P_node)
+        Q_lower_violation = torch.nn.functional.relu(Q_min - Q_node)
+        V_lower_violation = torch.nn.functional.relu(V_min - V_node)
+
+        # Max apparent power penalty
+        S_violation = torch.nn.functional.relu(torch.square(P_node) + torch.square(Q_node) - torch.square(S))
+
+        # Voltage Angle Penalty
+        # delta_P_bound = arccos_approx(torch.tanh(P_node / S))
+        # delta_Q_bound = arcsin_approx(torch.tanh(Q_node / S))
+
+        # min_delta_bound = torch.min(delta_P_bound, delta_Q_bound)
+        # max_delta_bound = torch.max(delta_P_bound, delta_Q_bound)
+
+        # delta_lower_violation = torch.nn.functional.relu(min_delta_bound - delta_node)
+        # delta_upper_violation = torch.nn.functional.relu(delta_node - max_delta_bound)
+
+        P_upper_penalties.extend(P_upper_violation)
+        Q_upper_penalties.extend(Q_upper_violation)
+        V_upper_penalties.extend(V_upper_violation)
+        P_lower_penalties.extend(P_lower_violation)
+        Q_lower_penalties.extend(Q_lower_violation)
+        V_lower_penalties.extend(V_lower_violation)
+        S_penalties.extend(S_violation)
+        # volt_angle_lower_penalties.extend(delta_lower_violation)
+        # volt_angle_higher_penalties.extend(delta_upper_violation)
+        P_supplied.extend(out_dict[from_bus][:, 2])
+        Q_supplied.extend(out_dict[from_bus][:, 3])
+
+    P_pen_lower = torch.stack(P_lower_penalties)
+    Q_pen_lower = torch.stack(Q_lower_penalties)
+    V_pen_lower = torch.stack(V_lower_penalties)
+    P_pen_upper = torch.stack(P_upper_penalties)
+    Q_pen_upper = torch.stack(Q_upper_penalties)
+    V_pen_upper = torch.stack(V_upper_penalties)
+    S_pen_ = torch.stack(S_penalties)
+    # delta_lower = torch.stack(volt_angle_lower_penalties)
+    # delta_higher = torch.stack(volt_angle_higher_penalties)
+
+    P_pen = (torch.sum(P_pen_lower) + torch.sum(P_pen_upper)) / len(P_pen_lower)
+    Q_pen = (torch.sum(Q_pen_lower) + torch.sum(Q_pen_upper)) / len(Q_pen_lower)
+    V_pen = (torch.sum(V_pen_lower) + torch.sum(V_pen_upper)) / len(V_pen_lower)
+    S_pen = torch.sum(S_pen_) / len(S_pen_)
+    # volt_angle_pen = (torch.sum(delta_lower) + torch.sum(delta_higher))/len(delta_lower)
+
+    P_ = torch.stack(P_supplied)
+    Q_ = torch.stack(Q_supplied)
+    P = torch.sum(P_)
+    Q = torch.sum(Q_)
+    if res_bus_dict is not None:
+        Loss = torch.mean(wired_losses) + alpha * (P_pen + Q_pen + V_pen + S_pen)  # + volt_angle_pen)
+    else:
+
+        active_power_loss = torch.square(P) / len(
+            P_supplied)  # loss(P, torch.tensor(0.0, dtype=torch.float32, requires_grad=False)) / len(P_supplied)
+        reactive_power_loss = torch.square(Q) / len(
+            Q_supplied)  # 'loss(Q, torch.tensor(0.0, dtype=torch.float32, requires_grad=False)) / len(Q_supplied)
+        Loss = active_power_loss + reactive_power_loss + alpha * (P_pen + Q_pen + V_pen + S_pen)  # + volt_angle_pen
+
+    return torch.mean(wired_mre_losses), Loss
 
 
 def load_homogeneous_supervised_model(in_channels=4, hidden_channels=256, out_channels=4, activation="elu",
@@ -1989,20 +2351,39 @@ def load_homogeneous_supervised_model(in_channels=4, hidden_channels=256, out_ch
     return model
 
 
-def create_ACOPFGNN_model(hidden_channels=256, out_channels=4, num_layers=1, dropout=0.0, act_fn="elu"):
-    hetero_model = ACOPFGNN(hidden_channels, out_channels, num_layers, dropout, act_fn)
+def create_ACOPFGNN_model(init_data, net, index_mappers, hidden_channels=4096, out_channels=4, num_layers=5,
+                          dropout=0.0, act_fn="elu"):
+    hetero_model = ACOPFGNN(hidden_channels, out_channels, num_layers, dropout, act_fn, init_data=init_data)
+
+    # Lazy Initialize Parameters
+    hetero_model.lazy_init(init_data, net, index_mappers)
+
     return hetero_model
 
 
-def train_validate_ACOPF(model: ACOPFGNN, optimizer: torch.optim.Adam, train_inputs: List[ACOPFInput],
-                         val_inputs: List[ACOPFInput], start_epoch=0, num_epochs: int = 1000,
-                         return_outputs: bool = True) -> Tuple[Any, Any]:
+def train_validate_ACOPF(model: ACOPFGNN, model_name: str, optimizer: torch.optim.AdamW, train_inputs: List[ACOPFInput],
+                         val_inputs: List[ACOPFInput], loss_weights:Tuple, start_epoch=0, num_epochs: int = 100,
+                         return_outputs: bool = True, save_model: bool = True) -> Tuple[Any, Any]:
     train_loss = 0.0
+    train_unsupervised_loss = 0.0
+    train_mre_loss = 0.0
+    train_physics_loss = 0.0
+    train_penalty_loss = 0.0
     val_loss = 0.0
+    val_mre_loss = 0.0
+    val_physics_loss = 0.0
+    val_penalty_loss = 0.0
+    val_unsupervised_loss = 0.0
+    alpha, beta, gamma = loss_weights
+
+    lr_scheduler = ReduceLROnPlateau(optimizer, mode="min", factor=0.2, patience=15)
 
     torch.autograd.set_detect_anomaly(True)
+    # torch.autograd.gradcheck()
     train_output = None
     val_output = None
+    prev_lr = optimizer.param_groups[0]['lr']
+    print_lr(prev_lr)
 
     for i in range(start_epoch - 1, num_epochs):
         print(f"Epoch: {i}")
@@ -2024,34 +2405,51 @@ def train_validate_ACOPF(model: ACOPFGNN, optimizer: torch.optim.Adam, train_inp
             edge_attr_dict = ACOPFinput.edge_attr_dict
             bus_idx_neighbors_dict = ACOPFinput.bus_idx_neighbors_dict
             net = ACOPFinput.net
-            scaler_dict = ACOPFinput.scaler_dict
+            scaler = ACOPFinput.scaler
             index_mappers = ACOPFinput.index_mappers
+            angle_params = ACOPFinput.angle_params
+            res_bus = ACOPFinput.res_bus
 
             # Zero your gradients for every batch!
             optimizer.zero_grad()
 
             # Make predictions for this batch
-            out_dict = model(x_dict, constraint_dict, edge_idx_dict, edge_attr_dict, bus_idx_neighbors_dict)
+            out_dict = model(x_dict, edge_idx_dict, edge_attr_dict)
 
             # Compute the loss and its gradients for RMSE loss
-            loss = self_supervised_hetero_obj_fn(out_dict)
+            physics_loss, mre_loss, loss, penalty_loss, unsupervised_loss = self_supervised_hetero_obj_fn(out_dict, bus_idx_neighbors_dict,
+                                                                                       res_bus, constraint_dict, alpha, beta, gamma)
             loss.backward()
+
+            """
+            # After loss.backward()
+            for i, param in enumerate(model.parameters()):
+                if param.requires_grad:
+                    print(f'param_{i}', param.grad)
+                    if param.data is not None:
+                        print(f"param data: {param.data}")"""
 
             # Adjust learning weights
             optimizer.step()
 
             # Store the outputs at the last iteration and last input
             if return_outputs and i == num_epochs - 1 and j == len(train_inputs) - 1:
-                train_output = ACOPFOutput(out_dict, scaler_dict, net, index_mappers)
+                train_output = ACOPFOutput(out_dict, scaler, net, index_mappers, angle_params, res_bus)
 
             # Gather data and report
             train_loss += loss.item()
+            train_mre_loss += mre_loss.item()
+            train_physics_loss += physics_loss.item()
+            train_penalty_loss += penalty_loss.item()
+            train_unsupervised_loss += unsupervised_loss.item()
 
-            print(f"     Training Step: {j} Training Loss: {train_loss/(j + 1)} ")
+            print(f"     Training Step: {j} Training Loss: {loss.item()} ")
 
         # Validation
         print("###########################################")
         print("   VALIDATION")
+
+        # VALIDATION
 
         for j, ACOPFinput in enumerate(val_inputs):
 
@@ -2062,34 +2460,84 @@ def train_validate_ACOPF(model: ACOPFGNN, optimizer: torch.optim.Adam, train_inp
             edge_attr_dict = ACOPFinput.edge_attr_dict
             bus_idx_neighbors_dict = ACOPFinput.bus_idx_neighbors_dict
             net = ACOPFinput.net
-            scaler_dict = ACOPFinput.scaler_dict
+            scaler = ACOPFinput.scaler
             index_mappers = ACOPFinput.index_mappers
+            angle_params = ACOPFinput.angle_params
+            res_bus = ACOPFinput.res_bus
 
             # Make predictions for this batch
-            out_dict = model(x_dict, constraint_dict, edge_idx_dict, edge_attr_dict, bus_idx_neighbors_dict)
+            out_dict = model(x_dict, edge_idx_dict, edge_attr_dict)
 
             # Compute the loss and its gradients for RMSE loss
-            loss = self_supervised_hetero_obj_fn(out_dict)
+            physics_loss, mre_loss, loss, penalty_loss, unsupervised_loss = self_supervised_hetero_obj_fn(out_dict, bus_idx_neighbors_dict,
+                                                                                       res_bus, constraint_dict, alpha, beta, gamma)
 
             # Store the outputs at the last iteration and last input
             if return_outputs and i == num_epochs - 1 and j == len(val_inputs) - 1:
-                val_output = ACOPFOutput(out_dict, scaler_dict, net, index_mappers)
-
+                try:
+                    val_output = ACOPFOutput(out_dict, scaler, net, index_mappers, angle_params, res_bus)
+                except:
+                    print("Output could not be processed.")
             # Gather data and report
             val_loss += loss.item()
+            val_mre_loss += mre_loss.item()
+            val_physics_loss += physics_loss.item()
+            val_penalty_loss += penalty_loss.item()
+            val_unsupervised_loss += unsupervised_loss.item()
 
-            print(f"     Validation Step: {j} Validation Loss: {val_loss / (j + 1)} ")
+            print(f"     Validation Step: {j} Validation Loss: {loss.item()} ")
 
         total_train_loss = train_loss / len(train_inputs)
+        total_train_mre_loss = train_mre_loss / len(train_inputs)
+        total_train_physics_loss = train_physics_loss / len(train_inputs)
+        total_train_penalty_loss = train_penalty_loss / len(train_inputs)
+        total_train_unsupervised_loss = train_unsupervised_loss / len(train_inputs)
         total_val_loss = val_loss / len(val_inputs)
+        total_val_mre_loss = val_mre_loss / len(val_inputs)
+        total_val_physics_loss = val_physics_loss / len(val_inputs)
+        total_val_penalty_loss = val_penalty_loss / len(val_inputs)
+        total_val_unsupervised_loss = val_unsupervised_loss / len(val_inputs)
 
+        # Log the losses to wandb run
         wandb.log({
             'epoch': i,
             'train_loss': total_train_loss,
-            'val_loss': total_val_loss
+            'train_mre_loss': total_train_mre_loss,
+            'train_physics_loss': total_train_physics_loss,
+            'train_penalty_loss': total_train_penalty_loss,
+            'train_unsupervised_loss': total_train_unsupervised_loss,
+            'val_loss': total_val_loss,
+            'val_mre_loss': total_val_mre_loss,
+            'val_physics_loss': total_val_physics_loss,
+            'val_penalty_loss': total_val_penalty_loss,
+            'val_unsupervised_loss': total_val_unsupervised_loss,
         })
+
+        # Adjust the learning Rate based on Validation Loss
+        lr_scheduler.step(val_loss)
+        lr = optimizer.param_groups[0]['lr']
+        if prev_lr != lr:
+            print_lr(lr, first_prompt=False)
+            prev_lr = lr
+
+        # Reset the metrics
         train_loss = 0.0
+        train_mre_loss = 0.0
+        train_physics_loss = 0.0
+        train_penalty_loss = 0.0
+        train_unsupervised_loss = 0.0
         val_loss = 0.0
+        val_mre_loss = 0.0
+        val_physics_loss = 0.0
+        val_penalty_loss = 0.0
+        val_unsupervised_loss = 0.0
+
+    # Save the Model
+    if save_model:
+        try:
+            save_ACOPFGNN_model(model, model_name)
+        except:
+            print("Model cant be saved.")
 
     return train_output, val_output
 
@@ -2146,6 +2594,53 @@ def custom_standard_inverse_transform(scaler: StandardScaler, constraint_feature
     return constraint_features
 
 
+def custom_minmax_constraints_transform(scaler: MinMaxScaler, constraints):
+    # Constraint feature columns: min_V_i, max_V_i, max_S, min_P_i, max_P_i, min_Q_i, max_Q_i
+    max_values = scaler.data_max_
+    min_values = scaler.data_min_
+
+    # Transform the Voltage Magnitude Columns min_V_i and max_V_i
+    _min_ = min_values[0]
+    _max_ = max_values[0]
+
+    constraints[:, 0] = (constraints[:, 0] - _min_) / (_max_ - _min_)
+    constraints[:, 1] = (constraints[:, 1] - _min_) / (_max_ - _min_)
+
+    # Transform the Active Power Columns min_P_i, max_P_i
+    _min_ = min_values[2]
+    _max_ = max_values[2]
+
+    if _max_ - _min_ == 0:
+        constraints[:, 3] = np.zeros_like(constraints[:, 3])
+        constraints[:, 4] = np.zeros_like(constraints[:, 4])
+    else:
+        constraints[:, 3] = (constraints[:, 3] - _min_) / (_max_ - _min_)
+        constraints[:, 4] = (constraints[:, 4] - _min_) / (_max_ - _min_)
+
+    # Transform the Reactive Power Columns min_Q_i, max_Q_i
+    _min_ = min_values[3]
+    _max_ = max_values[3]
+
+    if _max_ - _min_ == 0:
+        constraints[:, 5] = np.zeros_like(constraints[:, 5])
+        constraints[:, 6] = np.zeros_like(constraints[:, 6])
+    else:
+        constraints[:, 5] = (constraints[:, 5] - _min_) / (_max_ - _min_)
+        constraints[:, 6] = (constraints[:, 6] - _min_) / (_max_ - _min_)
+
+    # Transform the max S column
+    min_p = min(abs(min_values[2]), abs(max_values[2]))
+    max_p = max(abs(min_values[2]), abs(max_values[2]))
+    min_q = min(abs(min_values[3]), abs(max_values[3]))
+    max_q = max(abs(min_values[3]), abs(max_values[3]))
+
+    _min_ = np.sqrt(np.square(min_p) + np.square(min_q))
+    _max_ = np.sqrt(np.square(max_p) + np.square(max_q))
+
+    constraints[:, 2] = (constraints[:, 2] - _min_) / (_max_ - _min_)
+    return constraints
+
+
 def custom_minmax_transform(scaler: MinMaxScaler, core_features):
     # Constraint feature columns: min_V_i, max_V_i, max_S, min_P_i, max_P_i, min_Q_i, max_Q_i
     max_values = scaler.data_max_
@@ -2156,26 +2651,78 @@ def custom_minmax_transform(scaler: MinMaxScaler, core_features):
     _max_ = max(max_values[0], max_values[1])
     core_features[:, 0] = 2 * ((core_features[:, 0] - _min_) / (_max_ - _min_)) - 1
 
+    # Transform the voltage angle column delta_i of the core features based on the percentile of min_V_i and max_V_i
+    min_angle = min(core_features[:, 1])
+    max_angle = max(core_features[:, 1])
+    core_features[:, 1] = 2 * ((core_features[:, 1] - min_angle) / (max_angle - min_angle)) - 1
+
     # Transform the Active Power Column P_i of the Core Features based on min_P_i, max_P_i
     _min_ = min(min_values[3], min_values[4])
     _max_ = max(max_values[3], max_values[4])
-    core_features[:, 2] = 2 * ((core_features[:, 2] - _min_) / (_max_ - _min_)) - 1
-
-    if np.isnan(core_features[:, 2]).any():
+    if _max_ - _min_ == 0:
         core_features[:, 2] = np.zeros_like(core_features[:, 2])
+    else:
+        core_features[:, 2] = 2 * ((core_features[:, 2] - _min_) / (_max_ - _min_)) - 1
+
+    # if np.isnan(core_features[:, 2]).any():
+    # core_features[:, 2] = np.zeros_like(core_features[:, 2])
 
     # Transform the Reactive Power Column Q_i of the Core Features based on min_Q_i, max_Q_i
     _min_ = min(min_values[5], min_values[6])
     _max_ = max(max_values[5], max_values[6])
-    core_features[:, 3] = 2 * ((core_features[:, 3] - _min_) / (_max_ - _min_)) - 1
-
-    if np.isnan(core_features[:, 3]).any():
+    if _max_ - _min_ == 0:
         core_features[:, 3] = np.zeros_like(core_features[:, 3])
+    else:
+        core_features[:, 3] = 2 * ((core_features[:, 3] - _min_) / (_max_ - _min_)) - 1
 
-    return core_features
+    # if np.isnan(core_features[:, 3]).any():
+    # core_features[:, 3] = np.zeros_like(core_features[:, 3])
+
+    return core_features, min_angle, max_angle
 
 
-def custom_minmax_inverse_transform(scaler: MinMaxScaler, core_features):
+def custom_minmax_res_bus_transform(scaler: MinMaxScaler, core_features):
+    # Constraint feature columns: min_V_i, max_V_i, max_S, min_P_i, max_P_i, min_Q_i, max_Q_i
+    max_values = scaler.data_max_
+    min_values = scaler.data_min_
+
+    # Transform the Voltage Magnitude Column V_i of the Core Features based on min_V_i, max_V_i
+    _min_ = min_values[0]
+    _max_ = max_values[0]
+    core_features[:, 0] = 2 * ((core_features[:, 0] - _min_) / (_max_ - _min_)) - 1
+
+    # Transform the voltage angle column delta_i of the core features based on the percentile of min_V_i and max_V_i
+    _min_ = min_values[1]
+    _max_ = max_values[1]
+    core_features[:, 1] = 2 * ((core_features[:, 1] - _min_) / (_max_ - _min_)) - 1
+
+    # Transform the Active Power Column P_i of the Core Features based on min_P_i, max_P_i
+    _min_ = min_values[2]
+    _max_ = max_values[2]
+    if _max_ - _min_ == 0:
+        core_features[:, 2] = np.zeros_like(core_features[:, 2])
+    else:
+        core_features[:, 2] = 2 * ((core_features[:, 2] - _min_) / (_max_ - _min_)) - 1
+
+    # if np.isnan(core_features[:, 2]).any():
+    # core_features[:, 2] = np.zeros_like(core_features[:, 2])
+
+    # Transform the Reactive Power Column Q_i of the Core Features based on min_Q_i, max_Q_i
+    _min_ = min_values[3]
+    _max_ = max_values[3]
+
+    if _max_ - _min_ == 0:
+        core_features[:, 3] = np.zeros_like(core_features[:, 3])
+    else:
+        core_features[:, 3] = 2 * ((core_features[:, 3] - _min_) / (_max_ - _min_)) - 1
+
+    # if np.isnan(core_features[:, 3]).any():
+    # core_features[:, 3] = np.zeros_like(core_features[:, 3])
+
+    return core_features  # , min_angle, max_angle
+
+
+def custom_minmax_inverse_transform(scaler: MinMaxScaler, core_features, min_angle, max_angle):
     # Constraint feature columns: min_V_i, max_V_i, max_S, min_P_i, max_P_i, min_Q_i, max_Q_i
     max_values = scaler.data_max_
     min_values = scaler.data_min_
@@ -2184,6 +2731,10 @@ def custom_minmax_inverse_transform(scaler: MinMaxScaler, core_features):
     _min_ = min(min_values[0], min_values[1])
     _max_ = max(max_values[0], max_values[1])
     core_features[:, 0] = (core_features[:, 0] + 1) * 0.5 * (_max_ - _min_) + _min_
+
+    # Inverse Transform the Voltage Angle Column delta_i of the Core Features based on the percentile of min_V_i, max_V_i
+
+    core_features[:, 1] = (core_features[:, 1] + 1) * 0.5 * (max_angle - min_angle) + min_angle
 
     # Inverse Transform the Active Power Column P_i of the Core Features based on min_P_i, max_P_i
     _min_ = min(min_values[3], min_values[4])
@@ -2202,3 +2753,132 @@ def custom_minmax_inverse_transform(scaler: MinMaxScaler, core_features):
         core_features[:, 3] = np.zeros_like(core_features[:, 3])
 
     return core_features
+
+
+def print_lr(lr, first_prompt: bool = True):
+    if not first_prompt:
+        print('-' * 15 + f"   LEARNING RATE HALVING DOWN TO: {lr}   " + '-' * 15)
+    print('-' * 15 + f"   CURRENT LEARNING RATE: {lr}   " + '-' * 15)
+
+
+async def monitor_lr(optimizer: torch.optim.AdamW, prompt_first: bool = True):
+    prev_lr = optimizer.param_groups[0]['lr']
+    print_lr(prev_lr) if prompt_first else None
+
+    while True:
+        await asyncio.sleep(30)
+        current_lr = optimizer.param_groups[0]['lr']
+        if current_lr != prev_lr:
+            print_lr(current_lr)
+            prev_lr = current_lr
+
+
+async def run_thread(optimizer):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(monitor_lr(optimizer))
+    loop.close()
+
+
+def save_ACOPFGNN_model(model: ACOPFGNN, model_name: str):
+    path = r"./Models/SelfSupervised/" + model_name
+
+    torch.save(model.state_dict(), path)
+
+
+def load_ACOPFGNN_model(grid_name, model_name, hidden_channels, num_layers):
+    path = '/'.join(os.path.dirname(os.path.abspath(__file__)).split("\\")) + r"/Models/SelfSupervised/" + model_name
+    index_mappers, net, data = generate_unsupervised_input(grid_name)
+    model = create_ACOPFGNN_model(data, net, index_mappers, hidden_channels=hidden_channels, num_layers=num_layers)
+
+    # Load the saved model parameter
+    ordered_dict = torch.load(path)
+    model.load_state_dict(ordered_dict)
+
+    return model
+
+
+def softabs(x, alpha=1e-2):
+    return torch.sqrt(x ** 2 + alpha ** 2)
+
+
+def arcsin_approx(x_):
+    # 5th-degree Taylor approximation: arcsin(x) ≈ x + x^3/6 + 3x^5/40
+    x = torch.tanh(x_)
+    return x + (x ** 3) / 6 + (3 * (x ** 5)) / 40
+
+
+def arccos_approx(x):
+    # arccos(x) = pi/2 - arcsin(x)
+    # Use the arcsin approximation to calculate arccos
+    return (torch.pi / 2) - arcsin_approx(x)
+
+
+def inverse_map_index(node_type: str, index_mappers) -> list:
+    indices = []
+    idx_mapper = index_mappers[0]
+    node_type_idx_mapper = index_mappers[1]
+
+    for i in range(len(node_type_idx_mapper[node_type])):
+        idx = idx_mapper[node_type_idx_mapper[node_type][i]]
+        indices.append(idx)
+
+    return indices
+
+
+def calc_physics_loss(out_dict, bus_idx_neighbors_dict):
+    loss = torch.nn.functional.mse_loss
+    P_physics = []
+    P_model = []
+    Q_physics = []
+    Q_model = []
+
+    for from_bus in bus_idx_neighbors_dict:
+        for bus_idx in bus_idx_neighbors_dict[from_bus]:
+
+            V_i = out_dict[from_bus][bus_idx][0]
+            volt_angle_i = out_dict[from_bus][bus_idx][1]
+            P_i = out_dict[from_bus][bus_idx][2]
+            Q_i = out_dict[from_bus][bus_idx][3]
+
+            P = []
+            Q = []
+
+            for pair in bus_idx_neighbors_dict[from_bus][bus_idx]:
+                # For each neighbor of the iterated bus
+                to_bus, to_bus_idx, edge_attr = pair
+
+                V_j = out_dict[to_bus][to_bus_idx][0]
+
+                if to_bus_idx >= len(out_dict[to_bus]):
+                    print("INDEX PROBLEM")
+
+                volt_angle_j = out_dict[to_bus][to_bus_idx][1]
+                delta_ij = volt_angle_i - volt_angle_j
+
+                G_ij = edge_attr[0] / (edge_attr[0] ** 2 + edge_attr[1] ** 2)
+
+                B_ij = -edge_attr[1] / (edge_attr[0] ** 2 + edge_attr[1] ** 2)
+
+                # ACOPF Equation for P_i
+                P_ij = softabs(V_i) * softabs(V_j) * (G_ij * torch.cos(delta_ij) + B_ij * torch.sin(delta_ij))
+
+                P.append(P_ij)
+
+                # ACOPF Equation for Q_i
+                Q_ij = softabs(V_i) * softabs(V_j) * (G_ij * torch.sin(delta_ij) - B_ij * torch.cos(delta_ij))
+
+                Q.append(Q_ij)
+
+            # Sums of all P_ij and Q_ij equal to P_i and Q_i respectively
+            P_ = torch.stack(P)
+            P_physics.append(torch.sum(P_))
+            P_model.append(P_i)
+            Q_ = torch.stack(Q)
+            Q_physics.append(torch.sum(Q_))
+            Q_model.append(Q_i)
+
+    LOSS_P = loss(torch.stack(P_model), -1 * torch.stack(P_physics))
+    LOSS_Q = loss(torch.stack(Q_model), -1 * torch.stack(Q_physics))
+
+    return LOSS_P + LOSS_Q
