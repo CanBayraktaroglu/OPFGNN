@@ -32,6 +32,7 @@ class ACOPFOutput:
         self.net = net
         self.res_bus = res_bus
         self.scaler = scaler
+        self.out_dict = out_dict
         #self.scaler_res_bus = scaler_res_bus
         self.output, self.target = self.process_output(out_dict, scaler, angle_params)
 
