@@ -20,7 +20,8 @@ import json
 from ACOPFData import ACOPFInput, ACOPFOutput
 import pickle
 from gnn import GNN
-from heterognn import ACOPFGNN, custom_tanh, ACOPFEnforcer, ACOPFEmbedder, ACOPFEmbedder_Bus, ACOPFGeneral
+from heterognn import ACOPFGNN, custom_tanh, ACOPFEnforcer, ACOPFEmbedder, ACOPFEmbedder_Bus, ACOPFGeneral, \
+    ACOPFEmbedder_Bus_Constrained
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 import asyncio
 
@@ -466,7 +467,6 @@ def read_multiple_supervised_datasets(grid_names):
     graphdata_lst = []
     for _ in grid_names:
         train_data, val_data, test_data, edge_index, edge_attr = read_supervised_training_data_edge_attr(_)
-        # edge_attr = torch.tensor(StandardScaler().fit_transform(edge_attr), dtype=torch.float32)
         graphdata_lst.append(GraphData(_, train_data, val_data, test_data, edge_index, edge_attr))
     return graphdata_lst
 
@@ -942,52 +942,6 @@ def extract_node_types_as_dict(net: pp.pandapowerNet) -> Tuple[dict, dict]:
         # Get the number of loads connected to the bus
         load_count = len(load_idx_set)
 
-        """
-        sum_nominal_power_supply, sum_nominal_power_demand = 0.0, 0.0
-
-        if idx_given in net.sgen.bus.values:
-            sum_nominal_power_supply += list(net.sgen.loc[net.sgen.bus.values == idx_given].sn_mva).pop()
-
-        if gen_count and load_count:
-
-            for gen_idx in gen_idx_set:
-                sum_nominal_power_supply += net.gen.iloc[gen_idx].sn_mva
-
-            for load_idx in load_idx_set:
-                sum_nominal_power_demand += net.load.iloc[load_idx].sn_mva
-
-            total_sn_mva = sum_nominal_power_supply - sum_nominal_power_demand
-
-            if total_sn_mva > 0.0:
-                node_type_bus_idx_dict["PV"].append(idx_given)
-            elif total_sn_mva == 0.0:
-                node_type_bus_idx_dict["NB"].append(idx_given)
-            else:
-                node_type_bus_idx_dict["PQ"].append(idx_given)
-
-        elif gen_count:
-            node_type_bus_idx_dict["PV"].append(idx_given)
-
-        elif load_count:
-
-            for load_idx in load_idx_set:
-                sum_nominal_power_demand += net.load.iloc[load_idx].sn_mva
-
-            total_sn_mva = sum_nominal_power_supply - sum_nominal_power_demand
-
-            if total_sn_mva > 0.0:
-                node_type_bus_idx_dict["PV"].append(idx_given)
-            elif total_sn_mva == 0.0:
-                node_type_bus_idx_dict["NB"].append(idx_given)
-            else:
-                node_type_bus_idx_dict["PQ"].append(idx_given)
-
-        else:
-            if sum_nominal_power_supply == 0.0:
-                node_type_bus_idx_dict["NB"].append(idx_given)
-            else:
-                node_type_bus_idx_dict["PV"].append(idx_given)
-        """
 
         if gen_count or sum(net.load.loc[net.load.bus == idx_given].p_mw.values) < sum(
                 net.sgen.loc[net.sgen.bus == idx_given].p_mw.values):
@@ -1819,16 +1773,16 @@ def generate_unsupervised_input(grid_name: str, suppress_info: bool = True) -> A
 
                 # Max Active Power max_p_i
 
-                max_p_i = torch.tensor(-load_min_p, dtype=torch.float32,
+                max_p_i = torch.tensor(-sgen_min_p + load_min_p, dtype=torch.float32,
                                        requires_grad=True)  # PV busses must ensure at least their own load demand is satisfied
 
                 # Min Reactive Power min_q_i
 
-                min_q_i = torch.tensor(-load_min_q, dtype=torch.float32, requires_grad=True)
+                min_q_i = torch.tensor(-sgen_min_q, dtype=torch.float32, requires_grad=True)
 
                 # Max Reactive Power max_q_i
 
-                max_q_i = torch.tensor(-sgen_min_q, dtype=torch.float32,
+                max_q_i = torch.tensor(-sgen_min_q + load_min_q, dtype=torch.float32,
                                        requires_grad=True)  # enforcing self-sustenance
 
             elif node_type == "PQ":
@@ -1920,32 +1874,7 @@ def extract_unsupervised_inputs(data: HeteroData, net, index_mappers):
     edge_idx_dict = dict()
     edge_attr_dict = dict()
     bus_idx_neighbors_dict = dict()
-    """
-    # x_dict and constraint_dict
-    for node_type in data.node_types:
-        x: torch.Tensor
-        c: torch.Tensor
-        scaler = MinMaxScaler()
-        if len(data[node_type]) != 0:
-            c = scaler.fit_transform(data[node_type].x[:, 4:].detach().numpy())
-            c = 2 * c - 1  # Scale between -1 and 1
-            if torch.isnan(torch.tensor(c)).any():
-                print(f"nan value found in node_type {node_type} in c")
-            c = torch.tensor(c, dtype=torch.float32, requires_grad=False)
-            x, min_angle, max_angle = custom_minmax_transform(scaler, data[node_type].x[:, :4].detach().numpy())
 
-            if node_type == "SB":
-                x[0, 1] = torch.tensor(0.0, dtype=torch.float32, requires_grad=True)
-
-            if torch.isnan(torch.tensor(x)).any():
-                print(f"nan value found in node_type {node_type} in x")
-            x = torch.tensor(x, dtype=torch.float32, requires_grad=True)
-            x_dict[node_type] = x
-            constraint_dict[node_type] = c
-
-            scalers_dict[node_type] = scaler
-            angle_params_dict[node_type] = (min_angle, max_angle)
-    """
     node_type_len_mapper = dict()
     constraints = []
     features = []
@@ -2191,13 +2120,21 @@ def load_unsupervised_output(grid_name: str):
     return output
 
 
-def self_supervised_hetero_obj_fn(x_dict, out_dict, bus_idx_neighbors_dict, constraints_dict,
+def self_supervised_hetero_obj_fn(out_dict, res_dict, bus_idx_neighbors_dict, constraints_dict,
                                   scaler: StandardScaler):
-    unsupervised_loss = calc_unsupervised_loss(out_dict, scaler)
-    physics_loss = calc_physics_loss(x_dict, out_dict, bus_idx_neighbors_dict, scaler)
-    constraint_loss = calc_constraint_loss(out_dict, constraints_dict, scaler)
 
-    return physics_loss, torch.tensor(0.0), constraint_loss, unsupervised_loss
+    target, output = [],[]
+    for node_type in out_dict:
+        output.extend(out_dict[node_type])
+        target.extend(res_dict[node_type])
+
+    x = torch.stack(output)
+    y = torch.stack(target)
+
+    rmse_loss = torch.sqrt(torch.nn.functional.mse_loss(x, y))
+    mreloss = get_mre_loss(x, y)
+
+    return rmse_loss, mreloss
 
 
 def self_supervised_enforcer_obj_fn(out_dict, constraints_dict, scaler):
@@ -2232,7 +2169,7 @@ def load_homogeneous_supervised_model(in_channels=4, hidden_channels=256, out_ch
     return model
 
 
-def create_ACOPFGNN_model(init_data, net, index_mappers, hidden_channels=4096, out_channels=4, num_layers=5,
+def create_ACOPFGNN_model(init_data, net, index_mappers, hidden_channels=64, out_channels=4, num_layers=1,
                           dropout=0.0, act_fn="elu"):
     hetero_model = ACOPFGNN(hidden_channels, out_channels, num_layers, dropout, act_fn, init_data=init_data)
 
@@ -2275,6 +2212,15 @@ def create_ACOPFEmbedder_Bus_model(init_data, net, index_mappers, hidden_channel
 def create_ACOPFGeneral_model(init_data, net, index_mappers, hidden_channels=32, out_channels=4, num_layers=1,
                               dropout=0.0, act_fn="elu"):
     hetero_model = ACOPFGeneral(hidden_channels, out_channels, num_layers, dropout, act_fn, init_data=init_data)
+
+    # Lazy Initialize Parameters
+    hetero_model.lazy_init(init_data, net, index_mappers)
+
+    return hetero_model
+
+def create_ACOPFEmbedder_Bus_Constrained(init_data, net, index_mappers, hidden_channels=16, out_channels=4, num_layers=1,
+                              dropout=0.0, act_fn="elu"):
+    hetero_model = ACOPFEmbedder_Bus_Constrained(hidden_channels, out_channels, num_layers, dropout, act_fn, init_data=init_data)
 
     # Lazy Initialize Parameters
     hetero_model.lazy_init(init_data, net, index_mappers)
@@ -2541,13 +2487,13 @@ def train_validate_ACOPF_chained(minimizer_model: ACOPFGNN, enforcer_model: ACOP
             angle_params = ACOPFinput.angle_params
             res_bus = ACOPFinput.res_bus
 
-            powers_dict = dict()
+            #powers_dict = dict()
 
-            for node_type in x_dict:
-                V = x_dict[node_type][:, 0].view(-1, 1)
-                delta = x_dict[node_type][:, 1].view(-1, 1)
-                powers = torch.cat([V, delta], dim=1)
-                powers_dict[node_type] = powers
+            #for node_type in x_dict:
+               # V = x_dict[node_type][:, 0].view(-1, 1)
+                #delta = x_dict[node_type][:, 1].view(-1, 1)
+                #powers = torch.cat([V, delta], dim=1)
+                #powers_dict[node_type] = powers
 
             # initial_voltage_dict = dict()
             # for node_type in x_dict:
@@ -2563,11 +2509,12 @@ def train_validate_ACOPF_chained(minimizer_model: ACOPFGNN, enforcer_model: ACOP
             # Compute minimization loss
             # unsupervised_loss = torch.tensor(0.0)  # self_supervised_minimizer_obj_fn(out_dict, scaler)
 
-            out_dict = embedder_model(powers_dict, bus_idx_neighbors_dict, edge_idx_dict, edge_attr_dict)
+            out_dict = embedder_model(x_dict, constraint_dict,bus_idx_neighbors_dict, edge_idx_dict, edge_attr_dict)
 
             physics_loss = self_supervised_embedder_obj_fn(powers_dict, out_dict, bus_idx_neighbors_dict, scaler)
 
-            # physics_loss, mre_loss, penalty_loss, unsupervised_loss = self_supervised_hetero_obj_fn(x_dict,out_dict, bus_idx_neighbors_dict,constraint_dict,scaler)
+
+            #loss, mre_loss = self_supervised_hetero_obj_fn(out_dict,res_bus, bus_idx_neighbors_dict,constraint_dict,scaler)
             # Forward pass with enforcer
             # out_dict = enforcer_model(out_dict, constraint_dict, edge_idx_dict, edge_attr_dict, scaler)
 
@@ -2576,7 +2523,7 @@ def train_validate_ACOPF_chained(minimizer_model: ACOPFGNN, enforcer_model: ACOP
             unscaled_loss = torch.tensor(0.0)
             # Compute Total with weightings
             # loss = alpha * unsupervised_loss + beta * physics_loss + gamma * penalty_loss
-            loss = alpha * physics_loss  # + gamma * penalty_loss
+            #loss = alpha * physics_loss  # + gamma * penalty_loss
             loss.backward()
             ACOPF_optimizer.step()
 
@@ -2588,9 +2535,9 @@ def train_validate_ACOPF_chained(minimizer_model: ACOPFGNN, enforcer_model: ACOP
             """
             # Gather data and report
             train_loss += loss.item()
-            train_unscaled_loss += unscaled_loss.item()
-            # train_mre_loss += mre_loss.item()
-            train_physics_loss += physics_loss.item()
+            #train_unscaled_loss += unscaled_loss.item()
+            train_mre_loss += mre_loss.item()
+            #train_physics_loss += physics_loss.item()
             # train_penalty_loss += penalty_loss.item()
             # train_unsupervised_loss += unsupervised_loss.item()
 
@@ -2616,13 +2563,13 @@ def train_validate_ACOPF_chained(minimizer_model: ACOPFGNN, enforcer_model: ACOP
             angle_params = ACOPFinput.angle_params
             res_bus = ACOPFinput.res_bus
 
-            powers_dict = dict()
+            #powers_dict = dict()
 
-            for node_type in x_dict:
-                V = x_dict[node_type][:, 0].view(-1, 1)
-                delta = x_dict[node_type][:, 1].view(-1, 1)
-                powers = torch.cat([V, delta], dim=1)
-                powers_dict[node_type] = powers
+            #for node_type in x_dict:
+             #   V = x_dict[node_type][:, 0].view(-1, 1)
+             #   delta = x_dict[node_type][:, 1].view(-1, 1)
+              #  powers = torch.cat([V, delta], dim=1)
+             #  powers_dict[node_type] = powers
 
             # Forward pass with minimizer
             # out_dict = minimizer_model(x_dict, constraint_dict, edge_idx_dict, edge_attr_dict)
@@ -2630,20 +2577,20 @@ def train_validate_ACOPF_chained(minimizer_model: ACOPFGNN, enforcer_model: ACOP
             # Compute minimization loss
             # unsupervised_loss = torch.tensor(0.0)  # self_supervised_minimizer_obj_fn(out_dict, scaler)
 
-            out_dict = embedder_model(powers_dict, bus_idx_neighbors_dict, edge_idx_dict, edge_attr_dict)
+            out_dict = embedder_model(x_dict, constraint_dict,bus_idx_neighbors_dict, edge_idx_dict, edge_attr_dict)
 
-            physics_loss = self_supervised_embedder_obj_fn(powers_dict, out_dict, bus_idx_neighbors_dict, scaler)
-            # physics_loss, mre_loss, penalty_loss, unsupervised_loss = self_supervised_hetero_obj_fn(x_dict,out_dict, bus_idx_neighbors_dict,constraint_dict,scaler)
+            #physics_loss = self_supervised_embedder_obj_fn(powers_dict, out_dict, bus_idx_neighbors_dict, scaler)
+            loss, mre_loss = self_supervised_hetero_obj_fn(out_dict,res_bus, bus_idx_neighbors_dict,constraint_dict,scaler)
 
             # Forward pass with enforcer
             # out_dict = enforcer_model(out_dict, constraint_dict, edge_idx_dict, edge_attr_dict, scaler)
-            unscaled_loss = torch.tensor(0.0)
+            #unscaled_loss = torch.tensor(0.0)
             # Compute constraint loss
             # penalty_loss = torch.tensor(0.0)  # self_supervised_enforcer_obj_fn(out_dict, constraint_dict, scaler)
 
             # Compute Total with weightings
             # loss = alpha * unsupervised_loss + beta * physics_loss + gamma * penalty_loss
-            loss = alpha * physics_loss  # + gamma * penalty_loss
+            #loss = alpha * physics_loss  # + gamma * penalty_loss
 
             # Store the outputs at the last iteration and last input
             """
@@ -2653,42 +2600,42 @@ def train_validate_ACOPF_chained(minimizer_model: ACOPFGNN, enforcer_model: ACOP
             """
             # Gather data and report
             val_loss += loss.item()
-            val_unscaled_loss += unscaled_loss.item()
-            # val_mre_loss += mre_loss.item()
-            val_physics_loss += physics_loss.item()
+            #val_unscaled_loss += unscaled_loss.item()
+            val_mre_loss += mre_loss.item()
+            #val_physics_loss += physics_loss.item()
             # val_penalty_loss += penalty_loss.item()
             # val_unsupervised_loss += unsupervised_loss.item()
 
             print(f"     Validation Step: {j} Validation Loss: {loss.item()} ")
 
         total_train_loss = train_loss / len(train_inputs)
-        total_train_physics_loss = train_physics_loss / len(train_inputs)
-        total_train_penalty_loss = train_penalty_loss / len(train_inputs)
+        #total_train_physics_loss = train_physics_loss / len(train_inputs)
+        #total_train_penalty_loss = train_penalty_loss / len(train_inputs)
         total_train_mre_loss = train_mre_loss / len(train_inputs)
-        total_train_unsupervised_loss = train_unsupervised_loss / len(train_inputs)
-        total_train_unscaled_loss = train_unscaled_loss / len(train_inputs)
+        #total_train_unsupervised_loss = train_unsupervised_loss / len(train_inputs)
+        #total_train_unscaled_loss = train_unscaled_loss / len(train_inputs)
         total_val_loss = val_loss / len(val_inputs)
-        total_val_physics_loss = val_physics_loss / len(val_inputs)
-        total_val_penalty_loss = val_penalty_loss / len(val_inputs)
-        total_val_unsupervised_loss = val_unsupervised_loss / len(val_inputs)
+        #total_val_physics_loss = val_physics_loss / len(val_inputs)
+        #total_val_penalty_loss = val_penalty_loss / len(val_inputs)
+        #total_val_unsupervised_loss = val_unsupervised_loss / len(val_inputs)
         total_val_mre_loss = val_mre_loss / len(val_inputs)
-        total_val_unscaled_loss = val_unscaled_loss / len(val_inputs)
+        #total_val_unscaled_loss = val_unscaled_loss / len(val_inputs)
 
         # Log the losses to wandb run
         wandb.log({
             'epoch': i,
             'train_loss': total_train_loss,
-            'train_physics_loss': total_train_physics_loss,
-            'train_penalty_loss': total_train_penalty_loss,
-            'train_unsupervised_loss': total_train_unsupervised_loss,
+            #'train_physics_loss': total_train_physics_loss,
+            #'train_penalty_loss': total_train_penalty_loss,
+            #'train_unsupervised_loss': total_train_unsupervised_loss,
             'train_mre_loss': total_train_mre_loss,
-            'train_unscaled_loss': total_train_unscaled_loss,
+           # 'train_unscaled_loss': total_train_unscaled_loss,
             'val_loss': total_val_loss,
-            'val_physics_loss': total_val_physics_loss,
-            'val_penalty_loss': total_val_penalty_loss,
-            'val_unsupervised_loss': total_val_unsupervised_loss,
+            #'val_physics_loss': total_val_physics_loss,
+            #'val_penalty_loss': total_val_penalty_loss,
+            #'val_unsupervised_loss': total_val_unsupervised_loss,
             'val_mre_loss': total_val_mre_loss,
-            'val_unscaled_loss': total_val_unscaled_loss
+            #'val_unscaled_loss': total_val_unscaled_loss
         })
 
         # Adjust the learning Rate based on Validation Loss
@@ -2730,7 +2677,7 @@ def train_validate_ACOPF_chained(minimizer_model: ACOPFGNN, enforcer_model: ACOP
         # print("Model cant be saved.")
 
         try:
-            save_ACOPFGNN_model(embedder_model, "hetero_model_voltage.pt")
+            save_ACOPFGNN_model(embedder_model, "hetero_model_bus_constrained.pt")
         except:
             print("Model cant be saved.")
 

@@ -93,6 +93,255 @@ def flatten_and_reshape_tensors(tensor_list):
     return flat_list
 
 
+class ACOPFEmbedder_Bus_Constrained(torch.nn.Module):
+    def __init__(self, hidden_channels: int, out_channels: int, num_layers: int, dropout: float, act_fn: str = "elu"
+                 , norm: Union[str, Callable, None] = None, init_data=None):
+        """
+        Edge Types:
+            SB - PV, SB - PQ, SB - NB
+            PV - PQ, PV - NB, PV - PV
+            PQ - NB; PQ - PQ
+            NB - NB
+        Args:
+            hidden_channels:
+            out_channels:
+            num_layers:
+        """
+        super().__init__()
+
+        self.norms = None
+        self.meta_data = None
+        self.aggr = "sum"
+        #self.aggr_P = torch_geometric.nn.aggr.PowerMeanAggregation(learn=True)
+        #self.aggr_Q = torch_geometric.nn.aggr.PowerMeanAggregation(learn=True)
+        self.heads = 1
+        self.in_channels = 4
+        self.hidden_channels = hidden_channels
+        self.out_channels = 4
+        self.num_layers = num_layers
+        self.dropout = dropout
+        self.act_fn = act_fn
+        self.act = activation_resolver(act_fn, **({}))
+        self.act_first = False
+        self.jk_mode = "last"
+        in_channels = hidden_channels * self.heads
+        self.node_types = ["SB", "PQ", "PV", "NB"]
+
+
+        self.convs = ModuleList()
+        # self.splines = ModuleList()
+        #GATv2Conv(-1, self.hidden_channels, edge_dim=2)
+        for _ in range(self.num_layers):
+            conv = ModuleDict({
+                'SB': TransformerConv(-1, self.hidden_channels, edge_dim=2,heads=self.heads),
+
+                'PQ': TransformerConv(-1, self.hidden_channels, edge_dim=2,heads=self.heads),
+
+                'PV': TransformerConv(-1, self.hidden_channels, edge_dim=2,heads=self.heads),
+                'NB': TransformerConv(-1, self.hidden_channels, edge_dim=2,heads=self.heads),
+            })
+
+            self.convs.append(conv)
+
+        self.node_types_dict = {key: init_data[key].x.size(0) for key in init_data.node_types}
+
+        fc = ModuleDict()
+        for node_type in self.node_types_dict:
+            size = self.node_types_dict[node_type]
+            fc[node_type] = Linear(-1, int(size * self.out_channels), bias=True)
+
+        self.fcs = fc
+
+    def lazy_init(self, lazy_input, net, index_mappers):
+        x_dict, constraint_dict, edge_idx_dict, edge_attr_dict, bus_idx_neighbors_dict, scaler, _, res_bus_dict = hp.extract_unsupervised_inputs(
+            lazy_input, net, index_mappers)
+
+        #initial_voltage_dict = dict()
+        #for node_type in x_dict:
+            #V = x_dict[node_type][:, 0].view(-1, 1)
+            #initial_voltage_dict[node_type] = V
+        #self.init_layer_norm(x_dict)
+
+
+        output = self.forward(x_dict, constraint_dict,bus_idx_neighbors_dict, edge_idx_dict, edge_attr_dict, check_nans=True)
+        print(output)
+
+    def set_meta_data(self, x_dict):
+        meta_data = dict()
+
+        for node_type in x_dict:
+            meta_data[node_type] = len(x_dict[node_type])
+
+        self.meta_data = meta_data
+
+    def init_layer_norm(self, x_dict):
+        self.set_meta_data(x_dict)
+        self.norms = ModuleList()
+        norm_layer = HeteroMinMaxNorm()
+
+        # for _ in range(self.num_layers):
+        # self.norms.append(copy.deepcopy(norm_layer))
+        self.norms.append(norm_layer)
+
+    def group(self, xs: List[Tensor]) -> Optional[Tensor]:
+
+        out = torch.cat(xs, dim=0)
+        half = int(self.hidden_channels / 2)
+
+        P_ij = out[:, :half]
+        Q_ij = out[:, half:]
+
+        if self.aggr is not None:
+            P_i = getattr(torch, self.aggr)(P_ij, dim=1)
+            Q_i = getattr(torch, self.aggr)(Q_ij, dim=1)
+
+        else:
+            P_i = self.aggr_P(P_ij, dim=1)
+            print(f"P_i : {P_i}")
+            Q_i = self.aggr_Q(Q_ij, dim=1)
+            print(f"Q_i : {Q_i}")
+
+        if len(xs) > 1:
+            out = torch.cat([P_i.view(-1, 1), Q_i.view(-1, 1)], dim=1)
+
+        else:
+            out = torch.stack([P_i, Q_i])
+        return out
+
+    def group_wired(self, xs: List[Tensor]) -> Optional[Tensor]:
+
+        out = torch.cat(xs, dim=0)
+        half = int(self.hidden_channels / 2)
+        quarter = int(self.hidden_channels / 4)
+
+        V = out[:, :quarter]
+        delta = out[:, quarter:half]
+        P = out[:, half:half + quarter]
+        Q = out[:, half + quarter:]
+
+        if self.aggr is not None:
+            V_i = getattr(torch, self.aggr)(V, dim=1)
+            delta_i = getattr(torch, self.aggr)(delta, dim=1)
+            P_i = getattr(torch, self.aggr)(P, dim=1)
+            Q_i = getattr(torch, self.aggr)(Q, dim=1)
+
+        else:
+            P_i = self.aggr_P(P, dim=1)
+            print(f"P_i : {P_i}")
+            Q_i = self.aggr_Q(Q, dim=1)
+            print(f"Q_i : {Q_i}")
+
+        if len(xs) > 1:
+            out = torch.cat([V_i.view(-1, 1), delta_i.view(-1, 1), P_i.view(-1, 1), Q_i.view(-1, 1)], dim=1)
+
+        else:
+            out = torch.stack([V_i, delta_i, P_i, Q_i])
+        return out
+
+    def forward(self, x_dict, constraint_dict, bus_idx_neighbors_dict, edge_idx_dict, edge_attr_dict,
+                check_nans: bool = False):
+
+        if check_nans:
+            for node_type in x_dict:
+                x = x_dict[node_type]
+                if torch.isnan(x).any():
+                    print(f"nan found in node type {node_type} of x_dict")
+
+        # All calls of the forward function must support edge_attr & edge_idx for this model
+
+        out_dict = defaultdict(list)
+
+        for i in range(self.num_layers):
+
+            for from_bus in bus_idx_neighbors_dict:
+                conv = self.convs[i][from_bus]
+                to_xs = []
+                edge_attr = []
+                edge_idx = [[], []]
+                # print(f"from_bus : {from_bus}")
+
+                for bus_idx in bus_idx_neighbors_dict[from_bus]:
+
+                    for pair in bus_idx_neighbors_dict[from_bus][bus_idx]:
+                        # For each neighbor of the iterated bus
+                        to_bus, to_bus_idx, edge_attribute = pair
+                        to_x = x_dict[to_bus][to_bus_idx]
+                        to_xs.append(to_x.view(1, self.in_channels))
+                        # print(f"bus_idx: {bus_idx}, to_idx: {len(edge_idx[0])}")
+                        edge_idx[1].append(bus_idx)
+                        edge_idx[0].append(len(edge_idx[0]))
+                        edge_attr.append(edge_attribute.view(1, 2))
+
+                # print(f"edge_idx: {edge_idx}")
+                edge_attr = torch.cat(edge_attr, dim=0)
+                # print(f"edge_attr: {edge_attr.shape}")
+                x_dst = torch.cat(to_xs, dim=0)
+                # print(f"x_dst shape: {x_dst.shape}")
+                # print(f"x_src shape: {x_dict[from_bus].shape}")
+
+                out = conv((x_dst, x_dict[from_bus]), edge_index=torch.tensor(edge_idx), edge_attr=edge_attr)
+
+                out_dict[from_bus].append(out)
+                # print(f"shape: {out.shape}")
+
+        # Calculate the Aggregations
+        for key, value in out_dict.items():
+            # print(f"key: {key}")
+            # shape = [x.shape for x in value]
+            # print(f"shape before Aggr {shape}")
+
+            val = self.group_wired(value)
+            out_dict[key] = val
+
+            # print(f"shape after Aggr {val.shape}")
+            fc = self.fcs[key]
+
+            # Flatten the tensor
+            _out_ = val.view(-1)
+            # print(f"shape after flattened {_out_.shape}")
+
+            out = fc(_out_)
+
+            out_dict[key] = out.view(self.node_types_dict[key], self.out_channels)
+
+        for node_type, features in out_dict.items():
+            # Store the constraints
+            V_min = constraint_dict[node_type][:, 0].view(-1, 1)
+            V_max = constraint_dict[node_type][:, 1].view(-1, 1)
+            P_min = constraint_dict[node_type][:, 3].view(-1, 1)
+            P_max = constraint_dict[node_type][:, 4].view(-1, 1)
+            Q_min = constraint_dict[node_type][:, 5].view(-1, 1)
+            Q_max = constraint_dict[node_type][:, 6].view(-1, 1)
+
+            # Store the outputs
+            V_node = features[:, 0].view(-1, 1)
+            delta_node = features[:, 1].view(-1, 1)
+            P_node = features[:, 2].view(-1, 1)
+            Q_node = features[:, 3].view(-1, 1)
+            # delta_mean = scaler.mean_[1]
+            # delta_std = scaler.scale_[1]
+            # delta_sum_target = -delta_mean / delta_std
+
+            #lower_V = V_min + torch.nn.functional.relu(V_node - V_min)
+            #constrained_V = V_max - torch.nn.functional.relu(V_max - lower_V)
+
+            #lower_P = P_min + torch.nn.functional.relu(P_node - P_min)
+            #constrained_P = P_max - torch.nn.functional.relu(P_max - lower_P)
+
+            #lower_Q = Q_min + torch.nn.functional.relu(Q_node - Q_min)
+            #constrained_Q = Q_max - torch.nn.functional.relu(Q_max - lower_Q)
+
+            constrained_V = custom_tanh(V_node, V_min, V_max)
+            constrained_P = custom_tanh(P_node,P_min, P_max)
+            constrained_Q = custom_tanh(Q_node, Q_min, Q_max)
+
+            enforced_features = torch.cat([constrained_V, delta_node, constrained_P, constrained_Q], dim=1)
+            out_dict[node_type] = enforced_features
+
+
+        return out_dict
+
+
 class ACOPFEmbedder_Bus(torch.nn.Module):
     def __init__(self, hidden_channels: int, out_channels: int, num_layers: int, dropout: float, act_fn: str = "elu"
                  , norm: Union[str, Callable, None] = None, init_data=None):
@@ -115,9 +364,9 @@ class ACOPFEmbedder_Bus(torch.nn.Module):
         #self.aggr_P = torch_geometric.nn.aggr.PowerMeanAggregation(learn=True)
         #self.aggr_Q = torch_geometric.nn.aggr.PowerMeanAggregation(learn=True)
         self.heads = 1
-        self.in_channels = 2
+        self.in_channels = 4
         self.hidden_channels = hidden_channels
-        self.out_channels = 2
+        self.out_channels = 4
         self.num_layers = num_layers
         self.dropout = dropout
         self.act_fn = act_fn
@@ -351,12 +600,12 @@ class ACOPFGeneral(torch.nn.Module):
         #GATv2Conv(-1, self.hidden_channels, edge_dim=2)
         for _ in range(self.num_layers):
             conv = ModuleDict({
-                'SB': GeneralConv(-1,self.hidden_channels,2,attention=True,l2_normalize=True),#TransformerConv(-1, self.hidden_channels, edge_dim=2,heads=self.heads),
+                'SB': TransformerConv(-1, self.hidden_channels, edge_dim=2,heads=self.heads),
 
-                'PQ': GeneralConv(-1,self.hidden_channels,2,attention=True,l2_normalize=True),#TransformerConv(-1, self.hidden_channels, edge_dim=2,heads=self.heads),
+                'PQ': TransformerConv(-1, self.hidden_channels, edge_dim=2,heads=self.heads),
 
-                'PV': GeneralConv(-1,self.hidden_channels,2,attention=True,l2_normalize=True),#TransformerConv(-1, self.hidden_channels, edge_dim=2,heads=self.heads),
-                'NB': GeneralConv(-1,self.hidden_channels,2,attention=True,l2_normalize=True),#TransformerConv(-1, self.hidden_channels, edge_dim=2,heads=self.heads)
+                'PV': TransformerConv(-1, self.hidden_channels, edge_dim=2,heads=self.heads),
+                'NB': TransformerConv(-1, self.hidden_channels, edge_dim=2,heads=self.heads)
             })
 
             self.convs.append(conv)
@@ -389,7 +638,7 @@ class ACOPFGeneral(torch.nn.Module):
     def init_layer_norm(self, x_dict):
         self.set_meta_data(x_dict)
         self.norms = ModuleList()
-        norm_layer = HeteroMinMaxNorm()
+        norm_layer = HeteroStandardScaler()
 
         # for _ in range(self.num_layers):
         # self.norms.append(copy.deepcopy(norm_layer))
@@ -498,7 +747,6 @@ class ACOPFGeneral(torch.nn.Module):
                 out_dict[from_bus].append(out)
                 #print(f"shape: {out.shape}")
 
-
         # Calculate the Aggregations
         for key, value in out_dict.items():
             #print(f"key: {key}")
@@ -506,6 +754,7 @@ class ACOPFGeneral(torch.nn.Module):
             #print(f"shape before Aggr {shape}")
 
             val = self.group_wired(value)
+            out_dict[key] = val
 
             #print(f"shape after Aggr {val.shape}")
             fc = self.fcs[key]
@@ -520,7 +769,9 @@ class ACOPFGeneral(torch.nn.Module):
 
             #print(f"{key}: {len(out_dict[key])}")
 
-
+        # Normalization
+        #norm_layer = self.norms[0]
+        #out_dict = norm_layer(out_dict, self.node_types)
 
 
         return out_dict
@@ -646,15 +897,16 @@ class ACOPFGNN(torch.nn.Module):
             self.convs.append(conv)
 
 
-        fc = ModuleDict()
-        for node_type in self.node_types:
-            fc[node_type] = Linear(-1, self.out_channels, bias=True)
-        self.fcs = fc
-
     def lazy_init(self, lazy_input, net, index_mappers):
         x_dict, constraint_dict, edge_idx_dict, edge_attr_dict, bus_idx_neighbors_dict, scaler, _, _ = hp.extract_unsupervised_inputs(
             lazy_input, net, index_mappers)
-        self.node_types = list(set(self.node_types).intersection(set(x_dict.keys())))
+        node_type = list(set(self.node_types).intersection(set(x_dict.keys())))
+        self.node_types = {key: len(x_dict[key]) for key in node_type}
+        fc = ModuleDict()
+        for node_type in self.node_types:
+            fc[node_type] = Linear(-1, self.node_types[node_type] * self.out_channels, bias=True)
+        self.fcs = fc
+
         self.init_layer_norm(x_dict)
         output = self.forward(x_dict, constraint_dict, edge_idx_dict, edge_attr_dict, check_nans=True)
         print(output)
@@ -860,14 +1112,40 @@ class ACOPFGNN(torch.nn.Module):
     #
     #     return acopf_out_dict
 
-    def forward(self, _x_dict, constraint_dict, edge_idx_dict, edge_attr_dict,
-                check_nans: bool = False):
-        x_dict = dict()
+    def group(self, xs: List[Tensor]):
+        out = torch.cat(xs, dim=0)
+        return getattr(torch, self.aggr)(out, dim=1)
 
-        for node_type in _x_dict:
-            x = _x_dict[node_type]
-            c = constraint_dict[node_type]
-            x_dict[node_type] = torch.cat((x, c), dim=1)
+    def group_wired(self, out, dim) -> Optional[Tensor]:
+
+        #out = torch.cat(xs, dim=0)
+
+        half = int(dim/2)
+        quarter = int(dim/4)
+
+        V = out[:, :quarter]
+        delta = out[:, quarter:half]
+        P = out[:, half:half+quarter]
+        Q = out[:, half+quarter:]
+
+
+        V_i = getattr(torch, self.aggr)(V, dim=1)
+        delta_i = getattr(torch, self.aggr)(delta, dim=1)
+        P_i = getattr(torch, self.aggr)(P, dim=1)
+        Q_i = getattr(torch, self.aggr)(Q, dim=1)
+
+        out = torch.cat([V_i.view(-1, 1),delta_i.view(-1, 1),P_i.view(-1, 1), Q_i.view(-1, 1)], dim=1)
+
+        return out
+
+    def forward(self, x_dict, constraint_dict, edge_idx_dict, edge_attr_dict,
+                check_nans: bool = False):
+        #x_dict = dict()
+
+        #for node_type in _x_dict:
+            #x = _x_dict[node_type]
+            #c = constraint_dict[node_type]
+            #x_dict[node_type] = torch.cat((x, c), dim=1)
 
         torch.autograd.set_detect_anomaly(True)
         if check_nans:
@@ -904,32 +1182,35 @@ class ACOPFGNN(torch.nn.Module):
 
                 out_dict[dst].append(out)
 
+
+
         # Calculate the Aggregations
         for key, value in out_dict.items():
-            val = group(list(value), self.aggr)
-            out_dict[key] = self.act(self.lin(val))
-            if check_nans and torch.isnan(out_dict[key]).any():
-                print(f"NAN FOUND in AGGREGATION")
+            val = self.group(value).view(-1,1)
+            #print(f" AGGREGATION node_type: {key}, shape: {val.size()}")
+            fc = self.fcs[key]
+            out = self.act(fc(val))
+            ln = out.size()[0] * out.size()[1]
+            output = out.view(self.node_types[key], int(ln/self.node_types[key]))
+            #print(f"node_type: {key}, shape: {output.size()}")
+            features = self.group_wired(output, output.size()[1])
+            #print(f"FINAL node_type: {key}, shape: {features.size()}")
+            out_dict[key] = features #self.act(self.lin(val))
 
-        # Normalization
-        norm_layer = self.norms[0]
-        # for node_type in out_dict:
-        # out_dict[node_type] = torch.stack(flatten_and_reshape_tensors(out_dict[node_type]))
-        # print(f"shape of {node_type} is {out_dict[node_type].size()}")
-        out_dict = norm_layer(out_dict, self.node_types)
 
-        node_dict = defaultdict(list)
 
-        for i in range(self.num_layers):
-            for key, value in out_dict.items():
-                fc = self.fcs[i][key]
-                out = self.act(fc(value))
-                node_dict[key].append(out)
+        #node_dict = defaultdict(list)
+
+
+        #for key, value in out_dict.items():
+            #fc = self.fcs_last[key]
+            #out = self.act(fc(value))
+            #out_dict[key] = out
 
         # Calculate the Aggregations
-        for key, value in node_dict.items():
-            val = group(list(value), self.aggr)
-            node_dict[key] = self.act(self.lin_2(val))
+        #for key, value in node_dict.items():
+            #val = self.group_wired(value)
+            #node_dict[key] = self.act(self.lin_2(val))
 
             # if key == "NB":
             #   features = self.act(self.lin_2(val))
@@ -940,10 +1221,10 @@ class ACOPFGNN(torch.nn.Module):
             # enforced_features = torch.cat([V_node, delta_node, P_node, Q_node], dim=1)
             # node_dict[key] = enforced_features
 
-            if check_nans and torch.isnan(node_dict[key]).any():
-                print(f"NAN FOUND in AGGREGATION")
+            #if check_nans and torch.isnan(node_dict[key]).any():
+               # print(f"NAN FOUND in AGGREGATION")
 
-        return node_dict
+        return out_dict
 
 
 class ACOPFEmbedder(torch.nn.Module):
@@ -1573,6 +1854,39 @@ class ACOPFEnforcer(torch.nn.Module):
         """
         return node_dict
 
+class HeteroStandardScaler(nn.Module):
+    def __init__(self, eps=1e-5, momentum=0.1):
+        super().__init__()
+        self.eps = torch.tensor(eps)
+        self.momentum = torch.tensor(momentum)
+
+        # We need to keep track of the running mean and std across all node types
+        # Initialize running mean and std as learnable parameters
+        self.running_mean = nn.Parameter(torch.tensor(0.0))
+        self.running_std = nn.Parameter(torch.tensor(1.0))
+
+    def forward(self, x_dict, node_types):
+        # Extract node feature tensors and concatenate them
+        x_concat = torch.cat([x_dict[key] for key in node_types], dim=0)
+
+        # Compute the mean and std values for the current batch
+        batch_mean = x_concat.mean()
+        batch_std = x_concat.std()
+
+        # Update the running mean and std (detach to avoid backward pass issues)
+
+        self.running_mean.data = (torch.tensor(1.0) - self.momentum) * self.running_mean + self.momentum * batch_mean
+        self.running_std.data = (torch.tensor(1.0) - self.momentum) * self.running_std + self.momentum * batch_std
+
+        # Scale the concatenated tensor values to have mean 0 and std 1
+        x_scaled = (x_concat - self.running_mean) / (self.running_std + self.eps)
+
+        # Split the scaled tensor back into a dictionary format
+        split_sizes = [x_dict[key].size(0) for key in node_types]
+        x_split = torch.split(x_scaled, split_sizes, dim=0)
+
+        out_dict = {key: x_split[idx] for idx, key in enumerate(node_types)}
+        return out_dict
 
 class HeteroMinMaxNorm(nn.Module):
     def __init__(self, eps=1e-5, momentum=0.1):
