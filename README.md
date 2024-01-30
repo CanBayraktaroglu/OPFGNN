@@ -1,10 +1,21 @@
 # OPFGNN
 Master Thesis: Optimal Power in Power Systems using Graph Neural Networks
 
-## Models
+## Abstract
+This thesis investigates the Optimal Power Flow (OPF) problem in electrical networks,
+specifically focusing on the Alternating Current Optimal Power Flow (ACOPF) scenario.
+It explores the application of both Homogeneous and Heterogeneous Graph Neural
+Networks (GNNs) to optimize power generation and distribution, thereby enhancing
+network efficiency with a focus on network bus features. Motivated by the imperative
+of efficient energy management, the performance of these models is evaluated and
+compared against traditional numerical solvers. The research demonstrates the efficacy
+of GNNs in solving real-world power system challenges, offering valuable insights into
+their application in the energy optimization landscape. This work significantly contributes to the discourse on energy optimization techniques, emphasizing the feasibility
+and efficiency of GNNs in addressing intricate power system problems.
+
+## Best Performing Models
   - Homogeneous GNN (HGNN)
   - Node-Type Based Heterogeneous GNN (NHGNN)
-  - Edge-Type Based Heterogeneous GNN (EHGNN)
 
 ## Test Results
 ### HGNN: 
