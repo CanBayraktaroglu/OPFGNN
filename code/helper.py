@@ -338,7 +338,7 @@ def read_supervised_training_data(grid_name):
         assert (np.shape(x)[0] == np.shape(y)[0] and np.shape(x)[1] == np.shape(y)[1])
         val_data.append(Data(x=x, y=y, edge_index=edge_index, edge_attr=edge_weights, num_nodes=num_busses))
 
-    print("Processing Test Data for " + grid_name + " ...")
+    print("Processing TestData for " + grid_name + " ...")
 
     for data in test:
         x = data[:num_busses].drop(columns=["Unnamed: 0"])
@@ -445,7 +445,7 @@ def read_supervised_training_data_edge_attr(grid_name):
         assert (np.shape(x)[0] == np.shape(y)[0] and np.shape(x)[1] == np.shape(y)[1])
         val_data.append(Data(x=x, y=y, edge_index=edge_index, edge_attr=edge_attr, num_nodes=num_busses))
 
-    print("Processing Test Data for " + grid_name + " ...")
+    print("Processing TestData for " + grid_name + " ...")
 
     for data in test:
         x = data[:num_busses].drop(columns=["Unnamed: 0"])
@@ -1658,7 +1658,7 @@ def read_unsupervised_dataset(grid_name: str) -> Tuple[list, list, list]:
 
         val_data.append(hetero_data)
 
-    print("Processing Test Data for " + grid_name + " ...")
+    print("Processing TestData for " + grid_name + " ...")
 
     for data in test:
         hetero_data = HeteroData()
@@ -2058,7 +2058,6 @@ def save_unsupervised_inputs(grid_name: str, num_samples: int):
         pickle.dump(inputs, f)
 
     print("Inputs Saved.")
-
 
 def save_multiple_unsupervised_inputs(grid_names, num_samples):
     path = "../code/data/Heterogeneous/"
